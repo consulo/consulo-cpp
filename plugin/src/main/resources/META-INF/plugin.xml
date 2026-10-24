@@ -14,7 +14,7 @@
   - limitations under the License.
   -->
 
-<consulo-plugin url="https://github.com/consulo/incubating-consulo-cpp">
+<consulo-plugin url="https://github.com/consulo/consulo-cpp">
     <id>consulo.cpp</id>
     <depends>consulo.nativeDev</depends>
     <depends optional="true">consulo.msbuild</depends>
@@ -25,7 +25,6 @@
     <version>SNAPSHOT</version>
     <vendor>consulo.io</vendor>
     <category>Custom Languages</category>
-    <experimental>true</experimental>
 
     <tags>
         <tag>custom.language</tag>
