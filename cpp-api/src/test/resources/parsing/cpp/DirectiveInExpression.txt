@@ -1,0 +1,101 @@
+FILE
+  CPsiImplementingMethodImpl: int separator(int size, int c)
+{
+    if (size > 0 &&#ifdef WINDOWS
+        c != 1 &&
+#endif
+
+        c != 2)
+        return 1;
+    return 0;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('separator')
+    CPsiParameterListImpl: (int size, int c)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: int size
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('size')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int c
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('c')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    if (size > 0 &&#ifdef WINDOWS
+        c != 1 &&
+#endif
+
+        c != 2)
+        return 1;
+    return 0;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (size > 0 &&#ifdef WINDOWS
+        c != 1 &&
+#endif
+
+        c != 2)
+        return 1;
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiBinaryExpressionImpl: size > 0 &&#ifdef WINDOWS
+        c != 1 &&
+#endif
+
+        c != 2
+          CPsiBinaryExpressionImpl: size > 0
+            CPsiReferenceExpressionImpl: size
+              PsiElement(IDENTIFIER)('size')
+            PsiWhiteSpace(' ')
+            PsiElement(GT)('>')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0
+              PsiElement(INTEGER_LITERAL)('0')
+          PsiWhiteSpace(' ')
+          PsiElement(ANDAND)('&&')
+          PsiElement(OUTER)('#ifdef WINDOWS\n        c != 1 &&\n#endif')
+          PsiWhiteSpace('\n')
+          PsiWhiteSpace('\n        ')
+          CPsiBinaryExpressionImpl: c != 2
+            CPsiReferenceExpressionImpl: c
+              PsiElement(IDENTIFIER)('c')
+            PsiWhiteSpace(' ')
+            PsiElement(NE)('!=')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 2
+              PsiElement(INTEGER_LITERAL)('2')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiReturnStatementImpl: return 1;
+          PsiElement(RETURN_KEYWORD)('return')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: 1
+            PsiElement(INTEGER_LITERAL)('1')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return 0;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: 0
+          PsiElement(INTEGER_LITERAL)('0')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

@@ -1,0 +1,148 @@
+FILE
+  CPsiImplementingMethodImpl: BOOST_FILESYSTEM_DECL path path_algorithms::lexically_normal_v3(path const& p)
+{
+    return p;
+}
+    CPsiModifierListImpl: BOOST_FILESYSTEM_DECL
+      PsiElement(IDENTIFIER)('BOOST_FILESYSTEM_DECL')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: path
+      PsiElement(IDENTIFIER)('path')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path_algorithms::
+      PsiElement(IDENTIFIER)('path_algorithms')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('lexically_normal_v3')
+    CPsiParameterListImpl: (path const& p)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: path const& p
+        CPsiModifierListImpl: path const
+          PsiElement(IDENTIFIER)('path')
+          PsiWhiteSpace(' ')
+          PsiElement(CONST_KEYWORD)('const')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('p')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return p;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return p;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: p
+          PsiElement(IDENTIFIER)('p')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: BOOST_FILESYSTEM_DECL path::iterator path::begin() const
+{
+    return iterator();
+}
+    CPsiModifierListImpl: BOOST_FILESYSTEM_DECL
+      PsiElement(IDENTIFIER)('BOOST_FILESYSTEM_DECL')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: path::iterator
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('iterator')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path::
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('begin')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    PsiElement(CONST_KEYWORD)('const')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return iterator();
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return iterator();
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: iterator()
+          CPsiReferenceExpressionImpl: iterator
+            PsiElement(IDENTIFIER)('iterator')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: BOOST_FILESYSTEM_DECL std::locale path::imbue(std::locale const& loc)
+{
+    return loc;
+}
+    CPsiModifierListImpl: BOOST_FILESYSTEM_DECL
+      PsiElement(IDENTIFIER)('BOOST_FILESYSTEM_DECL')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: std::locale
+      PsiElement(IDENTIFIER)('std')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('locale')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path::
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('imbue')
+    CPsiParameterListImpl: (std::locale const& loc)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: std::locale const& loc
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::locale const
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('locale')
+          PsiWhiteSpace(' ')
+          PsiElement(CONST_KEYWORD)('const')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('loc')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return loc;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return loc;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: loc
+          PsiElement(IDENTIFIER)('loc')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiDeclarationMethodImpl: BOOST_FILESYSTEM_DECL void flush(path& p);
+    CPsiModifierListImpl: BOOST_FILESYSTEM_DECL
+      PsiElement(IDENTIFIER)('BOOST_FILESYSTEM_DECL')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('flush')
+    CPsiParameterListImpl: (path& p)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: path& p
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: path
+          PsiElement(IDENTIFIER)('path')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('p')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')

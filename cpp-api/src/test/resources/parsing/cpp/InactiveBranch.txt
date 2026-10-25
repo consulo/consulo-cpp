@@ -1,0 +1,56 @@
+FILE
+  CPsiImplementingMethodImpl: void normalize(int n)
+{#if defined(WINDOWS)
+    for (int i = 0; i < n; ++i)
+    {
+        if (i == 1)
+            mark(i);
+    }
+#endif
+
+    done();
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('normalize')
+    CPsiParameterListImpl: (int n)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: int n
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('n')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {#if defined(WINDOWS)
+    for (int i = 0; i < n; ++i)
+    {
+        if (i == 1)
+            mark(i);
+    }
+#endif
+
+    done();
+}
+      PsiElement(LBRACE)('{')
+      PsiElement(OUTER)('#if defined(WINDOWS)\n    for (int i = 0; i < n; ++i)\n    {\n        if (i == 1)\n            mark(i);\n    }\n#endif')
+      PsiWhiteSpace('\n')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: done();
+        CPsiCallExpressionImpl: done()
+          CPsiReferenceExpressionImpl: done
+            PsiElement(IDENTIFIER)('done')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiElement(OUTER)('#if defined(RETAIN)\nstruct retainer\n{\n    int value;\n};\n#endif')
+  PsiWhiteSpace('\n')
+  PsiWhiteSpace('\n\n')

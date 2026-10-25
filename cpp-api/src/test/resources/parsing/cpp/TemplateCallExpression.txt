@@ -1,0 +1,437 @@
+FILE
+  CPsiImplementingMethodImpl: std::codecvt_type const& codecvt()
+{
+    return std::use_facet< std::codecvt< wchar_t, char, std::mbstate_t > >(get_path_locale());
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: std::codecvt_type const
+      PsiElement(IDENTIFIER)('std')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('codecvt_type')
+      PsiWhiteSpace(' ')
+      PsiElement(CONST_KEYWORD)('const')
+    PsiElement(AND)('&')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('codecvt')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return std::use_facet< std::codecvt< wchar_t, char, std::mbstate_t > >(get_path_locale());
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return std::use_facet< std::codecvt< wchar_t, char, std::mbstate_t > >(get_path_locale());
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: std::use_facet< std::codecvt< wchar_t, char, std::mbstate_t > >(get_path_locale())
+          CPsiReferenceExpressionImpl: std::use_facet< std::codecvt< wchar_t, char, std::mbstate_t > >
+            CPsiReferenceExpressionImpl: std
+              PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('use_facet')
+            PsiElement(LT)('<')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('codecvt')
+            PsiElement(LT)('<')
+            PsiWhiteSpace(' ')
+            PsiElement(WCHAR_KEYWORD)('wchar_t')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            PsiElement(CHAR_KEYWORD)('char')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('mbstate_t')
+            PsiWhiteSpace(' ')
+            PsiElement(GT)('>')
+            PsiWhiteSpace(' ')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (get_path_locale())
+            PsiElement(LPARENTH)('(')
+            CPsiCallExpressionImpl: get_path_locale()
+              CPsiReferenceExpressionImpl: get_path_locale
+                PsiElement(IDENTIFIER)('get_path_locale')
+              CPsiArgumentListImpl: ()
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void calls(std::tuple<int, long> t, int a, int b, int c, int d)
+{
+    auto first = std::get<0>(t);
+    auto text = boost::lexical_cast<std::string>(a);
+    int largest = std::numeric_limits<int>::max();
+    std::vector<int> values = std::vector<int>{1, 2, 3};
+    auto pointer = std::make_shared<std::pair<int, int>>(a, b);
+    auto member = t.template get<1>();
+    auto shared = std::shared_ptr<T>(p->enable_shared_from_this<T>::shared_from_this(), p);
+    bool compare = a < b && c > (d);
+    bool chained = a < b || c > d;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('calls')
+    CPsiParameterListImpl: (std::tuple<int, long> t, int a, int b, int c, int d)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: std::tuple<int, long> t
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::tuple<int, long>
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('tuple')
+          PsiElement(LT)('<')
+          PsiElement(INT_KEYWORD)('int')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiElement(LONG_KEYWORD)('long')
+          PsiElement(GT)('>')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('t')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int a
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('a')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int b
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('b')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int c
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('c')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int d
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('d')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    auto first = std::get<0>(t);
+    auto text = boost::lexical_cast<std::string>(a);
+    int largest = std::numeric_limits<int>::max();
+    std::vector<int> values = std::vector<int>{1, 2, 3};
+    auto pointer = std::make_shared<std::pair<int, int>>(a, b);
+    auto member = t.template get<1>();
+    auto shared = std::shared_ptr<T>(p->enable_shared_from_this<T>::shared_from_this(), p);
+    bool compare = a < b && c > (d);
+    bool chained = a < b || c > d;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto first = std::get<0>(t);
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('first')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: std::get<0>(t)
+          CPsiReferenceExpressionImpl: std::get<0>
+            CPsiReferenceExpressionImpl: std
+              PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('get')
+            PsiElement(LT)('<')
+            PsiElement(INTEGER_LITERAL)('0')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (t)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: t
+              PsiElement(IDENTIFIER)('t')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto text = boost::lexical_cast<std::string>(a);
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('text')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: boost::lexical_cast<std::string>(a)
+          CPsiReferenceExpressionImpl: boost::lexical_cast<std::string>
+            CPsiReferenceExpressionImpl: boost
+              PsiElement(IDENTIFIER)('boost')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('lexical_cast')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('string')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (a)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: int largest = std::numeric_limits<int>::max();
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('largest')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: std::numeric_limits<int>::max()
+          CPsiReferenceExpressionImpl: std::numeric_limits<int>::max
+            CPsiReferenceExpressionImpl: std::numeric_limits<int>
+              CPsiReferenceExpressionImpl: std
+                PsiElement(IDENTIFIER)('std')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('numeric_limits')
+              PsiElement(LT)('<')
+              PsiElement(INT_KEYWORD)('int')
+              PsiElement(GT)('>')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('max')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: std::vector<int> values = std::vector<int>{1, 2, 3};
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::vector<int>
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('vector')
+          PsiElement(LT)('<')
+          PsiElement(INT_KEYWORD)('int')
+          PsiElement(GT)('>')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('values')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCastExpressionImpl: std::vector<int>{1, 2, 3}
+          CPsiReferenceExpressionImpl: std::vector<int>
+            CPsiReferenceExpressionImpl: std
+              PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('vector')
+            PsiElement(LT)('<')
+            PsiElement(INT_KEYWORD)('int')
+            PsiElement(GT)('>')
+          CPsiInitializerListImpl: {1, 2, 3}
+            PsiElement(LBRACE)('{')
+            CPsiLiteralExpressionImpl: 1
+              PsiElement(INTEGER_LITERAL)('1')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 2
+              PsiElement(INTEGER_LITERAL)('2')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 3
+              PsiElement(INTEGER_LITERAL)('3')
+            PsiElement(RBRACE)('}')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto pointer = std::make_shared<std::pair<int, int>>(a, b);
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('pointer')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: std::make_shared<std::pair<int, int>>(a, b)
+          CPsiReferenceExpressionImpl: std::make_shared<std::pair<int, int>>
+            CPsiReferenceExpressionImpl: std
+              PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('make_shared')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('pair')
+            PsiElement(LT)('<')
+            PsiElement(INT_KEYWORD)('int')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            PsiElement(INT_KEYWORD)('int')
+            PsiElement(GTGT)('>>')
+          CPsiArgumentListImpl: (a, b)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: b
+              PsiElement(IDENTIFIER)('b')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto member = t.template get<1>();
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('member')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: t.template get<1>()
+          CPsiReferenceExpressionImpl: t.template get<1>
+            CPsiReferenceExpressionImpl: t
+              PsiElement(IDENTIFIER)('t')
+            PsiElement(DOT)('.')
+            PsiElement(TEMPLATE_KEYWORD)('template')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('get')
+            PsiElement(LT)('<')
+            PsiElement(INTEGER_LITERAL)('1')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto shared = std::shared_ptr<T>(p->enable_shared_from_this<T>::shared_from_this(), p);
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('shared')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: std::shared_ptr<T>(p->enable_shared_from_this<T>::shared_from_this(), p)
+          CPsiReferenceExpressionImpl: std::shared_ptr<T>
+            CPsiReferenceExpressionImpl: std
+              PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('shared_ptr')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('T')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (p->enable_shared_from_this<T>::shared_from_this(), p)
+            PsiElement(LPARENTH)('(')
+            CPsiCallExpressionImpl: p->enable_shared_from_this<T>::shared_from_this()
+              CPsiReferenceExpressionImpl: p->enable_shared_from_this<T>::shared_from_this
+                CPsiReferenceExpressionImpl: p
+                  PsiElement(IDENTIFIER)('p')
+                PsiElement(ARROW)('->')
+                PsiElement(IDENTIFIER)('enable_shared_from_this')
+                PsiElement(LT)('<')
+                PsiElement(IDENTIFIER)('T')
+                PsiElement(GT)('>')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('shared_from_this')
+              CPsiArgumentListImpl: ()
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: p
+              PsiElement(IDENTIFIER)('p')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: bool compare = a < b && c > (d);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: bool
+          PsiElement(BOOL_KEYWORD)('bool')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('compare')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiBinaryExpressionImpl: a < b && c > (d)
+          CPsiBinaryExpressionImpl: a < b
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiWhiteSpace(' ')
+            PsiElement(LT)('<')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: b
+              PsiElement(IDENTIFIER)('b')
+          PsiWhiteSpace(' ')
+          PsiElement(ANDAND)('&&')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: c > (d)
+            CPsiReferenceExpressionImpl: c
+              PsiElement(IDENTIFIER)('c')
+            PsiWhiteSpace(' ')
+            PsiElement(GT)('>')
+            PsiWhiteSpace(' ')
+            CPsiParenthesizedExpressionImpl: (d)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: d
+                PsiElement(IDENTIFIER)('d')
+              PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: bool chained = a < b || c > d;
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: bool
+          PsiElement(BOOL_KEYWORD)('bool')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('chained')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiBinaryExpressionImpl: a < b || c > d
+          CPsiBinaryExpressionImpl: a < b
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiWhiteSpace(' ')
+            PsiElement(LT)('<')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: b
+              PsiElement(IDENTIFIER)('b')
+          PsiWhiteSpace(' ')
+          PsiElement(OROR)('||')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: c > d
+            CPsiReferenceExpressionImpl: c
+              PsiElement(IDENTIFIER)('c')
+            PsiWhiteSpace(' ')
+            PsiElement(GT)('>')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: d
+              PsiElement(IDENTIFIER)('d')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

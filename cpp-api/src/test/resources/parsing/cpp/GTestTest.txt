@@ -1,0 +1,431 @@
+FILE
+  CPsiStaticAssertImpl: static_assert(sizeof("CalcTest") > 1, "test_suite_name must not be empty");
+    PsiElement(STATIC_ASSERT_KEYWORD)('static_assert')
+    PsiElement(LPARENTH)('(')
+    CPsiBinaryExpressionImpl: sizeof("CalcTest") > 1
+      CPsiSizeofExpressionImpl: sizeof("CalcTest")
+        PsiElement(SIZEOF_KEYWORD)('sizeof')
+        CPsiParenthesizedExpressionImpl: ("CalcTest")
+          PsiElement(LPARENTH)('(')
+          CPsiLiteralExpressionImpl: "CalcTest"
+            PsiElement(STRING_LITERAL)('"CalcTest"')
+          PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(GT)('>')
+      PsiWhiteSpace(' ')
+      CPsiLiteralExpressionImpl: 1
+        PsiElement(INTEGER_LITERAL)('1')
+    PsiElement(COMMA)(',')
+    PsiWhiteSpace(' ')
+    CPsiLiteralExpressionImpl: "test_suite_name must not be empty"
+      PsiElement(STRING_LITERAL)('"test_suite_name must not be empty"')
+    PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace(' ')
+  CPsiStaticAssertImpl: static_assert(sizeof("AddsNumbers") > 1, "test_name must not be empty");
+    PsiElement(STATIC_ASSERT_KEYWORD)('static_assert')
+    PsiElement(LPARENTH)('(')
+    CPsiBinaryExpressionImpl: sizeof("AddsNumbers") > 1
+      CPsiSizeofExpressionImpl: sizeof("AddsNumbers")
+        PsiElement(SIZEOF_KEYWORD)('sizeof')
+        CPsiParenthesizedExpressionImpl: ("AddsNumbers")
+          PsiElement(LPARENTH)('(')
+          CPsiLiteralExpressionImpl: "AddsNumbers"
+            PsiElement(STRING_LITERAL)('"AddsNumbers"')
+          PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(GT)('>')
+      PsiWhiteSpace(' ')
+      CPsiLiteralExpressionImpl: 1
+        PsiElement(INTEGER_LITERAL)('1')
+    PsiElement(COMMA)(',')
+    PsiWhiteSpace(' ')
+    CPsiLiteralExpressionImpl: "test_name must not be empty"
+      PsiElement(STRING_LITERAL)('"test_name must not be empty"')
+    PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace(' ')
+  CPsiClassImpl: class CalcTest_AddsNumbers_Test : public ::testing::Test { public: CalcTest_AddsNumbers_Test() = default; ~CalcTest_AddsNumbers_Test() override = default; CalcTest_AddsNumbers_Test (const CalcTest_AddsNumbers_Test &) = delete; CalcTest_AddsNumbers_Test & operator=( const CalcTest_AddsNumbers_Test &) = delete; CalcTest_AddsNumbers_Test (CalcTest_AddsNumbers_Test &&) noexcept = delete; CalcTest_AddsNumbers_Test & operator=( CalcTest_AddsNumbers_Test &&) noexcept = delete; private: void TestBody() override; [[maybe_unused]] static ::testing::TestInfo* const test_info_; };
+    PsiElement(CLASS_KEYWORD)('class')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+    PsiWhiteSpace(' ')
+    CPsiSuperClassListImpl: : public ::testing::Test
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiSuperClassImpl: public ::testing::Test
+        PsiElement(PUBLIC_KEYWORD)('public')
+        PsiWhiteSpace(' ')
+        PsiElement(DOUBLE_COLON)('::')
+        PsiElement(IDENTIFIER)('testing')
+        PsiElement(DOUBLE_COLON)('::')
+        PsiElement(IDENTIFIER)('Test')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiAccessorOwnerImpl: public: CalcTest_AddsNumbers_Test() = default; ~CalcTest_AddsNumbers_Test() override = default; CalcTest_AddsNumbers_Test (const CalcTest_AddsNumbers_Test &) = delete; CalcTest_AddsNumbers_Test & operator=( const CalcTest_AddsNumbers_Test &) = delete; CalcTest_AddsNumbers_Test (CalcTest_AddsNumbers_Test &&) noexcept = delete; CalcTest_AddsNumbers_Test & operator=( CalcTest_AddsNumbers_Test &&) noexcept = delete;
+      PsiElement(PUBLIC_KEYWORD)('public')
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationConstructorImpl: CalcTest_AddsNumbers_Test() = default;
+        CPsiModifierListImpl: 
+          <empty list>
+        PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        CPsiParameterListImpl: ()
+          PsiElement(LPARENTH)('(')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DEFAULT_KEYWORD)('default')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationConstructorImpl: ~CalcTest_AddsNumbers_Test() override = default;
+        CPsiModifierListImpl: 
+          <empty list>
+        PsiElement(TILDE)('~')
+        PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        CPsiParameterListImpl: ()
+          PsiElement(LPARENTH)('(')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('override')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DEFAULT_KEYWORD)('default')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationConstructorImpl: CalcTest_AddsNumbers_Test (const CalcTest_AddsNumbers_Test &) = delete;
+        CPsiModifierListImpl: 
+          <empty list>
+        PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        PsiWhiteSpace(' ')
+        CPsiParameterListImpl: (const CalcTest_AddsNumbers_Test &)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: const CalcTest_AddsNumbers_Test &
+            CPsiModifierListImpl: const
+              PsiElement(CONST_KEYWORD)('const')
+            PsiWhiteSpace(' ')
+            CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+              PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+            PsiWhiteSpace(' ')
+            PsiElement(AND)('&')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DELETE_KEYWORD)('delete')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationMethodImpl: CalcTest_AddsNumbers_Test & operator=( const CalcTest_AddsNumbers_Test &) = delete;
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+          PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        PsiWhiteSpace(' ')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(OPERATOR_KEYWORD)('operator')
+        PsiElement(EQ)('=')
+        CPsiParameterListImpl: ( const CalcTest_AddsNumbers_Test &)
+          PsiElement(LPARENTH)('(')
+          PsiWhiteSpace(' ')
+          CPsiParameterImpl: const CalcTest_AddsNumbers_Test &
+            CPsiModifierListImpl: const
+              PsiElement(CONST_KEYWORD)('const')
+            PsiWhiteSpace(' ')
+            CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+              PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+            PsiWhiteSpace(' ')
+            PsiElement(AND)('&')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DELETE_KEYWORD)('delete')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationConstructorImpl: CalcTest_AddsNumbers_Test (CalcTest_AddsNumbers_Test &&) noexcept = delete;
+        CPsiModifierListImpl: 
+          <empty list>
+        PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        PsiWhiteSpace(' ')
+        CPsiParameterListImpl: (CalcTest_AddsNumbers_Test &&)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: CalcTest_AddsNumbers_Test &&
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+              PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+            PsiWhiteSpace(' ')
+            PsiElement(ANDAND)('&&')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DELETE_KEYWORD)('delete')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationMethodImpl: CalcTest_AddsNumbers_Test & operator=( CalcTest_AddsNumbers_Test &&) noexcept = delete;
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+          PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+        PsiWhiteSpace(' ')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(OPERATOR_KEYWORD)('operator')
+        PsiElement(EQ)('=')
+        CPsiParameterListImpl: ( CalcTest_AddsNumbers_Test &&)
+          PsiElement(LPARENTH)('(')
+          PsiWhiteSpace(' ')
+          CPsiParameterImpl: CalcTest_AddsNumbers_Test &&
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: CalcTest_AddsNumbers_Test
+              PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+            PsiWhiteSpace(' ')
+            PsiElement(ANDAND)('&&')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        PsiElement(DELETE_KEYWORD)('delete')
+        PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace(' ')
+    CPsiAccessorOwnerImpl: private: void TestBody() override; [[maybe_unused]] static ::testing::TestInfo* const test_info_;
+      PsiElement(PRIVATE_KEYWORD)('private')
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationMethodImpl: void TestBody() override;
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: void
+          PsiElement(VOID_KEYWORD)('void')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('TestBody')
+        CPsiParameterListImpl: ()
+          PsiElement(LPARENTH)('(')
+          PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('override')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      CPsiDeclarationFieldImpl: [[maybe_unused]] static ::testing::TestInfo* const test_info_;
+        CPsiModifierListImpl: [[maybe_unused]] static
+          CPsiAttributeListImpl: [[maybe_unused]]
+            PsiElement(LBRACKET)('[')
+            PsiElement(LBRACKET)('[')
+            PsiElement(IDENTIFIER)('maybe_unused')
+            PsiElement(RBRACKET)(']')
+            PsiElement(RBRACKET)(']')
+          PsiWhiteSpace(' ')
+          PsiElement(STATIC_KEYWORD)('static')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: ::testing::TestInfo
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('testing')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('TestInfo')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('test_info_')
+        PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace(' ')
+  CPsiFieldImpl: ::testing::TestInfo* const CalcTest_AddsNumbers_Test::test_info_ = ::testing::internal::MakeAndRegisterTestInfo( "CalcTest", "AddsNumbers", nullptr, nullptr, ::testing::internal::CodeLocation("calc_test.cpp", 5), (::testing::internal::GetTestTypeId()), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetSetUpCaseOrSuite("calc_test.cpp", 5), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetTearDownCaseOrSuite("calc_test.cpp", 5), new ::testing::internal::TestFactoryImpl<CalcTest_AddsNumbers_Test>);
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: ::testing::TestInfo
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('testing')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('TestInfo')
+    PsiElement(ASTERISK)('*')
+    PsiWhiteSpace(' ')
+    PsiElement(CONST_KEYWORD)('const')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: CalcTest_AddsNumbers_Test::
+      PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('test_info_')
+    PsiWhiteSpace(' ')
+    PsiElement(EQ)('=')
+    PsiWhiteSpace(' ')
+    CPsiCallExpressionImpl: ::testing::internal::MakeAndRegisterTestInfo( "CalcTest", "AddsNumbers", nullptr, nullptr, ::testing::internal::CodeLocation("calc_test.cpp", 5), (::testing::internal::GetTestTypeId()), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetSetUpCaseOrSuite("calc_test.cpp", 5), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetTearDownCaseOrSuite("calc_test.cpp", 5), new ::testing::internal::TestFactoryImpl<CalcTest_AddsNumbers_Test>)
+      CPsiReferenceExpressionImpl: ::testing::internal::MakeAndRegisterTestInfo
+        CPsiReferenceExpressionImpl: ::testing::internal
+          CPsiReferenceExpressionImpl: ::testing
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('testing')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('internal')
+        PsiElement(DOUBLE_COLON)('::')
+        PsiElement(IDENTIFIER)('MakeAndRegisterTestInfo')
+      CPsiArgumentListImpl: ( "CalcTest", "AddsNumbers", nullptr, nullptr, ::testing::internal::CodeLocation("calc_test.cpp", 5), (::testing::internal::GetTestTypeId()), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetSetUpCaseOrSuite("calc_test.cpp", 5), ::testing::internal::SuiteApiResolver< ::testing::Test>::GetTearDownCaseOrSuite("calc_test.cpp", 5), new ::testing::internal::TestFactoryImpl<CalcTest_AddsNumbers_Test>)
+        PsiElement(LPARENTH)('(')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: "CalcTest"
+          PsiElement(STRING_LITERAL)('"CalcTest"')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: "AddsNumbers"
+          PsiElement(STRING_LITERAL)('"AddsNumbers"')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: nullptr
+          PsiElement(NULLPTR_KEYWORD)('nullptr')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: nullptr
+          PsiElement(NULLPTR_KEYWORD)('nullptr')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: ::testing::internal::CodeLocation("calc_test.cpp", 5)
+          CPsiReferenceExpressionImpl: ::testing::internal::CodeLocation
+            CPsiReferenceExpressionImpl: ::testing::internal
+              CPsiReferenceExpressionImpl: ::testing
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('testing')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('internal')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('CodeLocation')
+          CPsiArgumentListImpl: ("calc_test.cpp", 5)
+            PsiElement(LPARENTH)('(')
+            CPsiLiteralExpressionImpl: "calc_test.cpp"
+              PsiElement(STRING_LITERAL)('"calc_test.cpp"')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 5
+              PsiElement(INTEGER_LITERAL)('5')
+            PsiElement(RPARENTH)(')')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiParenthesizedExpressionImpl: (::testing::internal::GetTestTypeId())
+          PsiElement(LPARENTH)('(')
+          CPsiCallExpressionImpl: ::testing::internal::GetTestTypeId()
+            CPsiReferenceExpressionImpl: ::testing::internal::GetTestTypeId
+              CPsiReferenceExpressionImpl: ::testing::internal
+                CPsiReferenceExpressionImpl: ::testing
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('testing')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('internal')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('GetTestTypeId')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+          PsiElement(RPARENTH)(')')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>::GetSetUpCaseOrSuite("calc_test.cpp", 5)
+          CPsiReferenceExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>::GetSetUpCaseOrSuite
+            CPsiReferenceExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>
+              CPsiReferenceExpressionImpl: ::testing::internal
+                CPsiReferenceExpressionImpl: ::testing
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('testing')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('internal')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('SuiteApiResolver')
+              PsiElement(LT)('<')
+              PsiWhiteSpace(' ')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('testing')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('Test')
+              PsiElement(GT)('>')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('GetSetUpCaseOrSuite')
+          CPsiArgumentListImpl: ("calc_test.cpp", 5)
+            PsiElement(LPARENTH)('(')
+            CPsiLiteralExpressionImpl: "calc_test.cpp"
+              PsiElement(STRING_LITERAL)('"calc_test.cpp"')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 5
+              PsiElement(INTEGER_LITERAL)('5')
+            PsiElement(RPARENTH)(')')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>::GetTearDownCaseOrSuite("calc_test.cpp", 5)
+          CPsiReferenceExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>::GetTearDownCaseOrSuite
+            CPsiReferenceExpressionImpl: ::testing::internal::SuiteApiResolver< ::testing::Test>
+              CPsiReferenceExpressionImpl: ::testing::internal
+                CPsiReferenceExpressionImpl: ::testing
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('testing')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('internal')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('SuiteApiResolver')
+              PsiElement(LT)('<')
+              PsiWhiteSpace(' ')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('testing')
+              PsiElement(DOUBLE_COLON)('::')
+              PsiElement(IDENTIFIER)('Test')
+              PsiElement(GT)('>')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('GetTearDownCaseOrSuite')
+          CPsiArgumentListImpl: ("calc_test.cpp", 5)
+            PsiElement(LPARENTH)('(')
+            CPsiLiteralExpressionImpl: "calc_test.cpp"
+              PsiElement(STRING_LITERAL)('"calc_test.cpp"')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 5
+              PsiElement(INTEGER_LITERAL)('5')
+            PsiElement(RPARENTH)(')')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiNewExpressionImpl: new ::testing::internal::TestFactoryImpl<CalcTest_AddsNumbers_Test>
+          PsiElement(NEW_KEYWORD)('new')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: ::testing::internal::TestFactoryImpl<CalcTest_AddsNumbers_Test>
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('testing')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('internal')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('TestFactoryImpl')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+            PsiElement(GT)('>')
+        PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace(' ')
+  CPsiImplementingMethodImpl: void CalcTest_AddsNumbers_Test::TestBody()
+{
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: CalcTest_AddsNumbers_Test::
+      PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('TestBody')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

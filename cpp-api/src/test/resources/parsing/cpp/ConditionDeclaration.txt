@@ -1,0 +1,394 @@
+FILE
+  CPsiImplementingMethodImpl: void conditions(int a, int b)
+{
+    if (int x = next())
+        use(x);
+    if (const ::testing::AssertionResult result = (compare(a, b)))
+        ;
+    if (TrueWithString message{})
+        use(message);
+    while (Node* node = take())
+        use(node);
+    if (auto it = find(a); it != end())
+        use(it);
+    switch (int c = read(); c)
+    {
+        case 0:
+            break;
+    }
+    if (a * b)
+        use(a);
+    if (a < b)
+        use(b);
+    do
+        use(a);
+    while (a < b);
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('conditions')
+    CPsiParameterListImpl: (int a, int b)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: int a
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('a')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int b
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('b')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    if (int x = next())
+        use(x);
+    if (const ::testing::AssertionResult result = (compare(a, b)))
+        ;
+    if (TrueWithString message{})
+        use(message);
+    while (Node* node = take())
+        use(node);
+    if (auto it = find(a); it != end())
+        use(it);
+    switch (int c = read(); c)
+    {
+        case 0:
+            break;
+    }
+    if (a * b)
+        use(a);
+    if (a < b)
+        use(b);
+    do
+        use(a);
+    while (a < b);
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (int x = next())
+        use(x);
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: int x = next()
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('x')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: next()
+            CPsiReferenceExpressionImpl: next
+              PsiElement(IDENTIFIER)('next')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(x);
+          CPsiCallExpressionImpl: use(x)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (x)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: x
+                PsiElement(IDENTIFIER)('x')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (const ::testing::AssertionResult result = (compare(a, b)))
+        ;
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: const ::testing::AssertionResult result = (compare(a, b))
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: ::testing::AssertionResult
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('testing')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('AssertionResult')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('result')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiParenthesizedExpressionImpl: (compare(a, b))
+            PsiElement(LPARENTH)('(')
+            CPsiCallExpressionImpl: compare(a, b)
+              CPsiReferenceExpressionImpl: compare
+                PsiElement(IDENTIFIER)('compare')
+              CPsiArgumentListImpl: (a, b)
+                PsiElement(LPARENTH)('(')
+                CPsiReferenceExpressionImpl: a
+                  PsiElement(IDENTIFIER)('a')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiReferenceExpressionImpl: b
+                  PsiElement(IDENTIFIER)('b')
+                PsiElement(RPARENTH)(')')
+            PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (TrueWithString message{})
+        use(message);
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: TrueWithString message{}
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: TrueWithString
+            PsiElement(IDENTIFIER)('TrueWithString')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('message')
+          CPsiInitializerListImpl: {}
+            PsiElement(LBRACE)('{')
+            PsiElement(RBRACE)('}')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(message);
+          CPsiCallExpressionImpl: use(message)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (message)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: message
+                PsiElement(IDENTIFIER)('message')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiWhileStatementImpl: while (Node* node = take())
+        use(node);
+        PsiElement(WHILE_KEYWORD)('while')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: Node* node = take()
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: Node
+            PsiElement(IDENTIFIER)('Node')
+          PsiElement(ASTERISK)('*')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('node')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: take()
+            CPsiReferenceExpressionImpl: take
+              PsiElement(IDENTIFIER)('take')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(node);
+          CPsiCallExpressionImpl: use(node)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (node)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: node
+                PsiElement(IDENTIFIER)('node')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (auto it = find(a); it != end())
+        use(it);
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: auto it = find(a)
+          CPsiModifierListImpl: auto
+            PsiElement(AUTO_KEYWORD)('auto')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('it')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: find(a)
+            CPsiReferenceExpressionImpl: find
+              PsiElement(IDENTIFIER)('find')
+            CPsiArgumentListImpl: (a)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: a
+                PsiElement(IDENTIFIER)('a')
+              PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        CPsiBinaryExpressionImpl: it != end()
+          CPsiReferenceExpressionImpl: it
+            PsiElement(IDENTIFIER)('it')
+          PsiWhiteSpace(' ')
+          PsiElement(NE)('!=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: end()
+            CPsiReferenceExpressionImpl: end
+              PsiElement(IDENTIFIER)('end')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(it);
+          CPsiCallExpressionImpl: use(it)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (it)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: it
+                PsiElement(IDENTIFIER)('it')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiSwitchStatementImpl: switch (int c = read(); c)
+    {
+        case 0:
+            break;
+    }
+        PsiElement(SWITCH_KEYWORD)('switch')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: int c = read()
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('c')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: read()
+            CPsiReferenceExpressionImpl: read
+              PsiElement(IDENTIFIER)('read')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: c
+          PsiElement(IDENTIFIER)('c')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n    ')
+        CPsiCodeBlockImpl: {
+        case 0:
+            break;
+    }
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          CPsiCaseStatementImpl: case 0:
+            PsiElement(CASE_KEYWORD)('case')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0
+              PsiElement(INTEGER_LITERAL)('0')
+            PsiElement(COLON)(':')
+          PsiWhiteSpace('\n            ')
+          CPsiBreakStatementImpl: break;
+            PsiElement(BREAK_KEYWORD)('break')
+            PsiElement(SEMICOLON)(';')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (a * b)
+        use(a);
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiBinaryExpressionImpl: a * b
+          CPsiReferenceExpressionImpl: a
+            PsiElement(IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(ASTERISK)('*')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: b
+            PsiElement(IDENTIFIER)('b')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(a);
+          CPsiCallExpressionImpl: use(a)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (a)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: a
+                PsiElement(IDENTIFIER)('a')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiIfStatementImpl: if (a < b)
+        use(b);
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiBinaryExpressionImpl: a < b
+          CPsiReferenceExpressionImpl: a
+            PsiElement(IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(LT)('<')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: b
+            PsiElement(IDENTIFIER)('b')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(b);
+          CPsiCallExpressionImpl: use(b)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (b)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: b
+                PsiElement(IDENTIFIER)('b')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDoWhileStatementImpl: do
+        use(a);
+    while (a < b);
+        PsiElement(DO_KEYWORD)('do')
+        PsiWhiteSpace('\n        ')
+        CPsiExpressionStatementImpl: use(a);
+          CPsiCallExpressionImpl: use(a)
+            CPsiReferenceExpressionImpl: use
+              PsiElement(IDENTIFIER)('use')
+            CPsiArgumentListImpl: (a)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: a
+                PsiElement(IDENTIFIER)('a')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace('\n    ')
+        PsiElement(WHILE_KEYWORD)('while')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiBinaryExpressionImpl: a < b
+          CPsiReferenceExpressionImpl: a
+            PsiElement(IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(LT)('<')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: b
+            PsiElement(IDENTIFIER)('b')
+        PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

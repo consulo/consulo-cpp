@@ -1,0 +1,473 @@
+FILE
+  CPsiImplementingMethodImpl: void CalcTest_AddsNumbers_Test::TestBody()
+{
+    switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message()) = ::testing::Message();
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: CalcTest_AddsNumbers_Test::
+      PsiElement(IDENTIFIER)('CalcTest_AddsNumbers_Test')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('TestBody')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    switch (0) case 0: default: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message()) = ::testing::Message();
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiSwitchStatementImpl: switch (0) case 0:
+        PsiElement(SWITCH_KEYWORD)('switch')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLiteralExpressionImpl: 0
+          PsiElement(INTEGER_LITERAL)('0')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        CPsiCaseStatementImpl: case 0:
+          PsiElement(CASE_KEYWORD)('case')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: 0
+            PsiElement(INTEGER_LITERAL)('0')
+          PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiDefaultStatementImpl: default:
+        PsiElement(DEFAULT_KEYWORD)('default')
+        PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiIfStatementImpl: if (const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5))) ; else ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message()) = ::testing::Message();
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: const ::testing::AssertionResult gtest_ar = (::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5))
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: ::testing::AssertionResult
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('testing')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('AssertionResult')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('gtest_ar')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiParenthesizedExpressionImpl: (::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5))
+            PsiElement(LPARENTH)('(')
+            CPsiCallExpressionImpl: ::testing::internal::EqHelper::Compare("calc::add(2, 3)", "5", calc::add(2, 3), 5)
+              CPsiReferenceExpressionImpl: ::testing::internal::EqHelper::Compare
+                CPsiReferenceExpressionImpl: ::testing::internal::EqHelper
+                  CPsiReferenceExpressionImpl: ::testing::internal
+                    CPsiReferenceExpressionImpl: ::testing
+                      PsiElement(DOUBLE_COLON)('::')
+                      PsiElement(IDENTIFIER)('testing')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('internal')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('EqHelper')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('Compare')
+              CPsiArgumentListImpl: ("calc::add(2, 3)", "5", calc::add(2, 3), 5)
+                PsiElement(LPARENTH)('(')
+                CPsiLiteralExpressionImpl: "calc::add(2, 3)"
+                  PsiElement(STRING_LITERAL)('"calc::add(2, 3)"')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiLiteralExpressionImpl: "5"
+                  PsiElement(STRING_LITERAL)('"5"')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiCallExpressionImpl: calc::add(2, 3)
+                  CPsiReferenceExpressionImpl: calc::add
+                    CPsiReferenceExpressionImpl: calc
+                      PsiElement(IDENTIFIER)('calc')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('add')
+                  CPsiArgumentListImpl: (2, 3)
+                    PsiElement(LPARENTH)('(')
+                    CPsiLiteralExpressionImpl: 2
+                      PsiElement(INTEGER_LITERAL)('2')
+                    PsiElement(COMMA)(',')
+                    PsiWhiteSpace(' ')
+                    CPsiLiteralExpressionImpl: 3
+                      PsiElement(INTEGER_LITERAL)('3')
+                    PsiElement(RPARENTH)(')')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiLiteralExpressionImpl: 5
+                  PsiElement(INTEGER_LITERAL)('5')
+                PsiElement(RPARENTH)(')')
+            PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(ELSE_KEYWORD)('else')
+        PsiWhiteSpace(' ')
+        CPsiExpressionStatementImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message()) = ::testing::Message();
+          CPsiAssignmentExpressionImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message()) = ::testing::Message()
+            CPsiCallExpressionImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message())
+              CPsiReferenceExpressionImpl: ::testing::internal::AssertHelper
+                CPsiReferenceExpressionImpl: ::testing::internal
+                  CPsiReferenceExpressionImpl: ::testing
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('testing')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('internal')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('AssertHelper')
+              CPsiArgumentListImpl: (::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 7, gtest_ar.failure_message())
+                PsiElement(LPARENTH)('(')
+                CPsiReferenceExpressionImpl: ::testing::TestPartResult::kNonFatalFailure
+                  CPsiReferenceExpressionImpl: ::testing::TestPartResult
+                    CPsiReferenceExpressionImpl: ::testing
+                      PsiElement(DOUBLE_COLON)('::')
+                      PsiElement(IDENTIFIER)('testing')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('TestPartResult')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('kNonFatalFailure')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiLiteralExpressionImpl: "calc_test.cpp"
+                  PsiElement(STRING_LITERAL)('"calc_test.cpp"')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiLiteralExpressionImpl: 7
+                  PsiElement(INTEGER_LITERAL)('7')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiCallExpressionImpl: gtest_ar.failure_message()
+                  CPsiReferenceExpressionImpl: gtest_ar.failure_message
+                    CPsiReferenceExpressionImpl: gtest_ar
+                      PsiElement(IDENTIFIER)('gtest_ar')
+                    PsiElement(DOT)('.')
+                    PsiElement(IDENTIFIER)('failure_message')
+                  CPsiArgumentListImpl: ()
+                    PsiElement(LPARENTH)('(')
+                    PsiElement(RPARENTH)(')')
+                PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            CPsiCallExpressionImpl: ::testing::Message()
+              CPsiReferenceExpressionImpl: ::testing::Message
+                CPsiReferenceExpressionImpl: ::testing
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('testing')
+                PsiElement(DOUBLE_COLON)('::')
+                PsiElement(IDENTIFIER)('Message')
+              CPsiArgumentListImpl: ()
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void CalcTest_DivisionByZeroThrows_Test::TestBody()
+{
+    switch (0) case 0: default: if (::testing::internal::TrueWithString gtest_msg{}) { bool gtest_caught_expected = false; try { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); } catch (std::invalid_argument const&) { gtest_caught_expected = true; } catch (...) { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; } if (!gtest_caught_expected) { goto gtest_label_testthrow_18; } } else gtest_label_testthrow_18 : ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message();
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: CalcTest_DivisionByZeroThrows_Test::
+      PsiElement(IDENTIFIER)('CalcTest_DivisionByZeroThrows_Test')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('TestBody')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    switch (0) case 0: default: if (::testing::internal::TrueWithString gtest_msg{}) { bool gtest_caught_expected = false; try { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); } catch (std::invalid_argument const&) { gtest_caught_expected = true; } catch (...) { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; } if (!gtest_caught_expected) { goto gtest_label_testthrow_18; } } else gtest_label_testthrow_18 : ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message();
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiSwitchStatementImpl: switch (0) case 0:
+        PsiElement(SWITCH_KEYWORD)('switch')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLiteralExpressionImpl: 0
+          PsiElement(INTEGER_LITERAL)('0')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        CPsiCaseStatementImpl: case 0:
+          PsiElement(CASE_KEYWORD)('case')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: 0
+            PsiElement(INTEGER_LITERAL)('0')
+          PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiDefaultStatementImpl: default:
+        PsiElement(DEFAULT_KEYWORD)('default')
+        PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiIfStatementImpl: if (::testing::internal::TrueWithString gtest_msg{}) { bool gtest_caught_expected = false; try { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); } catch (std::invalid_argument const&) { gtest_caught_expected = true; } catch (...) { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; } if (!gtest_caught_expected) { goto gtest_label_testthrow_18; } } else gtest_label_testthrow_18 : ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message();
+        PsiElement(IF_KEYWORD)('if')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: ::testing::internal::TrueWithString gtest_msg{}
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: ::testing::internal::TrueWithString
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('testing')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('internal')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('TrueWithString')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('gtest_msg')
+          CPsiInitializerListImpl: {}
+            PsiElement(LBRACE)('{')
+            PsiElement(RBRACE)('}')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        CPsiCodeBlockImpl: { bool gtest_caught_expected = false; try { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); } catch (std::invalid_argument const&) { gtest_caught_expected = true; } catch (...) { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; } if (!gtest_caught_expected) { goto gtest_label_testthrow_18; } }
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace(' ')
+          CPsiLocalVariableImpl: bool gtest_caught_expected = false;
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: bool
+              PsiElement(BOOL_KEYWORD)('bool')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('gtest_caught_expected')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: false
+              PsiElement(BOOL_LITERAL)('false')
+            PsiElement(SEMICOLON)(';')
+          PsiWhiteSpace(' ')
+          CPsiCodeBlockImpl: try { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); } catch (std::invalid_argument const&) { gtest_caught_expected = true; } catch (...) { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; }
+            PsiElement(TRY_KEYWORD)('try')
+            PsiWhiteSpace(' ')
+            CPsiCodeBlockImpl: { if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, ""); }
+              PsiElement(LBRACE)('{')
+              PsiWhiteSpace(' ')
+              CPsiIfStatementImpl: if (::testing::internal::AlwaysTrue()) { calc::divide(1, 0); } else static_assert(true, "");
+                PsiElement(IF_KEYWORD)('if')
+                PsiWhiteSpace(' ')
+                PsiElement(LPARENTH)('(')
+                CPsiCallExpressionImpl: ::testing::internal::AlwaysTrue()
+                  CPsiReferenceExpressionImpl: ::testing::internal::AlwaysTrue
+                    CPsiReferenceExpressionImpl: ::testing::internal
+                      CPsiReferenceExpressionImpl: ::testing
+                        PsiElement(DOUBLE_COLON)('::')
+                        PsiElement(IDENTIFIER)('testing')
+                      PsiElement(DOUBLE_COLON)('::')
+                      PsiElement(IDENTIFIER)('internal')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('AlwaysTrue')
+                  CPsiArgumentListImpl: ()
+                    PsiElement(LPARENTH)('(')
+                    PsiElement(RPARENTH)(')')
+                PsiElement(RPARENTH)(')')
+                PsiWhiteSpace(' ')
+                CPsiCodeBlockImpl: { calc::divide(1, 0); }
+                  PsiElement(LBRACE)('{')
+                  PsiWhiteSpace(' ')
+                  CPsiExpressionStatementImpl: calc::divide(1, 0);
+                    CPsiCallExpressionImpl: calc::divide(1, 0)
+                      CPsiReferenceExpressionImpl: calc::divide
+                        CPsiReferenceExpressionImpl: calc
+                          PsiElement(IDENTIFIER)('calc')
+                        PsiElement(DOUBLE_COLON)('::')
+                        PsiElement(IDENTIFIER)('divide')
+                      CPsiArgumentListImpl: (1, 0)
+                        PsiElement(LPARENTH)('(')
+                        CPsiLiteralExpressionImpl: 1
+                          PsiElement(INTEGER_LITERAL)('1')
+                        PsiElement(COMMA)(',')
+                        PsiWhiteSpace(' ')
+                        CPsiLiteralExpressionImpl: 0
+                          PsiElement(INTEGER_LITERAL)('0')
+                        PsiElement(RPARENTH)(')')
+                    PsiElement(SEMICOLON)(';')
+                  PsiWhiteSpace(' ')
+                  PsiElement(RBRACE)('}')
+                PsiWhiteSpace(' ')
+                PsiElement(ELSE_KEYWORD)('else')
+                PsiWhiteSpace(' ')
+                CPsiStaticAssertImpl: static_assert(true, "");
+                  PsiElement(STATIC_ASSERT_KEYWORD)('static_assert')
+                  PsiElement(LPARENTH)('(')
+                  CPsiLiteralExpressionImpl: true
+                    PsiElement(BOOL_LITERAL)('true')
+                  PsiElement(COMMA)(',')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: ""
+                    PsiElement(STRING_LITERAL)('""')
+                  PsiElement(RPARENTH)(')')
+                  PsiElement(SEMICOLON)(';')
+              PsiWhiteSpace(' ')
+              PsiElement(RBRACE)('}')
+            PsiWhiteSpace(' ')
+            PsiElement(CATCH_KEYWORD)('catch')
+            PsiWhiteSpace(' ')
+            CPsiParameterListImpl: (std::invalid_argument const&)
+              PsiElement(LPARENTH)('(')
+              CPsiParameterImpl: std::invalid_argument const&
+                CPsiModifierListImpl: 
+                  <empty list>
+                CPsiTypeRefImpl: std::invalid_argument const
+                  PsiElement(IDENTIFIER)('std')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('invalid_argument')
+                  PsiWhiteSpace(' ')
+                  PsiElement(CONST_KEYWORD)('const')
+                PsiElement(AND)('&')
+              PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            CPsiCodeBlockImpl: { gtest_caught_expected = true; }
+              PsiElement(LBRACE)('{')
+              PsiWhiteSpace(' ')
+              CPsiExpressionStatementImpl: gtest_caught_expected = true;
+                CPsiAssignmentExpressionImpl: gtest_caught_expected = true
+                  CPsiReferenceExpressionImpl: gtest_caught_expected
+                    PsiElement(IDENTIFIER)('gtest_caught_expected')
+                  PsiWhiteSpace(' ')
+                  PsiElement(EQ)('=')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: true
+                    PsiElement(BOOL_LITERAL)('true')
+                PsiElement(SEMICOLON)(';')
+              PsiWhiteSpace(' ')
+              PsiElement(RBRACE)('}')
+            PsiWhiteSpace(' ')
+            PsiElement(CATCH_KEYWORD)('catch')
+            PsiWhiteSpace(' ')
+            CPsiParameterListImpl: (...)
+              PsiElement(LPARENTH)('(')
+              CPsiParameterImpl: ...
+                PsiElement(ELLIPSIS)('...')
+              PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            CPsiCodeBlockImpl: { gtest_msg.value = "Actual: it throws a different type."; goto gtest_label_testthrow_18; }
+              PsiElement(LBRACE)('{')
+              PsiWhiteSpace(' ')
+              CPsiExpressionStatementImpl: gtest_msg.value = "Actual: it throws a different type.";
+                CPsiAssignmentExpressionImpl: gtest_msg.value = "Actual: it throws a different type."
+                  CPsiReferenceExpressionImpl: gtest_msg.value
+                    CPsiReferenceExpressionImpl: gtest_msg
+                      PsiElement(IDENTIFIER)('gtest_msg')
+                    PsiElement(DOT)('.')
+                    PsiElement(IDENTIFIER)('value')
+                  PsiWhiteSpace(' ')
+                  PsiElement(EQ)('=')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: "Actual: it throws a different type."
+                    PsiElement(STRING_LITERAL)('"Actual: it throws a different type."')
+                PsiElement(SEMICOLON)(';')
+              PsiWhiteSpace(' ')
+              CPsiGotoStatementImpl: goto gtest_label_testthrow_18;
+                PsiElement(GOTO_KEYWORD)('goto')
+                PsiWhiteSpace(' ')
+                PsiElement(IDENTIFIER)('gtest_label_testthrow_18')
+                PsiElement(SEMICOLON)(';')
+              PsiWhiteSpace(' ')
+              PsiElement(RBRACE)('}')
+          PsiWhiteSpace(' ')
+          CPsiIfStatementImpl: if (!gtest_caught_expected) { goto gtest_label_testthrow_18; }
+            PsiElement(IF_KEYWORD)('if')
+            PsiWhiteSpace(' ')
+            PsiElement(LPARENTH)('(')
+            CPsiPrefixExpressionImpl: !gtest_caught_expected
+              PsiElement(EXCL)('!')
+              CPsiReferenceExpressionImpl: gtest_caught_expected
+                PsiElement(IDENTIFIER)('gtest_caught_expected')
+            PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            CPsiCodeBlockImpl: { goto gtest_label_testthrow_18; }
+              PsiElement(LBRACE)('{')
+              PsiWhiteSpace(' ')
+              CPsiGotoStatementImpl: goto gtest_label_testthrow_18;
+                PsiElement(GOTO_KEYWORD)('goto')
+                PsiWhiteSpace(' ')
+                PsiElement(IDENTIFIER)('gtest_label_testthrow_18')
+                PsiElement(SEMICOLON)(';')
+              PsiWhiteSpace(' ')
+              PsiElement(RBRACE)('}')
+          PsiWhiteSpace(' ')
+          PsiElement(RBRACE)('}')
+        PsiWhiteSpace(' ')
+        PsiElement(ELSE_KEYWORD)('else')
+        PsiWhiteSpace(' ')
+        CPsiLabeledStatementImpl: gtest_label_testthrow_18 : ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message();
+          PsiElement(IDENTIFIER)('gtest_label_testthrow_18')
+          PsiWhiteSpace(' ')
+          PsiElement(COLON)(':')
+          PsiWhiteSpace(' ')
+          CPsiExpressionStatementImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message();
+            CPsiAssignmentExpressionImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str()) = ::testing::Message()
+              CPsiCallExpressionImpl: ::testing::internal::AssertHelper(::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str())
+                CPsiReferenceExpressionImpl: ::testing::internal::AssertHelper
+                  CPsiReferenceExpressionImpl: ::testing::internal
+                    CPsiReferenceExpressionImpl: ::testing
+                      PsiElement(DOUBLE_COLON)('::')
+                      PsiElement(IDENTIFIER)('testing')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('internal')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('AssertHelper')
+                CPsiArgumentListImpl: (::testing::TestPartResult::kNonFatalFailure, "calc_test.cpp", 18, gtest_msg.value.c_str())
+                  PsiElement(LPARENTH)('(')
+                  CPsiReferenceExpressionImpl: ::testing::TestPartResult::kNonFatalFailure
+                    CPsiReferenceExpressionImpl: ::testing::TestPartResult
+                      CPsiReferenceExpressionImpl: ::testing
+                        PsiElement(DOUBLE_COLON)('::')
+                        PsiElement(IDENTIFIER)('testing')
+                      PsiElement(DOUBLE_COLON)('::')
+                      PsiElement(IDENTIFIER)('TestPartResult')
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('kNonFatalFailure')
+                  PsiElement(COMMA)(',')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: "calc_test.cpp"
+                    PsiElement(STRING_LITERAL)('"calc_test.cpp"')
+                  PsiElement(COMMA)(',')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: 18
+                    PsiElement(INTEGER_LITERAL)('18')
+                  PsiElement(COMMA)(',')
+                  PsiWhiteSpace(' ')
+                  CPsiCallExpressionImpl: gtest_msg.value.c_str()
+                    CPsiReferenceExpressionImpl: gtest_msg.value.c_str
+                      CPsiReferenceExpressionImpl: gtest_msg.value
+                        CPsiReferenceExpressionImpl: gtest_msg
+                          PsiElement(IDENTIFIER)('gtest_msg')
+                        PsiElement(DOT)('.')
+                        PsiElement(IDENTIFIER)('value')
+                      PsiElement(DOT)('.')
+                      PsiElement(IDENTIFIER)('c_str')
+                    CPsiArgumentListImpl: ()
+                      PsiElement(LPARENTH)('(')
+                      PsiElement(RPARENTH)(')')
+                  PsiElement(RPARENTH)(')')
+              PsiWhiteSpace(' ')
+              PsiElement(EQ)('=')
+              PsiWhiteSpace(' ')
+              CPsiCallExpressionImpl: ::testing::Message()
+                CPsiReferenceExpressionImpl: ::testing::Message
+                  CPsiReferenceExpressionImpl: ::testing
+                    PsiElement(DOUBLE_COLON)('::')
+                    PsiElement(IDENTIFIER)('testing')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('Message')
+                CPsiArgumentListImpl: ()
+                  PsiElement(LPARENTH)('(')
+                  PsiElement(RPARENTH)(')')
+            PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

@@ -1,0 +1,262 @@
+FILE
+  CPsiTypeDeclarationImpl: typedef int size_type;
+    CPsiModifierListImpl: typedef
+      PsiElement(TYPEDEF_KEYWORD)('typedef')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('size_type')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  CPsiDeclarationMethodImpl: void unnamed(Foo, Bar);
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('unnamed')
+    CPsiParameterListImpl: (Foo, Bar)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: Foo
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: Bar
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Bar
+          PsiElement(IDENTIFIER)('Bar')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: std::string global(10, 'x');
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: std::string
+      PsiElement(IDENTIFIER)('std')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('string')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('global')
+    CPsiArgumentListImpl: (10, 'x')
+      PsiElement(LPARENTH)('(')
+      CPsiLiteralExpressionImpl: 10
+        PsiElement(INTEGER_LITERAL)('10')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiLiteralExpressionImpl: 'x'
+        PsiElement(CHARACTER_LITERAL)(''x'')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiDeclarationMethodImpl: Foo make();
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: Foo
+      PsiElement(IDENTIFIER)('Foo')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('make')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void normalize(const char* pathname, int size)
+{
+    path normal(pathname, pathname + size);
+    size_type pos(name.rfind(dot));
+    atomic_ref< std::locale* > a(locale);
+    std::string text(10, 'x');
+    void helper(int, const char*);
+    Foo produce();
+    Foo convert(size_type);
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('normalize')
+    CPsiParameterListImpl: (const char* pathname, int size)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: const char* pathname
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: char
+          PsiElement(CHAR_KEYWORD)('char')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('pathname')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int size
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('size')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    path normal(pathname, pathname + size);
+    size_type pos(name.rfind(dot));
+    atomic_ref< std::locale* > a(locale);
+    std::string text(10, 'x');
+    void helper(int, const char*);
+    Foo produce();
+    Foo convert(size_type);
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: path normal(pathname, pathname + size);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: path
+          PsiElement(IDENTIFIER)('path')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('normal')
+        CPsiArgumentListImpl: (pathname, pathname + size)
+          PsiElement(LPARENTH)('(')
+          CPsiReferenceExpressionImpl: pathname
+            PsiElement(IDENTIFIER)('pathname')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: pathname + size
+            CPsiReferenceExpressionImpl: pathname
+              PsiElement(IDENTIFIER)('pathname')
+            PsiWhiteSpace(' ')
+            PsiElement(PLUS)('+')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: size
+              PsiElement(IDENTIFIER)('size')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: size_type pos(name.rfind(dot));
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: size_type
+          PsiElement(IDENTIFIER)('size_type')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('pos')
+        CPsiArgumentListImpl: (name.rfind(dot))
+          PsiElement(LPARENTH)('(')
+          CPsiCallExpressionImpl: name.rfind(dot)
+            CPsiReferenceExpressionImpl: name.rfind
+              CPsiReferenceExpressionImpl: name
+                PsiElement(IDENTIFIER)('name')
+              PsiElement(DOT)('.')
+              PsiElement(IDENTIFIER)('rfind')
+            CPsiArgumentListImpl: (dot)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: dot
+                PsiElement(IDENTIFIER)('dot')
+              PsiElement(RPARENTH)(')')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: atomic_ref< std::locale* > a(locale);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: atomic_ref< std::locale* >
+          PsiElement(IDENTIFIER)('atomic_ref')
+          PsiElement(LT)('<')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('locale')
+          PsiElement(ASTERISK)('*')
+          PsiWhiteSpace(' ')
+          PsiElement(GT)('>')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('a')
+        CPsiArgumentListImpl: (locale)
+          PsiElement(LPARENTH)('(')
+          CPsiReferenceExpressionImpl: locale
+            PsiElement(IDENTIFIER)('locale')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: std::string text(10, 'x');
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::string
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('string')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('text')
+        CPsiArgumentListImpl: (10, 'x')
+          PsiElement(LPARENTH)('(')
+          CPsiLiteralExpressionImpl: 10
+            PsiElement(INTEGER_LITERAL)('10')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: 'x'
+            PsiElement(CHARACTER_LITERAL)(''x'')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: void helper(int, const char*);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: void
+          PsiElement(VOID_KEYWORD)('void')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('helper')
+        CPsiParameterListImpl: (int, const char*)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: int
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: int
+              PsiElement(INT_KEYWORD)('int')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiParameterImpl: const char*
+            CPsiModifierListImpl: const
+              PsiElement(CONST_KEYWORD)('const')
+            PsiWhiteSpace(' ')
+            CPsiTypeRefImpl: char
+              PsiElement(CHAR_KEYWORD)('char')
+            PsiElement(ASTERISK)('*')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: Foo produce();
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('produce')
+        CPsiParameterListImpl: ()
+          PsiElement(LPARENTH)('(')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: Foo convert(size_type);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('convert')
+        CPsiParameterListImpl: (size_type)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: size_type
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: size_type
+              PsiElement(IDENTIFIER)('size_type')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

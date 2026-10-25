@@ -1,0 +1,137 @@
+FILE
+  PsiElement(OUTER)('#define LIST_TESTS(T, FUNC) static_assert(FUNC(T(1), T(2)) == T(2));')
+  PsiWhiteSpace('\n\n')
+  CPsiStaticAssertImpl: LIST_TESTS(double, __builtin_fmax)
+    CPreprocessorMacroInvocation(LIST_TESTS)('LIST_TESTS(double, __builtin_fmax)')
+    ForeignLeaf(STATIC_ASSERT_KEYWORD: static_assert)('static_assert')
+    ForeignLeaf(LPARENTH: ()('(')
+    CPsiBinaryExpressionImpl: 
+      CPsiCallExpressionImpl: 
+        CPsiReferenceExpressionImpl: 
+          ForeignLeaf(IDENTIFIER: __builtin_fmax)('__builtin_fmax')
+        CPsiArgumentListImpl: 
+          ForeignLeaf(LPARENTH: ()('(')
+          CPsiCastExpressionImpl: 
+            ForeignLeaf(DOUBLE_KEYWORD: double)('double')
+            CPsiArgumentListImpl: 
+              ForeignLeaf(LPARENTH: ()('(')
+              CPsiLiteralExpressionImpl: 
+                ForeignLeaf(INTEGER_LITERAL: 1)('1')
+              ForeignLeaf(RPARENTH: ))(')')
+          ForeignLeaf(COMMA: ,)(',')
+          CPsiCastExpressionImpl: 
+            ForeignLeaf(DOUBLE_KEYWORD: double)('double')
+            CPsiArgumentListImpl: 
+              ForeignLeaf(LPARENTH: ()('(')
+              CPsiLiteralExpressionImpl: 
+                ForeignLeaf(INTEGER_LITERAL: 2)('2')
+              ForeignLeaf(RPARENTH: ))(')')
+          ForeignLeaf(RPARENTH: ))(')')
+      ForeignLeaf(EQEQ: ==)('==')
+      CPsiCastExpressionImpl: 
+        ForeignLeaf(DOUBLE_KEYWORD: double)('double')
+        CPsiArgumentListImpl: 
+          ForeignLeaf(LPARENTH: ()('(')
+          CPsiLiteralExpressionImpl: 
+            ForeignLeaf(INTEGER_LITERAL: 2)('2')
+          ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  PsiWhiteSpace('\n')
+  CPsiStaticAssertImpl: LIST_TESTS(float, __builtin_fmaxf)
+    CPreprocessorMacroInvocation(LIST_TESTS)('LIST_TESTS(float, __builtin_fmaxf)')
+    ForeignLeaf(STATIC_ASSERT_KEYWORD: static_assert)('static_assert')
+    ForeignLeaf(LPARENTH: ()('(')
+    CPsiBinaryExpressionImpl: 
+      CPsiCallExpressionImpl: 
+        CPsiReferenceExpressionImpl: 
+          ForeignLeaf(IDENTIFIER: __builtin_fmaxf)('__builtin_fmaxf')
+        CPsiArgumentListImpl: 
+          ForeignLeaf(LPARENTH: ()('(')
+          CPsiCastExpressionImpl: 
+            ForeignLeaf(FLOAT_KEYWORD: float)('float')
+            CPsiArgumentListImpl: 
+              ForeignLeaf(LPARENTH: ()('(')
+              CPsiLiteralExpressionImpl: 
+                ForeignLeaf(INTEGER_LITERAL: 1)('1')
+              ForeignLeaf(RPARENTH: ))(')')
+          ForeignLeaf(COMMA: ,)(',')
+          CPsiCastExpressionImpl: 
+            ForeignLeaf(FLOAT_KEYWORD: float)('float')
+            CPsiArgumentListImpl: 
+              ForeignLeaf(LPARENTH: ()('(')
+              CPsiLiteralExpressionImpl: 
+                ForeignLeaf(INTEGER_LITERAL: 2)('2')
+              ForeignLeaf(RPARENTH: ))(')')
+          ForeignLeaf(RPARENTH: ))(')')
+      ForeignLeaf(EQEQ: ==)('==')
+      CPsiCastExpressionImpl: 
+        ForeignLeaf(FLOAT_KEYWORD: float)('float')
+        CPsiArgumentListImpl: 
+          ForeignLeaf(LPARENTH: ()('(')
+          CPsiLiteralExpressionImpl: 
+            ForeignLeaf(INTEGER_LITERAL: 2)('2')
+          ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void g()
+{
+    f(nullptr, __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i)));
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('g')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    f(nullptr, __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i)));
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: f(nullptr, __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i)));
+        CPsiCallExpressionImpl: f(nullptr, __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i)))
+          CPsiReferenceExpressionImpl: f
+            PsiElement(IDENTIFIER)('f')
+          CPsiArgumentListImpl: (nullptr, __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i)))
+            PsiElement(LPARENTH)('(')
+            CPsiLiteralExpressionImpl: nullptr
+              PsiElement(NULLPTR_KEYWORD)('nullptr')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiCallExpressionImpl: __builtin_bit_cast(std::nullptr_t, static_cast<void*>(&i))
+              CPsiReferenceExpressionImpl: __builtin_bit_cast
+                PsiElement(IDENTIFIER)('__builtin_bit_cast')
+              CPsiArgumentListImpl: (std::nullptr_t, static_cast<void*>(&i))
+                PsiElement(LPARENTH)('(')
+                CPsiReferenceExpressionImpl: std::nullptr_t
+                  CPsiReferenceExpressionImpl: std
+                    PsiElement(IDENTIFIER)('std')
+                  PsiElement(DOUBLE_COLON)('::')
+                  PsiElement(IDENTIFIER)('nullptr_t')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiCastExpressionImpl: static_cast<void*>(&i)
+                  PsiElement(CAST_KEYWORD)('static_cast')
+                  PsiElement(LT)('<')
+                  CPsiTypeRefImpl: void
+                    PsiElement(VOID_KEYWORD)('void')
+                  PsiElement(ASTERISK)('*')
+                  PsiElement(GT)('>')
+                  PsiElement(LPARENTH)('(')
+                  CPsiPrefixExpressionImpl: &i
+                    PsiElement(AND)('&')
+                    CPsiReferenceExpressionImpl: i
+                      PsiElement(IDENTIFIER)('i')
+                  PsiElement(RPARENTH)(')')
+                PsiElement(RPARENTH)(')')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

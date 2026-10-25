@@ -1,0 +1,128 @@
+FILE
+  CPsiTypeDeclarationImpl: typedef void (*init_func_ptr_t)();
+    CPsiModifierListImpl: typedef
+      PsiElement(TYPEDEF_KEYWORD)('typedef')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(LPARENTH)('(')
+    PsiElement(ASTERISK)('*')
+    PsiElement(IDENTIFIER)('init_func_ptr_t')
+    PsiElement(RPARENTH)(')')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  PsiElement(OUTER)('#if defined(_MSC_VER)\n\n#if _MSC_VER >= 1400\n\n#pragma section(".CRT$XCM", long, read)\n__declspec(allocate(".CRT$XCM")) RETAIN_ATTRIBUTE\nextern const init_func_ptr_t p_init_globals = &init_globals;\n\n#else // _MSC_VER >= 1400\n\n#if (_MSC_VER >= 1300)\n#pragma data_seg(push, old_seg)\n#endif\n#pragma data_seg(".CRT$XCM")\nextern const init_func_ptr_t p_init_globals = &init_globals;\n#pragma data_seg()\n\n#endif // _MSC_VER >= 1400\n\n#if defined(NO_ATTRIBUTE_RETAIN)\nstruct globals_retainer\n{\n    const init_func_ptr_t* volatile m_p_init_globals;\n\n    globals_retainer() { m_p_init_globals = &p_init_globals; }\n};\nUNUSED_ATTRIBUTE\nstatic const globals_retainer g_globals_retainer;\n#endif // defined(NO_ATTRIBUTE_RETAIN)\n\n#else ')
+  PsiComment(END_OF_LINE_COMMENT)('// defined(_MSC_VER)')
+  PsiWhiteSpace('\n\n')
+  CPsiStructDeclarationImpl: struct deleter
+{
+    ~deleter() { cleanup(); }
+};
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('deleter')
+    PsiWhiteSpace('\n')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n    ')
+    CPsiImplementingMethodImpl: ~deleter() { cleanup(); }
+      CPsiModifierListImpl: 
+        <empty list>
+      PsiElement(TILDE)('~')
+      PsiElement(IDENTIFIER)('deleter')
+      CPsiParameterListImpl: ()
+        PsiElement(LPARENTH)('(')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: { cleanup(); }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiExpressionStatementImpl: cleanup();
+          CPsiCallExpressionImpl: cleanup()
+            CPsiReferenceExpressionImpl: cleanup
+              PsiElement(IDENTIFIER)('cleanup')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiElement(OUTER)('#endif')
+  PsiWhiteSpace('\n\n')
+  PsiWhiteSpace(' ')
+  PsiComment(END_OF_LINE_COMMENT)('// defined(_MSC_VER)')
+  PsiWhiteSpace('\n\n')
+  CPsiStructDeclarationImpl: struct globals_retainer_active
+{
+    const init_func_ptr_t* volatile m_p_init_globals;
+
+    globals_retainer_active() { m_p_init_globals = nullptr; }
+};
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('globals_retainer_active')
+    PsiWhiteSpace('\n')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n    ')
+    CPsiDeclarationFieldImpl: const init_func_ptr_t* volatile m_p_init_globals;
+      CPsiModifierListImpl: const
+        PsiElement(CONST_KEYWORD)('const')
+      PsiWhiteSpace(' ')
+      CPsiTypeRefImpl: init_func_ptr_t
+        PsiElement(IDENTIFIER)('init_func_ptr_t')
+      PsiElement(ASTERISK)('*')
+      PsiWhiteSpace(' ')
+      PsiElement(VOLATILE_KEYWORD)('volatile')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('m_p_init_globals')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n\n    ')
+    CPsiImplementingMethodImpl: globals_retainer_active() { m_p_init_globals = nullptr; }
+      CPsiModifierListImpl: 
+        <empty list>
+      PsiElement(IDENTIFIER)('globals_retainer_active')
+      CPsiParameterListImpl: ()
+        PsiElement(LPARENTH)('(')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: { m_p_init_globals = nullptr; }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiExpressionStatementImpl: m_p_init_globals = nullptr;
+          CPsiAssignmentExpressionImpl: m_p_init_globals = nullptr
+            CPsiReferenceExpressionImpl: m_p_init_globals
+              PsiElement(IDENTIFIER)('m_p_init_globals')
+            PsiWhiteSpace(' ')
+            PsiElement(EQ)('=')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: nullptr
+              PsiElement(NULLPTR_KEYWORD)('nullptr')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: UNUSED_ATTRIBUTE
+static const globals_retainer_active g_active_retainer;
+    CPsiModifierListImpl: UNUSED_ATTRIBUTE
+static const
+      PsiElement(IDENTIFIER)('UNUSED_ATTRIBUTE')
+      PsiWhiteSpace('\n')
+      PsiElement(STATIC_KEYWORD)('static')
+      PsiWhiteSpace(' ')
+      PsiElement(CONST_KEYWORD)('const')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: globals_retainer_active
+      PsiElement(IDENTIFIER)('globals_retainer_active')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('g_active_retainer')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')

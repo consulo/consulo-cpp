@@ -1,0 +1,147 @@
+FILE
+  CPsiImplementingMethodImpl: std::locale path::imbue(std::locale const& loc)
+{
+    return loc;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: std::locale
+      PsiElement(IDENTIFIER)('std')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('locale')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path::
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('imbue')
+    CPsiParameterListImpl: (std::locale const& loc)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: std::locale const& loc
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::locale const
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('locale')
+          PsiWhiteSpace(' ')
+          PsiElement(CONST_KEYWORD)('const')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('loc')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return loc;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return loc;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: loc
+          PsiElement(IDENTIFIER)('loc')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: __attribute__((visibility("default"))) std::locale path::imbue2(std::locale const& loc)
+{
+    return loc;
+}
+    CPsiModifierListImpl: __attribute__((visibility("default")))
+      CPsiAttributeListImpl: __attribute__((visibility("default")))
+        PsiElement(ATTRIBUTE_KEYWORD)('__attribute__')
+        PsiElement(LPARENTH)('(')
+        PsiElement(LPARENTH)('(')
+        PsiElement(IDENTIFIER)('visibility')
+        PsiElement(LPARENTH)('(')
+        PsiElement(STRING_LITERAL)('"default"')
+        PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: std::locale
+      PsiElement(IDENTIFIER)('std')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('locale')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path::
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('imbue2')
+    CPsiParameterListImpl: (std::locale const& loc)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: std::locale const& loc
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::locale const
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('locale')
+          PsiWhiteSpace(' ')
+          PsiElement(CONST_KEYWORD)('const')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('loc')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return loc;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return loc;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: loc
+          PsiElement(IDENTIFIER)('loc')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: __attribute__((visibility("default"))) path::codecvt_type const& path::codecvt()
+{
+    return codecvt_facet;
+}
+    CPsiModifierListImpl: __attribute__((visibility("default")))
+      CPsiAttributeListImpl: __attribute__((visibility("default")))
+        PsiElement(ATTRIBUTE_KEYWORD)('__attribute__')
+        PsiElement(LPARENTH)('(')
+        PsiElement(LPARENTH)('(')
+        PsiElement(IDENTIFIER)('visibility')
+        PsiElement(LPARENTH)('(')
+        PsiElement(STRING_LITERAL)('"default"')
+        PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: path::codecvt_type const
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+      PsiElement(IDENTIFIER)('codecvt_type')
+      PsiWhiteSpace(' ')
+      PsiElement(CONST_KEYWORD)('const')
+    PsiElement(AND)('&')
+    PsiWhiteSpace(' ')
+    CPsiDoubleColonTypeRefImpl: path::
+      PsiElement(IDENTIFIER)('path')
+      PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('codecvt')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return codecvt_facet;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return codecvt_facet;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: codecvt_facet
+          PsiElement(IDENTIFIER)('codecvt_facet')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

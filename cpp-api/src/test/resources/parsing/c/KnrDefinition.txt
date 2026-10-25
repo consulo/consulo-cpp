@@ -1,0 +1,118 @@
+FILE
+  CPsiImplementingMethodImpl: int g(i)
+    int i __attribute__((__unused__));
+{
+    return 0;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('g')
+    CPsiParameterListImpl: (i)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: i
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: i
+          PsiElement(IDENTIFIER)('i')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n    ')
+    CPsiLocalVariableImpl: int i __attribute__((__unused__));
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: int
+        PsiElement(INT_KEYWORD)('int')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('i')
+      PsiWhiteSpace(' ')
+      CPsiAttributeListImpl: __attribute__((__unused__))
+        PsiElement(ATTRIBUTE_KEYWORD)('__attribute__')
+        PsiElement(LPARENTH)('(')
+        PsiElement(LPARENTH)('(')
+        PsiElement(IDENTIFIER)('__unused__')
+        PsiElement(RPARENTH)(')')
+        PsiElement(RPARENTH)(')')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return 0;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return 0;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: 0
+          PsiElement(INTEGER_LITERAL)('0')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: long sum(a, b)
+    int a;
+    long b;
+{
+    return a + b;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: long
+      PsiElement(LONG_KEYWORD)('long')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('sum')
+    CPsiParameterListImpl: (a, b)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: a
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: a
+          PsiElement(IDENTIFIER)('a')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: b
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: b
+          PsiElement(IDENTIFIER)('b')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n    ')
+    CPsiLocalVariableImpl: int a;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: int
+        PsiElement(INT_KEYWORD)('int')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('a')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n    ')
+    CPsiLocalVariableImpl: long b;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: long
+        PsiElement(LONG_KEYWORD)('long')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('b')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    return a + b;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return a + b;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiBinaryExpressionImpl: a + b
+          CPsiReferenceExpressionImpl: a
+            PsiElement(IDENTIFIER)('a')
+          PsiWhiteSpace(' ')
+          PsiElement(PLUS)('+')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: b
+            PsiElement(IDENTIFIER)('b')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')
