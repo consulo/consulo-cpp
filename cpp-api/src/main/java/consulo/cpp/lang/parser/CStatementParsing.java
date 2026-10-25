@@ -21,7 +21,8 @@ import consulo.language.ast.IElementType;
 import consulo.language.parser.PsiBuilder;
 
 /**
- * Statements and code blocks.
+ * C statements and code blocks. What C++ adds - {@code try}, declarations in conditions, range {@code for},
+ * coroutine returns - is in {@link CppStatementParsing}, through the protected hooks here.
  *
  * @author VISTALL
  * @since 2026-10-19
@@ -76,7 +77,7 @@ public class CStatementParsing extends CParsingBase {
         else if (type == DEFAULT_KEYWORD) {
             parseDefaultStatement();
         }
-        else if (type == RETURN_KEYWORD) {
+        else if (type == RETURN_KEYWORD || isLanguageReturnStart()) {
             parseReturnStatement();
         }
         else if (type == BREAK_KEYWORD) {
@@ -88,12 +89,19 @@ public class CStatementParsing extends CParsingBase {
         else if (type == GOTO_KEYWORD) {
             parseGotoStatement();
         }
-        else if (type == TRY_KEYWORD) {
-            parseTryStatement();
+        else if (parseLanguageStatement()) {
+            // a statement of the language beyond C
         }
         else if (type == SEMICOLON) {
             // the null statement
             advance();
+        }
+        else if (declarations().isAttributeStart() && isAttributedStatement()) {
+            // an attributed statement, [[fallthrough]]; [[likely]] return x; [[clang::code_align(16)]] for (...)
+            declarations().parseAttributes();
+            if (!consume(SEMICOLON)) {
+                parseStatement();
+            }
         }
         else if (type == IDENTIFIER && lookAhead(1) == COLON) {
             parseLabeledStatement();
@@ -112,6 +120,55 @@ public class CStatementParsing extends CParsingBase {
         }
     }
 
+    /**
+     * A statement of the language beyond C; whether there was one.
+     */
+    protected boolean parseLanguageStatement() {
+        return false;
+    }
+
+    /**
+     * Whether a return of the language beyond C starts here, {@code co_return}.
+     */
+    protected boolean isLanguageReturnStart() {
+        return false;
+    }
+
+    /**
+     * Whether the condition of an {@code if}, {@code while} or {@code switch} may declare its variable.
+     */
+    protected boolean allowsConditionDeclaration() {
+        return false;
+    }
+
+    /**
+     * What may follow {@code if}: {@code constexpr} in C++.
+     */
+    protected void parseIfSpecifiers() {
+    }
+
+    /**
+     * The {@code :} of a range {@code for} after its declaration; whether there was one.
+     */
+    protected boolean parseRangeForColon() {
+        return false;
+    }
+
+    /**
+     * At attributes: whether they stand before a statement - {@code [[fallthrough]];}, {@code [[likely]] return x;} -
+     * rather than before a declaration, {@code [[maybe_unused]] int x;}.
+     */
+    private boolean isAttributedStatement() {
+        PsiBuilder.Marker speculation = mark();
+        try {
+            declarations().parseAttributes();
+            return at(SEMICOLON) || !declarations().looksLikeDeclaration();
+        }
+        finally {
+            speculation.rollbackTo();
+        }
+    }
+
     private void parseExpressionStatement() {
         PsiBuilder.Marker marker = mark();
         if (!expressions().parseExpression()) {
@@ -119,7 +176,7 @@ public class CStatementParsing extends CParsingBase {
 
             PsiBuilder.Marker error = mark();
             advance();
-            error.error(CLocalize.statementExpected());
+            errorAt(error, CLocalize.statementExpected());
             return;
         }
 
@@ -128,9 +185,31 @@ public class CStatementParsing extends CParsingBase {
     }
 
     private void parseCondition() {
-        if (expect(LPARENTH, CLocalize.lparenthExpected())) {
+        parseCondition(false);
+    }
+
+    /**
+     * {@code (condition)}; in C++, with {@code declarationAllowed}, the condition may declare its variable -
+     * {@code if (T x = f())} - and a C++17 init statement may come first - {@code if (auto x = f(); x > 0)}.
+     */
+    private void parseCondition(boolean declarationAllowed) {
+        if (!expect(LPARENTH, CLocalize.lparenthExpected())) {
+            return;
+        }
+        boolean declarations = declarationAllowed && allowsConditionDeclaration();
+        parseConditionPart(declarations);
+        if (declarations && consume(SEMICOLON)) {
+            parseConditionPart(true);
+        }
+        expect(RPARENTH, CLocalize.rparenthExpected());
+    }
+
+    private void parseConditionPart(boolean declarationAllowed) {
+        if (declarationAllowed && declarations().looksLikeDeclaration()) {
+            declarations().parseDeclaration(CDeclarationParsing.Scope.CONDITION);
+        }
+        else {
             expressions().parseExpressionOrError();
-            expect(RPARENTH, CLocalize.rparenthExpected());
         }
     }
 
@@ -146,10 +225,9 @@ public class CStatementParsing extends CParsingBase {
     private void parseIfStatement() {
         PsiBuilder.Marker marker = mark();
         advance();
-        // if constexpr (C++17)
-        consume(CONSTEXPR_KEYWORD);
+        parseIfSpecifiers();
 
-        parseCondition();
+        parseCondition(true);
         parseBody();
 
         if (consume(ELSE_KEYWORD)) {
@@ -162,7 +240,7 @@ public class CStatementParsing extends CParsingBase {
         PsiBuilder.Marker marker = mark();
         advance();
 
-        parseCondition();
+        parseCondition(true);
         parseBody();
         marker.done(CElementTypes.WHILE_STATEMENT);
     }
@@ -195,7 +273,7 @@ public class CStatementParsing extends CParsingBase {
             }
             else if (declarations().looksLikeDeclaration()) {
                 declarations().parseDeclaration(CDeclarationParsing.Scope.FOR_INIT);
-                range = consume(COLON);
+                range = parseRangeForColon();
             }
             else {
                 expressions().parseExpressionOrError();
@@ -228,7 +306,7 @@ public class CStatementParsing extends CParsingBase {
         PsiBuilder.Marker marker = mark();
         advance();
 
-        parseCondition();
+        parseCondition(true);
         parseBody();
         marker.done(CElementTypes.SWITCH_STATEMENT);
     }
@@ -308,35 +386,5 @@ public class CStatementParsing extends CParsingBase {
             parseStatement();
         }
         marker.done(CElementTypes.LABELED_STATEMENT);
-    }
-
-    /**
-     * {@code try { } catch (declaration) { }...}
-     */
-    private void parseTryStatement() {
-        PsiBuilder.Marker marker = mark();
-        advance();
-
-        if (at(LBRACE)) {
-            parseCodeBlock();
-        }
-        else {
-            error(CLocalize.lbraceExpected());
-        }
-
-        while (at(CATCH_KEYWORD)) {
-            advance();
-            if (at(LPARENTH)) {
-                declarations().parseParameterList();
-            }
-            if (at(LBRACE)) {
-                parseCodeBlock();
-            }
-            else {
-                error(CLocalize.lbraceExpected());
-                break;
-            }
-        }
-        marker.done(CElementTypes.CODE_BLOCK);
     }
 }

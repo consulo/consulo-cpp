@@ -20,10 +20,12 @@ import consulo.cpp.localize.CLocalize;
 import consulo.language.ast.IElementType;
 import consulo.language.ast.TokenSet;
 import consulo.language.parser.PsiBuilder;
+import org.jspecify.annotations.Nullable;
 
 /**
- * C and C++ expressions, by precedence: comma, assignment, conditional, the binary operators, cast, unary, postfix,
- * primary.
+ * C expressions, by precedence: comma, assignment, conditional, the binary operators, cast, unary, postfix, primary.
+ * What C++ adds - template arguments, lambdas, {@code new}, casts by keyword, pack expansions - is in
+ * {@link CppExpressionParsing}, through the protected hooks here, whose C behaviour is the base one.
  *
  * @author VISTALL
  * @since 2026-10-19
@@ -99,16 +101,6 @@ public class CExpressionParsing extends CParsingBase {
     }
 
     public boolean parseAssignmentExpression() {
-        if (at(THROW_KEYWORD)) {
-            PsiBuilder.Marker marker = mark();
-            advance();
-            if (!at(SEMICOLON) && !at(RPARENTH) && !at(COMMA)) {
-                parseAssignmentExpression();
-            }
-            marker.done(CElementTypes.PREFIX_EXPRESSION);
-            return true;
-        }
-
         PsiBuilder.Marker marker = mark();
         if (!parseConditionalExpression()) {
             marker.drop();
@@ -175,7 +167,7 @@ public class CExpressionParsing extends CParsingBase {
         }
 
         while (at(BINARY_LEVELS[level])) {
-            advance();
+            advanceBinaryOperator();
             if (!parseBinaryExpression(level + 1)) {
                 error(CLocalize.expressionExpected());
             }
@@ -184,6 +176,13 @@ public class CExpressionParsing extends CParsingBase {
         }
         marker.drop();
         return true;
+    }
+
+    /**
+     * Past a binary operator, which may take more than one token.
+     */
+    protected void advanceBinaryOperator() {
+        advance();
     }
 
     public boolean parseCastExpression() {
@@ -223,11 +222,18 @@ public class CExpressionParsing extends CParsingBase {
             if (typeName == CDeclarationParsing.TypeName.UNKNOWN_NAME) {
                 return at(UNAMBIGUOUS_OPERAND_STARTS);
             }
-            return at(LBRACE) || at(UNAMBIGUOUS_OPERAND_STARTS) || at(AMBIGUOUS_OPERAND_STARTS);
+            return at(LBRACE) || at(UNAMBIGUOUS_OPERAND_STARTS) || at(AMBIGUOUS_OPERAND_STARTS) || isLanguageCastOperandStart();
         }
         finally {
             speculation.rollbackTo();
         }
+    }
+
+    /**
+     * After a parenthesised type which is certainly one: whether a form of operand of the language beyond C starts.
+     */
+    protected boolean isLanguageCastOperandStart() {
+        return false;
     }
 
     public boolean parseUnaryExpression() {
@@ -236,10 +242,7 @@ public class CExpressionParsing extends CParsingBase {
         if (type == SIZEOF_KEYWORD || type == ALIGNOF_KEYWORD) {
             PsiBuilder.Marker marker = mark();
             advance();
-            if (at(ELLIPSIS)) {
-                // sizeof...(pack)
-                advance();
-            }
+            parseSizeofPack();
             if (at(LPARENTH) && isParenthesizedTypeName()) {
                 advance();
                 declarations().parseTypeName();
@@ -263,6 +266,10 @@ public class CExpressionParsing extends CParsingBase {
             return true;
         }
 
+        if (parseLanguageUnaryExpression()) {
+            return true;
+        }
+
         if (type == EXTENSION_KEYWORD) {
             PsiBuilder.Marker marker = mark();
             advance();
@@ -273,60 +280,35 @@ public class CExpressionParsing extends CParsingBase {
             return true;
         }
 
-        if (type == NEW_KEYWORD || type == DOUBLE_COLON && lookAhead(1) == NEW_KEYWORD) {
-            parseNewExpression();
-            return true;
-        }
-
-        if (type == DELETE_KEYWORD || type == DOUBLE_COLON && lookAhead(1) == DELETE_KEYWORD) {
-            PsiBuilder.Marker marker = mark();
-            consume(DOUBLE_COLON);
-            advance();
-            if (at(LBRACKET) && lookAhead(1) == RBRACKET) {
-                advance();
-                advance();
-            }
-            if (!parseCastExpression()) {
-                error(CLocalize.expressionExpected());
-            }
-            marker.done(CElementTypes.PREFIX_EXPRESSION);
-            return true;
-        }
-
         return parsePostfixExpression();
+    }
+
+    /**
+     * The {@code ...} of a C++ {@code sizeof...(pack)}.
+     */
+    protected void parseSizeofPack() {
+    }
+
+    /**
+     * A unary expression of the language beyond C; whether there was one.
+     */
+    protected boolean parseLanguageUnaryExpression() {
+        return false;
     }
 
     private boolean isParenthesizedTypeName() {
         PsiBuilder.Marker speculation = mark();
+        int errors = errorCount();
         try {
             advance();
             CDeclarationParsing.TypeName typeName = declarations().parseTypeName();
-            return typeName != CDeclarationParsing.TypeName.NONE && typeName != CDeclarationParsing.TypeName.UNKNOWN_NAME && at(RPARENTH);
+            // sizeof(check<T>(0)) is a call: a type which needed an error to read is none
+            return typeName != CDeclarationParsing.TypeName.NONE && typeName != CDeclarationParsing.TypeName.UNKNOWN_NAME
+                && at(RPARENTH) && errorCount() == errors;
         }
         finally {
             speculation.rollbackTo();
         }
-    }
-
-    private void parseNewExpression() {
-        PsiBuilder.Marker marker = mark();
-        consume(DOUBLE_COLON);
-        advance();
-
-        // placement arguments: new (buffer) T
-        if (at(LPARENTH)) {
-            parseArgumentList();
-        }
-
-        declarations().parseTypeName();
-
-        if (at(LPARENTH)) {
-            parseArgumentList();
-        }
-        else if (at(LBRACE)) {
-            parseInitializerList();
-        }
-        marker.done(CElementTypes.NEW_EXPRESSION);
     }
 
     public boolean parsePostfixExpression() {
@@ -337,46 +319,58 @@ public class CExpressionParsing extends CParsingBase {
         }
 
         while (true) {
-            if (at(LBRACKET)) {
-                advance();
-                if (isCpp() && at(LBRACE)) {
-                    parseInitializerList();
-                }
-                else {
-                    parseExpressionOrError();
-                }
-                expect(RBRACKET, CLocalize.rbracketExpected());
-                marker.done(CElementTypes.INDEXED_PROPERTY_ACCESS_EXPRESSION);
-            }
-            else if (at(LPARENTH)) {
-                parseArgumentList();
-                marker.done(CElementTypes.CALL_EXPRESSION);
-            }
-            else if (at(DOT) || at(ARROW)) {
-                advance();
-                consume(TEMPLATE_KEYWORD);
-                consume(TILDE);
-                expect(IDENTIFIER, CLocalize.nameExpected());
-                marker.done(CElementTypes.REFERENCE_EXPRESSION);
-            }
-            else if (at(PLUSPLUS) || at(MINUSMINUS)) {
-                advance();
-                marker.done(CElementTypes.POSTFIX_EXPRESSION);
-            }
-            else {
+            IElementType suffix = parsePostfixSuffix();
+            if (suffix == null) {
                 break;
             }
+            marker.done(suffix);
             marker = marker.precede();
         }
         marker.drop();
         return true;
     }
 
+    /**
+     * One suffix of a postfix expression - an index, a call, a member access, {@code ++} - returning the type of the
+     * expression it makes, or {@code null} when there is none.
+     */
+    protected @Nullable IElementType parsePostfixSuffix() {
+        if (at(LBRACKET)) {
+            advance();
+            parseIndex();
+            expect(RBRACKET, CLocalize.rbracketExpected());
+            return CElementTypes.INDEXED_PROPERTY_ACCESS_EXPRESSION;
+        }
+        if (at(LPARENTH)) {
+            parseArgumentList();
+            return CElementTypes.CALL_EXPRESSION;
+        }
+        if (at(DOT) || at(ARROW)) {
+            advance();
+            expect(IDENTIFIER, CLocalize.nameExpected());
+            return CElementTypes.REFERENCE_EXPRESSION;
+        }
+        if (at(PLUSPLUS) || at(MINUSMINUS)) {
+            advance();
+            return CElementTypes.POSTFIX_EXPRESSION;
+        }
+        return null;
+    }
+
+    /**
+     * The index between {@code [} and {@code ]}.
+     */
+    protected void parseIndex() {
+        parseExpressionOrError();
+    }
+
     public boolean parsePrimaryExpression() {
         IElementType type = token();
 
-        if (type == IDENTIFIER || isCpp() && type == DOUBLE_COLON && lookAhead(1) == IDENTIFIER) {
-            parseReference();
+        if (type == IDENTIFIER) {
+            PsiBuilder.Marker marker = mark();
+            advance();
+            marker.done(CElementTypes.REFERENCE_EXPRESSION);
             return true;
         }
 
@@ -398,13 +392,6 @@ public class CExpressionParsing extends CParsingBase {
             return true;
         }
 
-        if (type == THIS_KEYWORD) {
-            PsiBuilder.Marker marker = mark();
-            advance();
-            marker.done(CElementTypes.REFERENCE_EXPRESSION);
-            return true;
-        }
-
         if (type == LPARENTH) {
             PsiBuilder.Marker marker = mark();
             advance();
@@ -420,25 +407,8 @@ public class CExpressionParsing extends CParsingBase {
             return true;
         }
 
-        if (type == CAST_KEYWORD) {
-            // static_cast<T>(e)
-            PsiBuilder.Marker marker = mark();
-            advance();
-            if (expect(LT, CLocalize.ltExpected())) {
-                declarations().parseTypeName();
-                expect(GT, CLocalize.gtExpected());
-            }
-            if (at(LPARENTH)) {
-                advance();
-                parseExpressionOrError();
-                expect(RPARENTH, CLocalize.rparenthExpected());
-            }
-            marker.done(CElementTypes.CAST_EXPRESSION);
-            return true;
-        }
-
-        if (type == GENERIC_KEYWORD || type == TYPEID_KEYWORD || type == NOEXCEPT_KEYWORD || type == DECLTYPE_KEYWORD) {
-            // _Generic(e, int: a, default: b), typeid(x), noexcept(e): parsed for their extent only
+        if (type == GENERIC_KEYWORD) {
+            // _Generic(e, int: a, default: b): parsed for its extent only
             PsiBuilder.Marker marker = mark();
             advance();
             if (at(LPARENTH)) {
@@ -448,73 +418,7 @@ public class CExpressionParsing extends CParsingBase {
             return true;
         }
 
-        if (isCpp() && type == LBRACE) {
-            parseInitializerList();
-            return true;
-        }
-
-        if (isCpp() && type == LBRACKET) {
-            return parseLambda();
-        }
-
-        if (isCpp() && at(TYPES) && (lookAhead(1) == LPARENTH || lookAhead(1) == LBRACE)) {
-            // functional cast, int(x)
-            PsiBuilder.Marker marker = mark();
-            advance();
-            if (at(LPARENTH)) {
-                parseArgumentList();
-            }
-            else {
-                parseInitializerList();
-            }
-            marker.done(CElementTypes.CAST_EXPRESSION);
-            return true;
-        }
-
         return false;
-    }
-
-    /**
-     * A name, qualified in C++: {@code a}, {@code ::a}, {@code ns::a::b}.
-     */
-    private void parseReference() {
-        PsiBuilder.Marker marker = mark();
-        consume(DOUBLE_COLON);
-        advance();
-        marker.done(CElementTypes.REFERENCE_EXPRESSION);
-
-        while (isCpp() && at(DOUBLE_COLON) && (lookAhead(1) == IDENTIFIER || lookAhead(1) == TILDE)) {
-            marker = marker.precede();
-            advance();
-            consume(TILDE);
-            advance();
-            marker.done(CElementTypes.REFERENCE_EXPRESSION);
-        }
-    }
-
-    /**
-     * {@code [captures] (parameters) specifiers -> type { body }}
-     */
-    private boolean parseLambda() {
-        PsiBuilder.Marker marker = mark();
-        skipBalanced();
-        if (at(LPARENTH)) {
-            declarations().parseParameterList();
-        }
-        while (at(MODIFIERS) || at(NOEXCEPT_KEYWORD) || at(IDENTIFIER)) {
-            // mutable, constexpr, noexcept
-            advance();
-        }
-        if (consume(ARROW)) {
-            declarations().parseTypeName();
-        }
-        if (!at(LBRACE)) {
-            marker.rollbackTo();
-            return false;
-        }
-        statements().parseCodeBlock();
-        marker.done(CElementTypes.CALL_EXPRESSION);
-        return true;
     }
 
     public void parseArgumentList() {
@@ -529,6 +433,7 @@ public class CExpressionParsing extends CParsingBase {
                         break;
                     }
                 }
+                parsePackExpansion();
                 if (!consume(COMMA)) {
                     break;
                 }
@@ -540,19 +445,38 @@ public class CExpressionParsing extends CParsingBase {
     }
 
     /**
+     * The {@code ...} expanding a C++ pack argument, {@code f(args...)}.
+     */
+    protected void parsePackExpansion() {
+    }
+
+    /**
      * An argument, or a type name - which a macro such as {@code va_arg(ap, int)} or {@code offsetof(struct s, f)}
      * takes, and which stays one when the macro is not known.
      */
     private boolean parseArgument() {
-        if (declarations().startsTypeNameDefinitely()) {
+        if (declarations().startsTypeNameDefinitely() || isTypeArgumentAhead()) {
             declarations().parseTypeName();
             return true;
         }
-        if (isCpp() && at(LBRACE)) {
-            parseInitializerList();
+        if (parseLanguageArgument()) {
             return true;
         }
         return parseAssignmentExpression();
+    }
+
+    /**
+     * Whether a type which can be nothing else makes the whole argument, where the start alone does not tell.
+     */
+    protected boolean isTypeArgumentAhead() {
+        return false;
+    }
+
+    /**
+     * An argument of a form beyond C; whether there was one.
+     */
+    protected boolean parseLanguageArgument() {
+        return false;
     }
 
     /**
@@ -604,7 +528,7 @@ public class CExpressionParsing extends CParsingBase {
             if (!parseInitializer()) {
                 skipUntil(TokenSet.create(COMMA, RBRACE, SEMICOLON), CLocalize.expressionExpected());
             }
-            consume(ELLIPSIS);
+            parsePackExpansion();
 
             if (!consume(COMMA)) {
                 break;

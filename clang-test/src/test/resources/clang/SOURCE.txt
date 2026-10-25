@@ -1,0 +1,8 @@
+Test files of clang (https://github.com/llvm/llvm-project, clang/test), commit
+aaa2c083d57b597673e95eccba536f74c588ae86 (2026-10-25), under the license in LICENSE.TXT (Apache License v2.0 with
+LLVM Exceptions). The files are unchanged; their paths are relative to clang/test.
+
+Selected: the .c and .cpp files of Parser, Sema, SemaCXX, SemaTemplate and CXX which clang compiles without a
+diagnostic - they say "expected-no-diagnostics" - leaving out those for other languages or dialects (Objective-C,
+OpenMP, CUDA, HIP, OpenCL, SYCL, blocks, Microsoft extensions), the target-specific directories (AArch64, ARM, X86,
+RISCV...) and the ARM SME/SVE intrinsic tests: they test builtins, not the grammar.

@@ -14,6 +14,4 @@ public interface CPreprocessorMacroReference extends CPsiElement, OuterLanguageE
 {
 	@NotNull
 	PsiElement getReferenceElement();
-
-	boolean isDefined();
 }

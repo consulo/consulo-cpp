@@ -42,6 +42,7 @@ public class CParsingContext {
     private final PsiBuilder myBuilder;
     private final CLanguageVersion myLanguageVersion;
     private final Set<String> myTypeNames = new HashSet<>();
+    private int myErrorCount;
 
     private @Nullable CDeclarationParsing myDeclarationParsing;
     private @Nullable CStatementParsing myStatementParsing;
@@ -54,6 +55,17 @@ public class CParsingContext {
 
     public PsiBuilder getBuilder() {
         return myBuilder;
+    }
+
+    /**
+     * Counts a reported error, so a speculative parse can tell whether what it read needed one.
+     */
+    public void errorReported() {
+        myErrorCount++;
+    }
+
+    public int getErrorCount() {
+        return myErrorCount;
     }
 
     public CLanguageVersion getLanguageVersion() {
@@ -108,14 +120,14 @@ public class CParsingContext {
     }
 
     protected CDeclarationParsing createDeclarationParsing() {
-        return new CDeclarationParsing(this);
+        return isCpp() ? new CppDeclarationParsing(this) : new CDeclarationParsing(this);
     }
 
     protected CStatementParsing createStatementParsing() {
-        return new CStatementParsing(this);
+        return isCpp() ? new CppStatementParsing(this) : new CStatementParsing(this);
     }
 
     protected CExpressionParsing createExpressionParsing() {
-        return new CExpressionParsing(this);
+        return isCpp() ? new CppExpressionParsing(this) : new CExpressionParsing(this);
     }
 }

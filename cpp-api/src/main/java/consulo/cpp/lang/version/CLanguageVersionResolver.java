@@ -19,7 +19,7 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.annotation.component.ExtensionImpl;
 import consulo.cpp.lang.CLanguage;
 import consulo.cpp.moduleAware.CDefineEnv;
-import consulo.cpp.moduleAware.CPreprocessorOptions;
+import consulo.cpp.moduleAware.CLanguageVersionOption;
 import consulo.language.Language;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
@@ -33,8 +33,8 @@ import org.jspecify.annotations.Nullable;
 
 /**
  * Resolves the version of a C/C++ file. A registered version which {@link LanguageVersionWithDefinition claims}
- * the file wins; otherwise the version comes from the module-aware index options - the same options the defines
- * come from, so a header indexed for one module is parsed with that module's standard - and falls back to
+ * the file wins; otherwise the version comes from the module-aware index - its own option, cheap to compute, so a
+ * header indexed for one module is parsed with that module's standard - and falls back to
  * {@link CLanguageVersions#select} by file type.
  *
  * @author VISTALL
@@ -56,7 +56,7 @@ public class CLanguageVersionResolver implements LanguageVersionResolver {
         }
 
         PsiFile file = element.getContainingFile();
-        return resolve(file == null ? null : file.getFileType(), CDefineEnv.optionsFor(element));
+        return resolve(file == null ? null : file.getFileType(), CDefineEnv.languageVersionFor(element));
     }
 
     @RequiredReadAction
@@ -72,12 +72,12 @@ public class CLanguageVersionResolver implements LanguageVersionResolver {
             }
         }
 
-        CPreprocessorOptions options = project == null ? CPreprocessorOptions.EMPTY : CDefineEnv.optionsFor(project, virtualFile);
-        return resolve(virtualFile.getFileType(), options);
+        CLanguageVersionOption option = project == null ? CLanguageVersionOption.EMPTY : CDefineEnv.languageVersionFor(project, virtualFile);
+        return resolve(virtualFile.getFileType(), option);
     }
 
-    private static CLanguageVersion resolve(@Nullable FileType fileType, CPreprocessorOptions options) {
-        CLanguageVersion configured = CLanguageVersions.findById(options.languageVersionId());
+    private static CLanguageVersion resolve(@Nullable FileType fileType, CLanguageVersionOption option) {
+        CLanguageVersion configured = CLanguageVersions.findById(option.languageVersionId());
         return configured != null ? configured : CLanguageVersions.select(fileType, null, null);
     }
 

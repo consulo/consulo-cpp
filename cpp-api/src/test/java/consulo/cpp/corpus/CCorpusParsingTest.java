@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.jspecify.annotations.Nullable;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,14 +88,23 @@ public class CCorpusParsingTest extends CParsingBaseTest {
         String corpusDir = System.getenv(CORPUS_DIR);
         Assumptions.assumeTrue(corpusDir != null && !corpusDir.isEmpty(), CORPUS_DIR + " is not set");
 
-        Path root = Path.of(corpusDir);
-        List<Path> sources;
-        try (Stream<Path> walk = Files.walk(root)) {
-            sources = walk.filter(Files::isRegularFile)
-                .filter(path -> fileTypeOf(path) != null)
-                .filter(path -> !root.relativize(path).toString().startsWith("build"))
-                .sorted(Comparator.comparing(Path::toString))
-                .toList();
+        // several trees may be given, separated as in a path; with more than one, a file is named after its tree too
+        List<Path> roots = new ArrayList<>();
+        for (String each : corpusDir.split(File.pathSeparator)) {
+            if (!each.isBlank()) {
+                roots.add(Path.of(each));
+            }
+        }
+        Map<Path, String> sources = new LinkedHashMap<>();
+        for (Path tree : roots) {
+            String prefix = roots.size() == 1 ? "" : tree.getFileName() + "/";
+            try (Stream<Path> walk = Files.walk(tree)) {
+                walk.filter(Files::isRegularFile)
+                    .filter(path -> fileTypeOf(path) != null)
+                    .filter(path -> !tree.relativize(path).toString().startsWith("build"))
+                    .sorted(Comparator.comparing(Path::toString))
+                    .forEach(path -> sources.put(path, prefix + tree.relativize(path)));
+            }
         }
 
         String reportPath = System.getenv(CORPUS_REPORT);
@@ -108,8 +118,9 @@ public class CCorpusParsingTest extends CParsingBaseTest {
         List<String> textMismatches = new ArrayList<>();
         int lines = 0;
 
-        for (Path source : sources) {
-            String relative = root.relativize(source).toString();
+        for (Map.Entry<Path, String> entry : sources.entrySet()) {
+            Path source = entry.getKey();
+            String relative = entry.getValue();
             String text = Files.readString(source, StandardCharsets.UTF_8).replace("\r\n", "\n").replace('\r', '\n');
             lines += text.split("\n", -1).length;
             Files.writeString(progressFile, relative, StandardCharsets.UTF_8);
@@ -140,7 +151,7 @@ public class CCorpusParsingTest extends CParsingBaseTest {
         }
 
         Files.deleteIfExists(progressFile);
-        Files.writeString(reportFile, report(root, sources.size(), lines, problems, crashes, textMismatches), StandardCharsets.UTF_8);
+        Files.writeString(reportFile, report(corpusDir, sources.size(), lines, problems, crashes, textMismatches), StandardCharsets.UTF_8);
     }
 
     private static @Nullable LanguageFileType fileTypeOf(Path path) {
@@ -185,7 +196,7 @@ public class CCorpusParsingTest extends CParsingBaseTest {
         return line.length() > 30 ? line.substring(0, 30) + "..." : line;
     }
 
-    private static String report(Path root,
+    private static String report(String root,
                                  int fileCount,
                                  int lineCount,
                                  List<Problem> problems,
@@ -194,18 +205,24 @@ public class CCorpusParsingTest extends CParsingBaseTest {
         StringBuilder out = new StringBuilder();
         out.append("Corpus: ").append(root).append('\n');
         out.append("Files: ").append(fileCount).append(", lines: ").append(lineCount).append('\n');
-        out.append("Errors: ").append(problems.size())
-            .append(", crashes: ").append(crashes.size())
-            .append(", text mismatches: ").append(textMismatches.size()).append("\n\n");
-
         Map<String, Integer> byMessage = new TreeMap<>();
         Map<String, Integer> byMessageAndToken = new TreeMap<>();
+        Map<String, Integer> byFile = new TreeMap<>();
         for (Problem problem : problems) {
             byMessage.merge(problem.root() + " | " + problem.message(), 1, Integer::sum);
             byMessageAndToken.merge(problem.root() + " | " + problem.message() + " | at '" + problem.near() + "'", 1, Integer::sum);
+            byFile.merge(problem.file(), 1, Integer::sum);
         }
+
+        out.append("Errors: ").append(problems.size())
+            .append(", crashes: ").append(crashes.size())
+            .append(", text mismatches: ").append(textMismatches.size()).append('\n');
+        // a corpus of code known to compile - clang's tests marked expected-no-diagnostics - should be all clean
+        out.append("Clean files: ").append(fileCount - byFile.size()).append(" of ").append(fileCount).append("\n\n");
+
         appendCounts(out, "By message", byMessage);
         appendCounts(out, "By message and token", byMessageAndToken);
+        appendCounts(out, "By file", byFile);
 
         out.append("== Crashes\n");
         crashes.forEach((file, crash) -> out.append(file).append(": ").append(crash).append('\n'));

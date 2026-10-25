@@ -46,7 +46,6 @@ public class CPreprocessorOptionsExternalizer implements DataExternalizer<CPrepr
         }
 
         IOUtil.writeUTF(out, value.includeFingerprint());
-        IOUtil.writeUTF(out, value.languageVersionId());
     }
 
     @Override
@@ -63,7 +62,6 @@ public class CPreprocessorOptionsExternalizer implements DataExternalizer<CPrepr
         for (int i = 0; i < pathCount; i++) {
             includePaths.add(IOUtil.readUTF(in));
         }
-        String includeFingerprint = IOUtil.readUTF(in);
-        return new CPreprocessorOptions(defines, includePaths, includeFingerprint, IOUtil.readUTF(in));
+        return new CPreprocessorOptions(defines, includePaths, IOUtil.readUTF(in));
     }
 }

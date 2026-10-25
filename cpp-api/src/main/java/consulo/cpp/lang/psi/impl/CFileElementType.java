@@ -23,6 +23,7 @@ import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiManager;
 import consulo.language.psi.stub.IStubFileElementType;
+import consulo.language.psi.stub.IndexingDataKeys;
 import consulo.language.psi.stub.PsiFileStub;
 import consulo.language.psi.stub.PsiFileStubImpl;
 import consulo.language.psi.stub.StubBuilder;
@@ -88,7 +89,7 @@ public class CFileElementType extends IStubFileElementType<PsiFileStub<PsiFile>>
 
         CPreprocessorDirectiveCollector collector = expander.getRangeCollector();
 
-        final PsiFile templatePsiFile = createPsiFileFromSource(CLanguage.INSTANCE, languageVersion, onlyCSourceCode, psi.getManager(), expander);
+        final PsiFile templatePsiFile = createPsiFileFromSource(CLanguage.INSTANCE, languageVersion, onlyCSourceCode, (PsiFile) psi, expander);
         final FileElement templateFileElement = ((PsiFileImpl) templatePsiFile).calcTreeElement();
 
         return DebugUtil.performPsiModification("template language parsing", () -> {
@@ -106,11 +107,15 @@ public class CFileElementType extends IStubFileElementType<PsiFileStub<PsiFile>>
     protected PsiFile createPsiFileFromSource(final Language language,
                                               CLanguageVersion languageVersion,
                                               CharSequence sourceCode,
-                                              PsiManager manager,
+                                              PsiFile realFile,
                                               PreprocessorExpander expander) {
+        PsiManager manager = realFile.getManager();
         LightVirtualFile virtualFile = new LightVirtualFile("foo", createTemplateFakeFileType(language), sourceCode, LocalTimeCounter.currentTime());
         // the directive-free text is parsed with the version of the real file, not resolved again for the light one
         virtualFile.putUserData(LanguageVersion.KEY, languageVersion);
+        // and its elements read the module-aware options of the real file: through it as their original file, or the
+        // options attached to it when it is parsed for one stored variant
+        virtualFile.setOriginalFile(realFile.getViewProvider().getVirtualFile());
 
         FileViewProvider viewProvider = new SingleRootFileViewProvider(manager, virtualFile, false) {
             @Override
@@ -140,7 +145,11 @@ public class CFileElementType extends IStubFileElementType<PsiFileStub<PsiFile>>
         // there should also be no file size checks for template data files.
         SingleRootFileViewProvider.doNotCheckFileSizeLimit(virtualFile);
 
-        return viewProvider.getPsi(language);
+        PsiFile templateFile = viewProvider.getPsi(language);
+        if (templateFile != null) {
+            templateFile.putUserData(IndexingDataKeys.INDEX_OPTIONS, realFile.getUserData(IndexingDataKeys.INDEX_OPTIONS));
+        }
+        return templateFile;
     }
 
     protected LanguageFileType createTemplateFakeFileType(final Language language) {

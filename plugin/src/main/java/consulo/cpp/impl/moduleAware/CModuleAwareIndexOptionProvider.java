@@ -50,17 +50,21 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
 
     /**
      * Claims every file type of the C language, so the files of a dialect plugin - {@code .m}, {@code .ino} - get
-     * their module's defines and standard too.
+     * their module's defines too.
      */
     @Inject
     public CModuleAwareIndexOptionProvider(FileTypeRegistry fileTypeRegistry) {
+        myFileTypes = fileTypesOf(fileTypeRegistry);
+    }
+
+    static Set<FileType> fileTypesOf(FileTypeRegistry fileTypeRegistry) {
         Set<FileType> fileTypes = new LinkedHashSet<>();
         for (FileType fileType : fileTypeRegistry.getRegisteredFileTypes()) {
             if (fileType instanceof LanguageFileType languageFileType && languageFileType.getLanguage() == CLanguage.INSTANCE) {
                 fileTypes.add(fileType);
             }
         }
-        myFileTypes = Collections.unmodifiableSet(fileTypes);
+        return Collections.unmodifiableSet(fileTypes);
     }
 
     @Override
@@ -70,8 +74,8 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
 
     @Override
     public int getVersion() {
-        // 2: options carry the language version id
-        return 2;
+        // 3: the language version id moved to CLanguageVersionIndexOptionProvider
+        return 3;
     }
 
     @Override
@@ -109,7 +113,7 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
             return IndexOption.fullySharable();
         }
 
-        CPreprocessorOptions options = CPreprocessorOptions.of(extension, file, includeFingerprint(module, extension, file));
+        CPreprocessorOptions options = CPreprocessorOptions.of(extension, includeFingerprint(module, extension, file));
         if (options.isEmpty()) {
             return IndexOption.fullySharable();
         }

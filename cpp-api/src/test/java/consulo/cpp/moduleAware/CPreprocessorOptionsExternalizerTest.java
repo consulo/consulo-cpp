@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,6 +73,24 @@ public class CPreprocessorOptionsExternalizerTest {
         second.put("A", "1");
 
         assertEquals(new CPreprocessorOptions(first, List.of(), ""), new CPreprocessorOptions(second, List.of(), ""));
+        assertArrayEquals(save(new CPreprocessorOptions(first, List.of(), "")), save(new CPreprocessorOptions(second, List.of(), "")));
+    }
+
+    /**
+     * The stored payload must not depend on the JVM run: the module-aware index compares it byte for byte with what
+     * the previous session stored, and a difference re-indexes the file. Defines are kept sorted for that.
+     */
+    @Test
+    public void definesAreStoredSorted() throws IOException {
+        Map<String, String> defines = new LinkedHashMap<>();
+        for (int i = 20; i > 0; i--) {
+            defines.put("DEFINE_" + (char) ('A' + i), Integer.toString(i));
+        }
+
+        CPreprocessorOptions options = new CPreprocessorOptions(defines, List.of(), "");
+        List<String> sorted = defines.keySet().stream().sorted().toList();
+        assertEquals(sorted, List.copyOf(options.defines().keySet()));
+        assertEquals(sorted, List.copyOf(roundTrip(options).defines().keySet()));
     }
 
     /**
@@ -110,12 +129,16 @@ public class CPreprocessorOptionsExternalizerTest {
         assertTrue(new CPreprocessorOptions(Map.of(), List.of(), "").isEmpty());
     }
 
-    private static CPreprocessorOptions roundTrip(CPreprocessorOptions options) throws IOException {
+    private static byte[] save(CPreprocessorOptions options) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try (DataOutputStream stream = new DataOutputStream(out)) {
             CPreprocessorOptionsExternalizer.INSTANCE.save(stream, options);
         }
-        try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(out.toByteArray()))) {
+        return out.toByteArray();
+    }
+
+    private static CPreprocessorOptions roundTrip(CPreprocessorOptions options) throws IOException {
+        try (DataInputStream stream = new DataInputStream(new ByteArrayInputStream(save(options)))) {
             return CPreprocessorOptionsExternalizer.INSTANCE.read(stream);
         }
     }

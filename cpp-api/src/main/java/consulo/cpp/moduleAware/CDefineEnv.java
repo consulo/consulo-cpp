@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Objects;
 
 /**
  * Reads back the preprocessor options the module-aware index recorded for a file, so parsing and highlighting
@@ -59,11 +59,35 @@ public final class CDefineEnv {
      * the platform answers as the module reaching it through its order entry compiles it.
      */
     public static CPreprocessorOptions optionsFor(PsiElement context) {
-        return read(() -> ModuleAwareIndexOptions.getOptions(context, PROVIDER_ID, CPreprocessorOptionsExternalizer.INSTANCE));
+        return Objects.requireNonNullElse(
+            ModuleAwareIndexOptions.getOptions(context, PROVIDER_ID, CPreprocessorOptionsExternalizer.INSTANCE),
+            CPreprocessorOptions.EMPTY
+        );
     }
 
     public static CPreprocessorOptions optionsFor(Project project, VirtualFile file) {
-        return read(() -> ModuleAwareIndexOptions.getOptions(project, file, PROVIDER_ID, CPreprocessorOptionsExternalizer.INSTANCE));
+        return Objects.requireNonNullElse(
+            ModuleAwareIndexOptions.getOptions(project, file, PROVIDER_ID, CPreprocessorOptionsExternalizer.INSTANCE),
+            CPreprocessorOptions.EMPTY
+        );
+    }
+
+    /**
+     * The language version a file is parsed with - asked of its own provider only, so resolving a version never
+     * computes the preprocessor options.
+     */
+    public static CLanguageVersionOption languageVersionFor(PsiElement context) {
+        return Objects.requireNonNullElse(
+            ModuleAwareIndexOptions.getOptions(context, CLanguageVersionOption.PROVIDER_ID, CLanguageVersionOptionExternalizer.INSTANCE),
+            CLanguageVersionOption.EMPTY
+        );
+    }
+
+    public static CLanguageVersionOption languageVersionFor(Project project, VirtualFile file) {
+        return Objects.requireNonNullElse(
+            ModuleAwareIndexOptions.getOptions(project, file, CLanguageVersionOption.PROVIDER_ID, CLanguageVersionOptionExternalizer.INSTANCE),
+            CLanguageVersionOption.EMPTY
+        );
     }
 
     /**
@@ -79,20 +103,5 @@ public final class CDefineEnv {
             }
         }
         return roots;
-    }
-
-    /**
-     * The module-aware index is a service of a full application; a light fixture which only parses a file has no
-     * such service, and there parsing simply proceeds with no options rather than failing.
-     */
-    private static CPreprocessorOptions read(Supplier<CPreprocessorOptions> reader) {
-        CPreprocessorOptions options;
-        try {
-            options = reader.get();
-        }
-        catch (IllegalArgumentException serviceNotBound) {
-            return CPreprocessorOptions.EMPTY;
-        }
-        return options == null ? CPreprocessorOptions.EMPTY : options;
     }
 }

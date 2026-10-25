@@ -15,7 +15,9 @@
  */
 package consulo.cpp.moduleAware;
 
+import consulo.util.dataholder.Key;
 import consulo.virtualFileSystem.VirtualFile;
+import consulo.virtualFileSystem.VirtualFileManager;
 import consulo.virtualFileSystem.util.VirtualFileUtil;
 
 import java.io.IOException;
@@ -42,6 +44,16 @@ public final class CIncludeWalker {
 
     /** A guard against pathological include graphs; the fingerprint stays stable, it just stops widening. */
     private static final int MAX_FILES = 256;
+
+    private record DirectIncludes(long stamp, List<String> names) {
+    }
+
+    private static final Key<DirectIncludes> DIRECT_INCLUDES = Key.create("CIncludeWalker.directIncludes");
+
+    private record ResolvedIncludes(long stamp, long structureStamp, List<VirtualFile> roots, List<VirtualFile> files) {
+    }
+
+    private static final Key<ResolvedIncludes> RESOLVED_INCLUDES = Key.create("CIncludeWalker.resolvedIncludes");
 
     private CIncludeWalker() {
     }
@@ -92,20 +104,65 @@ public final class CIncludeWalker {
             return;
         }
 
+        for (VirtualFile included : resolvedIncludesOf(file, includeRoots)) {
+            collect(included, includeRoots, visited);
+        }
+    }
+
+    /**
+     * The files a file includes directly, resolved once per modification of the file, of the file system's structure
+     * and of the include directories: resolving a name probes every include directory, and boost has more than a
+     * hundred of them.
+     */
+    private static List<VirtualFile> resolvedIncludesOf(VirtualFile file, List<VirtualFile> includeRoots) {
+        long stamp = file.getModificationStamp();
+        long structureStamp = VirtualFileManager.getInstance().getStructureModificationCount();
+        ResolvedIncludes cached = file.getUserData(RESOLVED_INCLUDES);
+        if (cached != null && cached.stamp() == stamp && cached.structureStamp() == structureStamp && cached.roots().equals(includeRoots)) {
+            return cached.files();
+        }
+
+        List<VirtualFile> files = new ArrayList<>();
+        for (String includeName : directIncludesOf(file)) {
+            VirtualFile included = resolve(includeName, file, includeRoots);
+            if (included != null) {
+                files.add(included);
+            }
+        }
+        List<VirtualFile> result = List.copyOf(files);
+        file.putUserData(RESOLVED_INCLUDES, new ResolvedIncludes(stamp, structureStamp, List.copyOf(includeRoots), result));
+        return result;
+    }
+
+    /**
+     * The names a file includes directly, read once per modification of the file: every file including a header walks
+     * through it, and a header of a project like boost is reached from thousands of files.
+     */
+    private static List<String> directIncludesOf(VirtualFile file) {
+        long stamp = file.getModificationStamp();
+        DirectIncludes cached = file.getUserData(DIRECT_INCLUDES);
+        if (cached != null && cached.stamp() == stamp) {
+            return cached.names();
+        }
+
         String text;
         try {
             text = VirtualFileUtil.loadText(file);
         }
         catch (IOException | RuntimeException unreadable) {
-            return;
+            return List.of();
         }
 
+        List<String> names = new ArrayList<>();
         for (String line : text.split("\n")) {
             Matcher matcher = INCLUDE.matcher(line);
             if (matcher.find()) {
-                collect(resolve(matcher.group(1), file, includeRoots), includeRoots, visited);
+                names.add(matcher.group(1));
             }
         }
+        List<String> result = List.copyOf(names);
+        file.putUserData(DIRECT_INCLUDES, new DirectIncludes(stamp, result));
+        return result;
     }
 
     private static VirtualFile resolve(String includeName, VirtualFile from, List<VirtualFile> includeRoots) {

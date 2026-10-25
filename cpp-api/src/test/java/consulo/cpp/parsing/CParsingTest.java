@@ -280,4 +280,12 @@ public class CParsingTest extends CParsingBaseTest {
     public void testStrings(Context context) throws Exception {
         doTest(context, null);
     }
+
+    /**
+     * K&R definitions, whose parameters are declared between the declarator and the body: {@code int g(i) int i; { }}
+     */
+    @Test
+    public void testKnrDefinition(Context context) throws Exception {
+        doTest(context, null);
+    }
 }

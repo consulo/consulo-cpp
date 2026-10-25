@@ -43,6 +43,7 @@
 
 	<modules>
 		<module>cpp-api</module>
+		<module>clang-test</module>
 		<module>msbuild</module>
 		<module>cmake</module>
 		<module>asm</module>

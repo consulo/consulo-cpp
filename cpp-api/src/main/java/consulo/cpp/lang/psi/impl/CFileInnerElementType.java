@@ -42,8 +42,11 @@ public class CFileInnerElementType extends IFileElementType
 
 		Project project = psi.getProject();
 		Language languageForParser = getLanguageForParser(psi);
-		// the light file carries the version of the real file, see CFileElementType#createPsiFileFromSource
-		LanguageVersion languageVersion = psi.getLanguageVersion();
+		// the light file carries the version of the real file, see CFileElementType#createPsiFileFromSource. It is read
+		// off the light file itself: its view provider has no event system, so the PSI file reports no virtual file and
+		// would resolve the version again - for a file of no known type, the default C++ one, whatever the real file is
+		LanguageVersion stored = viewProvider.getVirtualFile().getUserData(LanguageVersion.KEY);
+		LanguageVersion languageVersion = stored != null && stored.getLanguage() == languageForParser ? stored : psi.getLanguageVersion();
 
 		PsiBuilder builder;
 		if(expander != null)

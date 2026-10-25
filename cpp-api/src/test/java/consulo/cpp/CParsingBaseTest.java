@@ -5,6 +5,7 @@ import consulo.cpp.lang.version.CLanguageVersions;
 import consulo.language.Language;
 import consulo.language.file.FileViewProvider;
 import consulo.language.psi.PsiFile;
+import consulo.language.psi.stub.IndexingDataKeys;
 import consulo.language.version.LanguageVersion;
 import consulo.test.junit.impl.language.SimpleParsingTest;
 import consulo.virtualFileSystem.fileType.FileType;
@@ -13,6 +14,7 @@ import jakarta.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -30,6 +32,22 @@ public abstract class CParsingBaseTest extends SimpleParsingTest<Object> {
     public CParsingBaseTest(String dataPath, String extension) {
         super(dataPath, extension);
         myDataPath = dataPath;
+    }
+
+    /**
+     * A light file is never indexed, so it is parsed under no module-aware options: they are attached up front, as
+     * the index does for a file it parses, rather than looked up in an index a light application does not have.
+     * Not marked as a copy - marking walks the tree, which would parse it before the options are attached.
+     */
+    @RequiredReadAction
+    @Override
+    protected PsiFile createFile(Context context, @Nullable Object testContext, String fileName, FileType fileType, String text) {
+        LanguageVersion languageVersion = resolveLanguageVersion(context, testContext, fileType);
+        PsiFile file = context.psiFileFactory().createFileFromText(fileName, languageVersion, text, true, false, false);
+        for (PsiFile root : file.getViewProvider().getAllFiles()) {
+            root.putUserData(IndexingDataKeys.INDEX_OPTIONS, Map.of());
+        }
+        return file;
     }
 
     /**

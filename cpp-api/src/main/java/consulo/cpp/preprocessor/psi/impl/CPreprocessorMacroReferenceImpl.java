@@ -72,12 +72,6 @@ public class CPreprocessorMacroReferenceImpl extends ASTWrapperPsiElement implem
 		return macro.getElement();
 	}
 
-	@Override
-	public boolean isDefined()
-	{
-		return findMacro() != null;
-	}
-
 	@Nullable
 	private ExpandedMacro findMacro()
 	{

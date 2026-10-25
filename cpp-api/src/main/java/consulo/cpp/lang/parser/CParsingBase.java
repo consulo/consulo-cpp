@@ -49,10 +49,6 @@ public abstract class CParsingBase implements CPsiTokens {
         return myContext.getExpressionParsing();
     }
 
-    protected boolean isCpp() {
-        return myContext.isCpp();
-    }
-
     protected @Nullable IElementType token() {
         return myBuilder.getTokenType();
     }
@@ -99,7 +95,23 @@ public abstract class CParsingBase implements CPsiTokens {
     }
 
     protected void error(LocalizeValue message) {
+        myContext.errorReported();
         myBuilder.error(message);
+    }
+
+    /**
+     * Ends {@code marker} as an error.
+     */
+    protected void errorAt(PsiBuilder.Marker marker, LocalizeValue message) {
+        myContext.errorReported();
+        marker.error(message);
+    }
+
+    /**
+     * The number of errors reported so far: a speculative parse compares it before and after.
+     */
+    protected int errorCount() {
+        return myContext.getErrorCount();
     }
 
     protected PsiBuilder.Marker mark() {
@@ -141,7 +153,7 @@ public abstract class CParsingBase implements CPsiTokens {
             skipped = true;
         }
         if (skipped) {
-            error.error(message);
+            errorAt(error, message);
         }
         else {
             error.drop();

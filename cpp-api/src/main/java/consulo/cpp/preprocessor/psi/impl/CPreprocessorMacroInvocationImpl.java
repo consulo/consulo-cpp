@@ -85,12 +85,6 @@ public class CPreprocessorMacroInvocationImpl extends LeafPsiElement implements 
         return macro == null ? null : macro.getElement();
     }
 
-    @RequiredReadAction
-    @Override
-    public boolean isDefined() {
-        return CMacroReferenceResolver.findMacro(this, getCanonicalText()) != null;
-    }
-
     @Override
     public PsiReference getReference() {
         return this;
