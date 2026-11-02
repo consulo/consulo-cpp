@@ -41,3 +41,12 @@ int use(geo::Point point, geo::Point3 point3, Holder<geo::Point> holder, Box box
     stat("path", &info);
     return holder.item.x + holder.get().y + info.size;
 }
+
+// a class with operators to a pointer: only by a user-defined conversion, so the exact overload wins
+struct Text { Text(const char* chars); bool operator==(const Text& other) const; };
+int show(const char* chars);
+int show(const Text& text);
+int showText(Text text)
+{
+    return show(text);
+}

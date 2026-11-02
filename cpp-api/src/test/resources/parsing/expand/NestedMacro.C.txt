@@ -1,7 +1,7 @@
 FILE
   PsiElement(OUTER)('#define BASE int')
-  PsiElement(OUTER)('#define ALIAS BASE')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define ALIAS BASE')
   PsiWhiteSpace('\n')
   CPsiFieldImpl: ALIAS value;
     CPsiModifierListImpl: 

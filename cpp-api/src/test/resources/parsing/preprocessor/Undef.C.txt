@@ -1,5 +1,5 @@
 FILE
   PsiElement(OUTER)('#define FOO 42')
-  PsiElement(OUTER)('#undef FOO')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#undef FOO')
   PsiWhiteSpace('\n')

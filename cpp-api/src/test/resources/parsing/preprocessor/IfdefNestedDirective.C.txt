@@ -1,7 +1,7 @@
 FILE
   PsiElement(OUTER)('#define FOO')
-  PsiElement(OUTER)('#ifdef FOO\n#define INNER 1')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#ifdef FOO\n#define INNER 1')
   PsiWhiteSpace('\n')
   CPsiFieldImpl: int x;
     CPsiModifierListImpl: 
@@ -11,5 +11,6 @@ FILE
     PsiWhiteSpace(' ')
     PsiElement(IDENTIFIER)('x')
     PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
   PsiElement(OUTER)('#else\nint y;\n#endif')
-  PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n')

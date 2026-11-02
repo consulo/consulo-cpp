@@ -12,6 +12,6 @@ int
     PsiWhiteSpace(' ')
     PsiElement(IDENTIFIER)('x')
     PsiElement(SEMICOLON)(';')
-  PsiElement(OUTER)('#else\nint y;\n#endif')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#else\nint y;\n#endif')
   PsiWhiteSpace('\n')

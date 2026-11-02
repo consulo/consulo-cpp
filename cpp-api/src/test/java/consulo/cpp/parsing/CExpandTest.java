@@ -17,11 +17,19 @@
 package consulo.cpp.parsing;
 
 import consulo.cpp.CParsingBaseTest;
+import consulo.language.psi.util.PsiTreeUtil;
+import consulo.language.psi.PsiFile;
+import consulo.language.psi.PsiElement;
+import consulo.document.util.TextRange;
+import consulo.cpp.lang.CLanguage;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.cpp.lang.CSourceFileType;
 import consulo.language.file.LanguageFileType;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Tests for preprocessor macro expansion in C source files.
@@ -148,5 +156,20 @@ public class CExpandTest extends CParsingBaseTest {
     @Test
     public void testStringizeAndPaste(Context context) throws Exception {
         doTest(context, null);
+    }
+    /**
+     * A directive after whitespace - the blank line after a comment, the indent before a nested {@code #define}: every
+     * leaf of the C tree sits where its text is, so the offsets of declarations after it are those of the file
+     */
+    @Test
+    @RequiredReadAction
+    public void testDirectiveOffsets(Context context) throws Exception {
+        PsiFile file = loadPsiFile(context, null);
+        PsiFile cRoot = file.getViewProvider().getPsi(CLanguage.INSTANCE);
+        String source = file.getViewProvider().getContents().toString();
+        for (PsiElement leaf = PsiTreeUtil.firstChild(cRoot); leaf != null; leaf = PsiTreeUtil.nextLeaf(leaf)) {
+            TextRange range = leaf.getTextRange();
+            assertEquals(range.substring(source), leaf.getText(), "leaf " + leaf.getNode().getElementType() + " at " + range);
+        }
     }
 }

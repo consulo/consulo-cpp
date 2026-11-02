@@ -279,8 +279,9 @@ public final class COverloads {
             return Rank.CONVERSION;
         }
         if (!argument.isPointer()) {
-            // a class may convert itself to a pointer
-            return argument.isClass() ? Rank.UNKNOWN : Rank.NO_MATCH;
+            // a class may convert itself to a pointer - by its operator, a user-defined conversion: an exact match of
+            // another overload is better, as const String& is than const char* for a String
+            return argument.isClass() && hasConversionOperator(argument.declaration()) ? Rank.USER_DEFINED : Rank.NO_MATCH;
         }
         if (parameter.pointers() == 1 && parameter.builtin() == Builtin.VOID) {
             return argument.pointers() == 1 && argument.builtin() == Builtin.VOID ? Rank.EXACT : Rank.CONVERSION;

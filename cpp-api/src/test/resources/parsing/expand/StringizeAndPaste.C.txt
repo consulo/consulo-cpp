@@ -1,7 +1,7 @@
 FILE
   PsiElement(OUTER)('#define NAME(x) #x')
-  PsiElement(OUTER)('#define VAR(n) var_ ## n')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define VAR(n) var_ ## n')
   PsiWhiteSpace('\n')
   CPsiFieldImpl: const char* s = NAME(hello);
     CPsiModifierListImpl: const

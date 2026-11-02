@@ -9,6 +9,6 @@ FILE
     PsiWhiteSpace(' ')
     PsiElement(IDENTIFIER)('y')
     PsiElement(SEMICOLON)(';')
-  PsiElement(OUTER)('#endif')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#endif')
   PsiWhiteSpace('\n')

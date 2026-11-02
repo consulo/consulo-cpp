@@ -1,11 +1,12 @@
 FILE
   PsiElement(OUTER)('#ifndef GUARD\n# define GUARD')
+  PsiWhiteSpace('\n')
   PsiElement(OUTER)('# ifdef GUARD\n#  define VALUE int')
   PsiWhiteSpace('\n')
   PsiElement(OUTER)('# else\n#  define VALUE char\n# endif')
+  PsiWhiteSpace('\n')
   PsiElement(OUTER)('#endif')
   PsiWhiteSpace('\n')
-  PsiWhiteSpace('\n\n')
   CPsiFieldImpl: VALUE x;
     CPsiModifierListImpl: 
       <empty list>

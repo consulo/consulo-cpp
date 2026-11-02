@@ -213,7 +213,7 @@ public class CPreprocessorDirectiveCollector {
             else {
                 if (currentLeafOrLazyParseable instanceof LeafElement && currentLeafOffset < rangeStartOffset) {
                     int splitOffset = rangeStartOffset - currentLeafOffset;
-                    currentLeafOrLazyParseable = templateTreePatcher.split((LeafElement) currentLeafOrLazyParseable, splitOffset, charTable);
+                    currentLeafOrLazyParseable = splitAt((LeafElement) currentLeafOrLazyParseable, splitOffset, charTable);
                     currentLeafOffset = rangeStartOffset;
                 }
                 if (currentLeafOrLazyParseable == null) {
@@ -263,6 +263,21 @@ public class CPreprocessorDirectiveCollector {
 
         templateTreePatcher.insert(currentLeaf.getTreeParent(), currentLeaf, newLeaf);
         return newLeaf;
+    }
+
+    /**
+     * Splits a leaf in two of its type and returns the right part, where the range being processed starts. Not
+     * {@link TreePatcher#split}: the default one returns the left part, which put a directive before the whitespace
+     * preceding it and shifted every offset after it.
+     */
+    private static LeafElement splitAt(LeafElement leaf, int offset, CharTable table) {
+        CharSequence chars = leaf.getChars();
+        LeafElement leftPart = ASTFactory.leaf(leaf.getElementType(), table.intern(chars, 0, offset));
+        LeafElement rightPart = ASTFactory.leaf(leaf.getElementType(), table.intern(chars, offset, chars.length()));
+        leaf.rawInsertAfterMe(leftPart);
+        leftPart.rawInsertAfterMe(rightPart);
+        leaf.rawRemove();
+        return rightPart;
     }
 
     private static boolean isSuitableElement(@NotNull ASTNode element) {
@@ -393,7 +408,7 @@ public class CPreprocessorDirectiveCollector {
         if (!(nextLeaf instanceof LeafElement)) {
             return removeRange(nextLeaf, TextRange.from(0, offsetToSplit), charTable);
         }
-        LeafElement rLeaf = templateTreePatcher.split((LeafElement) nextLeaf, offsetToSplit, charTable);
+        LeafElement rLeaf = splitAt((LeafElement) nextLeaf, offsetToSplit, charTable);
         LeafElement lLeaf = (LeafElement) TreeUtil.prevLeaf(rLeaf);
         assert lLeaf != null;
         lLeaf.rawRemove();

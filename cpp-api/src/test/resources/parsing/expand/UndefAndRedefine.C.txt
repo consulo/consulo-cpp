@@ -1,9 +1,10 @@
 FILE
   PsiElement(OUTER)('#define MY_INT int')
+  PsiWhiteSpace('\n')
   PsiElement(OUTER)('#undef MY_INT')
   PsiWhiteSpace('\n')
   PsiElement(OUTER)('#define MY_INT long')
-  PsiWhiteSpace('\n\n')
+  PsiWhiteSpace('\n')
   CPsiFieldImpl: MY_INT x;
     CPsiModifierListImpl: 
       <empty list>

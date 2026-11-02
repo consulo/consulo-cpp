@@ -1,7 +1,7 @@
 FILE
   PsiElement(OUTER)('#define __FD_ZERO(s) \\n  do {\t\t\t\t\t\t\t\t\t      \\n    unsigned int __i;\t\t\t\t\t\t\t      \\n    fd_set *__arr = (s);\t\t\t\t\t\t      \\n    for (__i = 0; __i < sizeof (fd_set) / sizeof (__fd_mask); ++__i)\t      \\n      __FDS_BITS (__arr)[__i] = 0;\t\t\t\t\t      \\n  } while (0)')
-  PsiElement(OUTER)('#define\tFD_ZERO(fdsetp)\t\t__FD_ZERO (fdsetp)')
   PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define\tFD_ZERO(fdsetp)\t\t__FD_ZERO (fdsetp)')
   PsiWhiteSpace('\n')
   CPsiImplementingMethodImpl: void loop(void) {
   while (1) {

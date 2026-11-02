@@ -1,13 +1,13 @@
 FILE
   CPsiImplementingMethodImpl: void normalize(int n)
-{#if defined(WINDOWS)
+{
+#if defined(WINDOWS)
     for (int i = 0; i < n; ++i)
     {
         if (i == 1)
             mark(i);
     }
 #endif
-
     done();
 }
     CPsiModifierListImpl: 
@@ -27,19 +27,19 @@ FILE
         PsiElement(IDENTIFIER)('n')
       PsiElement(RPARENTH)(')')
     PsiWhiteSpace('\n')
-    CPsiCodeBlockImpl: {#if defined(WINDOWS)
+    CPsiCodeBlockImpl: {
+#if defined(WINDOWS)
     for (int i = 0; i < n; ++i)
     {
         if (i == 1)
             mark(i);
     }
 #endif
-
     done();
 }
       PsiElement(LBRACE)('{')
-      PsiElement(OUTER)('#if defined(WINDOWS)\n    for (int i = 0; i < n; ++i)\n    {\n        if (i == 1)\n            mark(i);\n    }\n#endif')
       PsiWhiteSpace('\n')
+      PsiElement(OUTER)('#if defined(WINDOWS)\n    for (int i = 0; i < n; ++i)\n    {\n        if (i == 1)\n            mark(i);\n    }\n#endif')
       PsiWhiteSpace('\n    ')
       CPsiExpressionStatementImpl: done();
         CPsiCallExpressionImpl: done()
@@ -51,6 +51,6 @@ FILE
         PsiElement(SEMICOLON)(';')
       PsiWhiteSpace('\n')
       PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
   PsiElement(OUTER)('#if defined(RETAIN)\nstruct retainer\n{\n    int value;\n};\n#endif')
   PsiWhiteSpace('\n')
-  PsiWhiteSpace('\n\n')

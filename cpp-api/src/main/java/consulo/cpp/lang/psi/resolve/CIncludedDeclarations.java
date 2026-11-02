@@ -25,9 +25,11 @@ import consulo.language.psi.PsiManager;
 import consulo.language.psi.scope.GlobalSearchScope;
 import consulo.language.psi.search.UsageSearchContext;
 import consulo.language.psi.util.LanguageCachedValueUtil;
+import consulo.module.content.ProjectFileIndex;
 import consulo.project.DumbService;
 import consulo.project.Project;
 import consulo.util.dataholder.Key;
+import consulo.util.dataholder.UserDataHolderEx;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.virtualFileSystem.util.VirtualFileUtil;
 import consulo.virtualFileSystem.light.LightVirtualFileBase;
@@ -40,7 +42,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,8 +138,7 @@ public final class CIncludedDeclarations {
             if (!candidates.contains(header)) {
                 continue;
             }
-            PsiFile psiFile = manager.findFile(header);
-            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            PsiFile cRoot = cTreeOf(manager, header);
             if (cRoot != null) {
                 headers.add(cRoot);
             }
@@ -160,8 +163,7 @@ public final class CIncludedDeclarations {
             if (!projectScope.contains(header)) {
                 continue;
             }
-            PsiFile psiFile = manager.findFile(header);
-            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            PsiFile cRoot = cTreeOf(manager, header);
             if (cRoot != null) {
                 headers.add(cRoot);
             }
@@ -185,8 +187,7 @@ public final class CIncludedDeclarations {
             if (!hasDirectives(header)) {
                 continue;
             }
-            PsiFile psiFile = manager.findFile(header);
-            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            PsiFile cRoot = cTreeOf(manager, header);
             if (cRoot != null) {
                 headers.add(cRoot);
             }
@@ -194,17 +195,47 @@ public final class CIncludedDeclarations {
         return headers;
     }
 
+    private static final Key<Map<VirtualFile, PsiFile>> LOADED_HEADERS = Key.create("CIncludedDeclarations.loadedHeaders");
+
     /**
-     * The included files containing {@code name} as a word: the word index answers for those of the project and its
-     * libraries; a header found through an include directory attached to neither is read and its words kept until it
+     * The C tree of a header, kept for the project: the platform holds the files outside the project's content only
+     * weakly, so without it the trees of a board's core - and the member maps cached on them - went with the next
+     * collection, and every navigation parsed and preprocessed the headers over again. Kept until the header changes,
+     * which makes its file invalid.
+     */
+    private static @Nullable PsiFile cTreeOf(PsiManager manager, VirtualFile header) {
+        Project project = manager.getProject();
+        Map<VirtualFile, PsiFile> loaded = project.getUserData(LOADED_HEADERS);
+        if (loaded == null) {
+            loaded = ((UserDataHolderEx) project).putUserDataIfAbsent(LOADED_HEADERS, new ConcurrentHashMap<>());
+        }
+        PsiFile cRoot = loaded.get(header);
+        if (cRoot != null && cRoot.isValid()) {
+            return cRoot;
+        }
+        PsiFile psiFile = manager.findFile(header);
+        cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+        if (cRoot != null) {
+            loaded.put(header, cRoot);
+        }
+        else {
+            loaded.remove(header);
+        }
+        return cRoot;
+    }
+
+    /**
+     * The included files containing {@code name} as a word: the word index answers for those of the project's content
+     * and of the sources of its libraries; any other header - one of the binary roots of a library, as a board's core
+     * is attached, or one found through an include directory attached to nothing - is read and its words kept until it
      * changes.
      */
     private static Set<VirtualFile> candidatesMentioning(Project project, List<VirtualFile> included, String name) {
-        GlobalSearchScope indexed = GlobalSearchScope.allScope(project);
+        ProjectFileIndex fileIndex = ProjectFileIndex.getInstance(project);
         List<VirtualFile> inIndex = new ArrayList<>();
         Set<VirtualFile> candidates = new HashSet<>();
         for (VirtualFile file : included) {
-            if (indexed.contains(file)) {
+            if (fileIndex.isInContent(file) || fileIndex.isInLibrarySource(file)) {
                 inIndex.add(file);
             }
             else if (wordsOf(file).contains(name)) {
