@@ -91,6 +91,14 @@ public final class CDefineEnv {
     }
 
     /**
+     * The headers a file is preprocessed as if it included them before its first line, as recorded - resolved by the
+     * expander, which knows the file they are relative to.
+     */
+    public static List<String> forcedIncludesFor(PsiElement context) {
+        return optionsFor(context).forcedIncludes();
+    }
+
+    /**
      * Resolves the recorded include directories; entries which no longer exist are skipped rather than failing
      * the parse.
      */

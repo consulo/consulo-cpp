@@ -43,10 +43,12 @@ public class CPreprocessorOptionsExternalizerTest {
         defines.put("GUARD", "");
         defines.put("NAME", "value with spaces");
         List<String> includePaths = List.of("/usr/include", "/opt/sdk/include");
+        List<String> forcedIncludes = List.of("/opt/sdk/Definitions.h", "Prefix.h");
 
-        CPreprocessorOptions restored = roundTrip(new CPreprocessorOptions(defines, includePaths, "abc123"));
+        CPreprocessorOptions restored = roundTrip(new CPreprocessorOptions(defines, includePaths, forcedIncludes, "abc123"));
         assertEquals(defines, restored.defines());
         assertEquals(includePaths, restored.includePaths());
+        assertEquals(forcedIncludes, restored.forcedIncludes());
         assertEquals("abc123", restored.includeFingerprint());
     }
 
@@ -72,8 +74,8 @@ public class CPreprocessorOptionsExternalizerTest {
         second.put("B", "2");
         second.put("A", "1");
 
-        assertEquals(new CPreprocessorOptions(first, List.of(), ""), new CPreprocessorOptions(second, List.of(), ""));
-        assertArrayEquals(save(new CPreprocessorOptions(first, List.of(), "")), save(new CPreprocessorOptions(second, List.of(), "")));
+        assertEquals(new CPreprocessorOptions(first, List.of(), List.of(), ""), new CPreprocessorOptions(second, List.of(), List.of(), ""));
+        assertArrayEquals(save(new CPreprocessorOptions(first, List.of(), List.of(), "")), save(new CPreprocessorOptions(second, List.of(), List.of(), "")));
     }
 
     /**
@@ -87,7 +89,7 @@ public class CPreprocessorOptionsExternalizerTest {
             defines.put("DEFINE_" + (char) ('A' + i), Integer.toString(i));
         }
 
-        CPreprocessorOptions options = new CPreprocessorOptions(defines, List.of(), "");
+        CPreprocessorOptions options = new CPreprocessorOptions(defines, List.of(), List.of(), "");
         List<String> sorted = defines.keySet().stream().sorted().toList();
         assertEquals(sorted, List.copyOf(options.defines().keySet()));
         assertEquals(sorted, List.copyOf(roundTrip(options).defines().keySet()));
@@ -99,8 +101,8 @@ public class CPreprocessorOptionsExternalizerTest {
      */
     @Test
     public void includeOrderIsPreserved() throws IOException {
-        CPreprocessorOptions first = new CPreprocessorOptions(Map.of(), List.of("/a", "/b"), "");
-        CPreprocessorOptions second = new CPreprocessorOptions(Map.of(), List.of("/b", "/a"), "");
+        CPreprocessorOptions first = new CPreprocessorOptions(Map.of(), List.of("/a", "/b"), List.of(), "");
+        CPreprocessorOptions second = new CPreprocessorOptions(Map.of(), List.of("/b", "/a"), List.of(), "");
 
         assertFalse(first.equals(second));
         assertEquals(List.of("/a", "/b"), roundTrip(first).includePaths());
@@ -112,8 +114,8 @@ public class CPreprocessorOptionsExternalizerTest {
      */
     @Test
     public void fingerprintSeparatesOptions() throws IOException {
-        CPreprocessorOptions before = new CPreprocessorOptions(Map.of(), List.of(), "aaaa");
-        CPreprocessorOptions after = new CPreprocessorOptions(Map.of(), List.of(), "bbbb");
+        CPreprocessorOptions before = new CPreprocessorOptions(Map.of(), List.of(), List.of(), "aaaa");
+        CPreprocessorOptions after = new CPreprocessorOptions(Map.of(), List.of(), List.of(), "bbbb");
 
         assertFalse(before.equals(after));
         assertEquals("aaaa", roundTrip(before).includeFingerprint());
@@ -125,8 +127,13 @@ public class CPreprocessorOptionsExternalizerTest {
      * sharing where there is no dependency to track.
      */
     @Test
+    public void forcedIncludesMakeOptionsNonEmpty() {
+        assertFalse(new CPreprocessorOptions(Map.of(), List.of(), List.of("Definitions.h"), "").isEmpty());
+    }
+
+    @Test
     public void noIncludesMeansEmptyOptions() {
-        assertTrue(new CPreprocessorOptions(Map.of(), List.of(), "").isEmpty());
+        assertTrue(new CPreprocessorOptions(Map.of(), List.of(), List.of(), "").isEmpty());
     }
 
     private static byte[] save(CPreprocessorOptions options) throws IOException {

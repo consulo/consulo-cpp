@@ -31,5 +31,7 @@ public interface CMutableModuleExtension<T extends CModuleExtension<T>> extends 
 
     void setIncludePaths(List<String> includePaths);
 
+    void setForcedIncludes(List<String> forcedIncludes);
+
     void setTarget(@Nullable String target);
 }

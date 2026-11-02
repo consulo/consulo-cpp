@@ -16,6 +16,16 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiCodeBlock;
 import consulo.cpp.lang.psi.CPsiImplementingMethod;
@@ -52,4 +62,9 @@ public class CPsiImplementingMethodImpl extends CPsiDeclarationImpl implements C
 	public CPsiCodeBlock getCodeBlock() {
 		return findNotNullChildByClass(CPsiCodeBlock.class);
 	}
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processFunction(this, processor, state, lastParent);
+    }
 }

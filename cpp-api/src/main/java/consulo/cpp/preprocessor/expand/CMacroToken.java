@@ -23,5 +23,11 @@ import consulo.language.ast.IElementType;
  * @author VISTALL
  * @since 2026-10-19
  */
-public record CMacroToken(IElementType type, String text) {
+public record CMacroToken(IElementType type, String text, int sourceOffset) {
+    /**
+     * A token a macro body or an expansion made, which no text of the file stands for.
+     */
+    public CMacroToken(IElementType type, String text) {
+        this(type, text, -1);
+    }
 }

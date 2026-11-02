@@ -81,7 +81,8 @@ public class CFileElementType extends IStubFileElementType<PsiFileStub<PsiFile>>
         CLanguageVersion languageVersion = CLanguageVersions.of(psi);
 
         PreprocessorExpander expander =
-            new PreprocessorExpander(preprocessorFile, languageVersion, CDefineEnv.includeRootsFor(psi), CDefineEnv.seedFor(psi));
+            new PreprocessorExpander(preprocessorFile, languageVersion, CDefineEnv.includeRootsFor(psi), CDefineEnv.seedFor(psi),
+                CDefineEnv.forcedIncludesFor(psi));
 
         CharSequence sourceCode = chameleon.getChars();
 

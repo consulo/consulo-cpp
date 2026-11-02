@@ -30,7 +30,7 @@ import consulo.cpp.lang.psi.visitor.CPsiElementVisitor;
  * @author VISTALL
  * @date 17:41/14.12.2011
  */
-public class CPsiEnumImpl extends CPsiElementBaseImpl implements CPsiEnum
+public class CPsiEnumImpl extends CPsiNamedElementBaseImpl implements CPsiEnum
 {
 	public CPsiEnumImpl(@org.jetbrains.annotations.NotNull ASTNode node)
 	{
@@ -51,27 +51,8 @@ public class CPsiEnumImpl extends CPsiElementBaseImpl implements CPsiEnum
 	}
 
 	@Override
-	public String getName()
-	{
-		PsiElement element = getNameIdentifier();
-		return element == null ? null : element.getText();
-	}
-
-	@Override
-	public PsiElement getNameIdentifier()
-	{
-		return findChildByType(CPsiTokens.IDENTIFIER);
-	}
-
-	@Override
 	public CPsiEnumConstant[] getConstants()
 	{
 		return findChildrenByClass(CPsiEnumConstant.class);
-	}
-
-	@Override
-	public PsiElement setName(@NotNull String name) throws IncorrectOperationException
-	{
-		return null;
 	}
 }

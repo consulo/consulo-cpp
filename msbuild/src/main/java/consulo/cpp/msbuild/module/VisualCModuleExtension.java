@@ -87,6 +87,11 @@ public class VisualCModuleExtension extends MSBuildModuleExtensionBase<VisualCMo
     }
 
     @Override
+    public List<String> getForcedIncludes() {
+        return myCompileSettings.getForcedIncludes();
+    }
+
+    @Override
     public @Nullable CLanguageVersion getCStandard() {
         return myCompileSettings.getCStandard();
     }

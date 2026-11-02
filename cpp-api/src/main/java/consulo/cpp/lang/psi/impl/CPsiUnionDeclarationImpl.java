@@ -16,6 +16,16 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.ast.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiUnionDeclaration;
@@ -24,8 +34,13 @@ import consulo.cpp.lang.psi.CPsiUnionDeclaration;
  * @author VISTALL
  * @since 2026-03-20
  */
-public class CPsiUnionDeclarationImpl extends CPsiElementBaseImpl implements CPsiUnionDeclaration {
+public class CPsiUnionDeclarationImpl extends CPsiNamedElementBaseImpl implements CPsiUnionDeclaration {
     public CPsiUnionDeclarationImpl(@NotNull ASTNode node) {
         super(node);
+    }
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processOwnerFromInside(this, processor, state, lastParent);
     }
 }

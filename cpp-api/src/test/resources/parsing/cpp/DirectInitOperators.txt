@@ -1,0 +1,428 @@
+FILE
+  CPsiImplementingMethodImpl: void build()
+{
+    const FVector2f Half(BallSize * 0.5f, BallSize * 0.5f);
+    const FVector2f Min(PaddleX - PaddleWidth * 0.5f, PaddleY);
+    const FVector2f Corner(Left + Column * (BrickWidth + BrickGap), BricksTop + Row * (BrickHeight + BrickGap));
+    FVector2f Scaled(Size & 0xFF, Offset && true);
+    FVector2f Negative(Size * -1, Size * Factor.X);
+    Foo pointer(Bar * baz);
+    Foo reference(Bar & baz, const Qux * quux);
+    Foo pointers(Bar **, Qux * const);
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('build')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    const FVector2f Half(BallSize * 0.5f, BallSize * 0.5f);
+    const FVector2f Min(PaddleX - PaddleWidth * 0.5f, PaddleY);
+    const FVector2f Corner(Left + Column * (BrickWidth + BrickGap), BricksTop + Row * (BrickHeight + BrickGap));
+    FVector2f Scaled(Size & 0xFF, Offset && true);
+    FVector2f Negative(Size * -1, Size * Factor.X);
+    Foo pointer(Bar * baz);
+    Foo reference(Bar & baz, const Qux * quux);
+    Foo pointers(Bar **, Qux * const);
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: const FVector2f Half(BallSize * 0.5f, BallSize * 0.5f);
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: FVector2f
+          PsiElement(IDENTIFIER)('FVector2f')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Half')
+        CPsiArgumentListImpl: (BallSize * 0.5f, BallSize * 0.5f)
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: BallSize * 0.5f
+            CPsiReferenceExpressionImpl: BallSize
+              PsiElement(IDENTIFIER)('BallSize')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0.5f
+              PsiElement(FLOAT_LITERAL)('0.5f')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: BallSize * 0.5f
+            CPsiReferenceExpressionImpl: BallSize
+              PsiElement(IDENTIFIER)('BallSize')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0.5f
+              PsiElement(FLOAT_LITERAL)('0.5f')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: const FVector2f Min(PaddleX - PaddleWidth * 0.5f, PaddleY);
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: FVector2f
+          PsiElement(IDENTIFIER)('FVector2f')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Min')
+        CPsiArgumentListImpl: (PaddleX - PaddleWidth * 0.5f, PaddleY)
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: PaddleX - PaddleWidth * 0.5f
+            CPsiReferenceExpressionImpl: PaddleX
+              PsiElement(IDENTIFIER)('PaddleX')
+            PsiWhiteSpace(' ')
+            PsiElement(MINUS)('-')
+            PsiWhiteSpace(' ')
+            CPsiBinaryExpressionImpl: PaddleWidth * 0.5f
+              CPsiReferenceExpressionImpl: PaddleWidth
+                PsiElement(IDENTIFIER)('PaddleWidth')
+              PsiWhiteSpace(' ')
+              PsiElement(ASTERISK)('*')
+              PsiWhiteSpace(' ')
+              CPsiLiteralExpressionImpl: 0.5f
+                PsiElement(FLOAT_LITERAL)('0.5f')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: PaddleY
+            PsiElement(IDENTIFIER)('PaddleY')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: const FVector2f Corner(Left + Column * (BrickWidth + BrickGap), BricksTop + Row * (BrickHeight + BrickGap));
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: FVector2f
+          PsiElement(IDENTIFIER)('FVector2f')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Corner')
+        CPsiArgumentListImpl: (Left + Column * (BrickWidth + BrickGap), BricksTop + Row * (BrickHeight + BrickGap))
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: Left + Column * (BrickWidth + BrickGap)
+            CPsiReferenceExpressionImpl: Left
+              PsiElement(IDENTIFIER)('Left')
+            PsiWhiteSpace(' ')
+            PsiElement(PLUS)('+')
+            PsiWhiteSpace(' ')
+            CPsiBinaryExpressionImpl: Column * (BrickWidth + BrickGap)
+              CPsiReferenceExpressionImpl: Column
+                PsiElement(IDENTIFIER)('Column')
+              PsiWhiteSpace(' ')
+              PsiElement(ASTERISK)('*')
+              PsiWhiteSpace(' ')
+              CPsiParenthesizedExpressionImpl: (BrickWidth + BrickGap)
+                PsiElement(LPARENTH)('(')
+                CPsiBinaryExpressionImpl: BrickWidth + BrickGap
+                  CPsiReferenceExpressionImpl: BrickWidth
+                    PsiElement(IDENTIFIER)('BrickWidth')
+                  PsiWhiteSpace(' ')
+                  PsiElement(PLUS)('+')
+                  PsiWhiteSpace(' ')
+                  CPsiReferenceExpressionImpl: BrickGap
+                    PsiElement(IDENTIFIER)('BrickGap')
+                PsiElement(RPARENTH)(')')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: BricksTop + Row * (BrickHeight + BrickGap)
+            CPsiReferenceExpressionImpl: BricksTop
+              PsiElement(IDENTIFIER)('BricksTop')
+            PsiWhiteSpace(' ')
+            PsiElement(PLUS)('+')
+            PsiWhiteSpace(' ')
+            CPsiBinaryExpressionImpl: Row * (BrickHeight + BrickGap)
+              CPsiReferenceExpressionImpl: Row
+                PsiElement(IDENTIFIER)('Row')
+              PsiWhiteSpace(' ')
+              PsiElement(ASTERISK)('*')
+              PsiWhiteSpace(' ')
+              CPsiParenthesizedExpressionImpl: (BrickHeight + BrickGap)
+                PsiElement(LPARENTH)('(')
+                CPsiBinaryExpressionImpl: BrickHeight + BrickGap
+                  CPsiReferenceExpressionImpl: BrickHeight
+                    PsiElement(IDENTIFIER)('BrickHeight')
+                  PsiWhiteSpace(' ')
+                  PsiElement(PLUS)('+')
+                  PsiWhiteSpace(' ')
+                  CPsiReferenceExpressionImpl: BrickGap
+                    PsiElement(IDENTIFIER)('BrickGap')
+                PsiElement(RPARENTH)(')')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: FVector2f Scaled(Size & 0xFF, Offset && true);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: FVector2f
+          PsiElement(IDENTIFIER)('FVector2f')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Scaled')
+        CPsiArgumentListImpl: (Size & 0xFF, Offset && true)
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: Size & 0xFF
+            CPsiReferenceExpressionImpl: Size
+              PsiElement(IDENTIFIER)('Size')
+            PsiWhiteSpace(' ')
+            PsiElement(AND)('&')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0xFF
+              PsiElement(INTEGER_LITERAL)('0xFF')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: Offset && true
+            CPsiReferenceExpressionImpl: Offset
+              PsiElement(IDENTIFIER)('Offset')
+            PsiWhiteSpace(' ')
+            PsiElement(ANDAND)('&&')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: true
+              PsiElement(BOOL_LITERAL)('true')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: FVector2f Negative(Size * -1, Size * Factor.X);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: FVector2f
+          PsiElement(IDENTIFIER)('FVector2f')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Negative')
+        CPsiArgumentListImpl: (Size * -1, Size * Factor.X)
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: Size * -1
+            CPsiReferenceExpressionImpl: Size
+              PsiElement(IDENTIFIER)('Size')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            CPsiPrefixExpressionImpl: -1
+              PsiElement(MINUS)('-')
+              CPsiLiteralExpressionImpl: 1
+                PsiElement(INTEGER_LITERAL)('1')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: Size * Factor.X
+            CPsiReferenceExpressionImpl: Size
+              PsiElement(IDENTIFIER)('Size')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: Factor.X
+              CPsiReferenceExpressionImpl: Factor
+                PsiElement(IDENTIFIER)('Factor')
+              PsiElement(DOT)('.')
+              PsiElement(IDENTIFIER)('X')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: Foo pointer(Bar * baz);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('pointer')
+        CPsiParameterListImpl: (Bar * baz)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: Bar * baz
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: Bar
+              PsiElement(IDENTIFIER)('Bar')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('baz')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: Foo reference(Bar & baz, const Qux * quux);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('reference')
+        CPsiParameterListImpl: (Bar & baz, const Qux * quux)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: Bar & baz
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: Bar
+              PsiElement(IDENTIFIER)('Bar')
+            PsiWhiteSpace(' ')
+            PsiElement(AND)('&')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('baz')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiParameterImpl: const Qux * quux
+            CPsiModifierListImpl: const
+              PsiElement(CONST_KEYWORD)('const')
+            PsiWhiteSpace(' ')
+            CPsiTypeRefImpl: Qux
+              PsiElement(IDENTIFIER)('Qux')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('quux')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiDeclarationMethodImpl: Foo pointers(Bar **, Qux * const);
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Foo
+          PsiElement(IDENTIFIER)('Foo')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('pointers')
+        CPsiParameterListImpl: (Bar **, Qux * const)
+          PsiElement(LPARENTH)('(')
+          CPsiParameterImpl: Bar **
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: Bar
+              PsiElement(IDENTIFIER)('Bar')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiElement(ASTERISK)('*')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiParameterImpl: Qux * const
+            CPsiModifierListImpl: 
+              <empty list>
+            CPsiTypeRefImpl: Qux
+              PsiElement(IDENTIFIER)('Qux')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            PsiElement(CONST_KEYWORD)('const')
+          PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void loops()
+{
+    for (FBrick& Brick : Bricks)
+    {
+        Brick.Hit();
+    }
+    for (const FBrick* Brick : Pointers)
+    {
+    }
+    FBrick* Last{nullptr};
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('loops')
+    CPsiParameterListImpl: ()
+      PsiElement(LPARENTH)('(')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    for (FBrick& Brick : Bricks)
+    {
+        Brick.Hit();
+    }
+    for (const FBrick* Brick : Pointers)
+    {
+    }
+    FBrick* Last{nullptr};
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiForStatementImpl: for (FBrick& Brick : Bricks)
+    {
+        Brick.Hit();
+    }
+        PsiElement(FOR_KEYWORD)('for')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: FBrick& Brick
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: FBrick
+            PsiElement(IDENTIFIER)('FBrick')
+          PsiElement(AND)('&')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('Brick')
+        PsiWhiteSpace(' ')
+        PsiElement(COLON)(':')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: Bricks
+          PsiElement(IDENTIFIER)('Bricks')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n    ')
+        CPsiCodeBlockImpl: {
+        Brick.Hit();
+    }
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          CPsiExpressionStatementImpl: Brick.Hit();
+            CPsiCallExpressionImpl: Brick.Hit()
+              CPsiReferenceExpressionImpl: Brick.Hit
+                CPsiReferenceExpressionImpl: Brick
+                  PsiElement(IDENTIFIER)('Brick')
+                PsiElement(DOT)('.')
+                PsiElement(IDENTIFIER)('Hit')
+              CPsiArgumentListImpl: ()
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+            PsiElement(SEMICOLON)(';')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n    ')
+      CPsiForStatementImpl: for (const FBrick* Brick : Pointers)
+    {
+    }
+        PsiElement(FOR_KEYWORD)('for')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: const FBrick* Brick
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: FBrick
+            PsiElement(IDENTIFIER)('FBrick')
+          PsiElement(ASTERISK)('*')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('Brick')
+        PsiWhiteSpace(' ')
+        PsiElement(COLON)(':')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: Pointers
+          PsiElement(IDENTIFIER)('Pointers')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace('\n    ')
+        CPsiCodeBlockImpl: {
+    }
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: FBrick* Last{nullptr};
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: FBrick
+          PsiElement(IDENTIFIER)('FBrick')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('Last')
+        CPsiInitializerListImpl: {nullptr}
+          PsiElement(LBRACE)('{')
+          CPsiLiteralExpressionImpl: nullptr
+            PsiElement(NULLPTR_KEYWORD)('nullptr')
+          PsiElement(RBRACE)('}')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

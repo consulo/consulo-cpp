@@ -108,6 +108,12 @@
 		</dependency>
 		<dependency>
 			<groupId>consulo</groupId>
+			<artifactId>consulo-language-editor-refactoring-api</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>consulo</groupId>
 			<artifactId>consulo-project-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>

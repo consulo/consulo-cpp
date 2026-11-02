@@ -23,7 +23,7 @@ import consulo.cpp.lang.psi.CPsiParameter;
  * @author VISTALL
  * @date 23:03/10.12.2011
  */
-public class CPsiParameterImpl extends CPsiElementBaseImpl implements CPsiParameter {
+public class CPsiParameterImpl extends CPsiNamedElementBaseImpl implements CPsiParameter {
 	public CPsiParameterImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
 		super(node);
 	}

@@ -16,7 +16,6 @@
 package consulo.cpp.msbuild.module;
 
 import consulo.annotation.component.ExtensionImpl;
-import consulo.cpp.module.extension.CDefaultModuleExtension;
 import consulo.cpp.msbuild.localize.VisualCLocalize;
 import consulo.localize.LocalizeValue;
 import consulo.module.content.layer.ModuleExtensionProvider;
@@ -36,11 +35,6 @@ public class VisualCModuleExtensionProvider implements ModuleExtensionProvider<V
     @Override
     public String getId() {
         return VisualCModuleExtension.ID;
-    }
-
-    @Override
-    public @Nullable String getParentId() {
-        return CDefaultModuleExtension.ID;
     }
 
     @Override

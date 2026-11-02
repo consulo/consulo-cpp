@@ -16,6 +16,14 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CDeclarationKind;
+
+import consulo.cpp.lang.psi.resolve.CNameChainReference;
+
+import consulo.language.psi.PsiReference;
+
 import consulo.language.ast.IElementType;
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiSuperClass;
@@ -42,4 +50,9 @@ public class CPsiSuperClassImpl extends CPsiElementBaseImpl implements CPsiSuper
 	public PsiElement getAccessElement() {
 		return findChildByType(CPsiTokens.ACCESS_MODIFIERS);
 	}
+
+    @Override
+    public @Nullable PsiReference getReference() {
+        return CNameChainReference.of(this, CDeclarationKind.TYPES);
+    }
 }

@@ -19,6 +19,7 @@ import consulo.annotation.access.RequiredReadAction;
 import consulo.cpp.lang.psi.visitor.CPsiElementVisitor;
 import consulo.cpp.preprocessor.expand.ExpandedMacro;
 import consulo.cpp.preprocessor.psi.CPreprocessorMacroReference;
+import consulo.cpp.lang.psi.resolve.CMacroArguments;
 import consulo.document.util.TextRange;
 import consulo.language.ast.IElementType;
 import consulo.language.impl.psi.LeafPsiElement;
@@ -27,6 +28,8 @@ import consulo.language.psi.PsiElementVisitor;
 import consulo.language.psi.PsiReference;
 import consulo.language.util.IncorrectOperationException;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * A macro use in the C tree: the name, and for a function-like macro its parenthesised arguments, as one leaf. The
@@ -88,6 +91,22 @@ public class CPreprocessorMacroInvocationImpl extends LeafPsiElement implements 
     @Override
     public PsiReference getReference() {
         return this;
+    }
+
+    /**
+     * The name of the macro, and the names its arguments pass into the expansion - so {@code calc::add} of
+     * {@code EXPECT_EQ(calc::add(2, 3), 5)} can be clicked, found and renamed.
+     */
+    @RequiredReadAction
+    @Override
+    public PsiReference[] getReferences() {
+        List<CMacroArguments.Name> names = CMacroArguments.namesOf(this);
+        PsiReference[] references = new PsiReference[names.size() + 1];
+        references[0] = this;
+        for (int i = 0; i < names.size(); i++) {
+            references[i + 1] = new CMacroArgumentReference(this, names.get(i).rangeInCall());
+        }
+        return references;
     }
 
     @Override

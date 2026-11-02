@@ -19,7 +19,9 @@ import consulo.annotation.component.ExtensionImpl;
 import consulo.content.bundle.Sdk;
 import consulo.cpp.lang.CHeaderFileType;
 import consulo.cpp.lang.CPPHeaderFileType;
+import consulo.cpp.module.extension.CDefaultModuleExtension;
 import consulo.cpp.msbuild.module.VisualCMutableModuleExtension;
+import consulo.module.extension.MutableModuleExtension;
 import consulo.module.Module;
 import consulo.module.content.layer.ModifiableRootModel;
 import consulo.msbuild.MSBuildEvaluatedItem;
@@ -68,6 +70,10 @@ public class VisualCProjectCapability implements MSBuildProjectCapability {
 
         VisualCProjectModel model = VisualCProjectModel.of(Path.of(projectDir.getPath()), properties);
 
+        // the project's framework is Visual C++ of MSBuild: the C/C++ set up by hand is another one
+        if (rootModel.getExtensionWithoutCheck(CDefaultModuleExtension.ID) instanceof MutableModuleExtension<?> manual) {
+            manual.setEnabled(false);
+        }
         extension.setEnabled(true);
         extension.setProjectFilePath(projectFile.getPath());
         extension.setConfiguration(model.configuration());
@@ -107,6 +113,7 @@ public class VisualCProjectCapability implements MSBuildProjectCapability {
 
         extension.setDefines(defines);
         extension.setIncludePaths(settings.includeDirectories());
+        extension.setForcedIncludes(settings.forcedIncludes());
         extension.setCStandard(settings.cStandard());
         extension.setCppStandard(settings.cppStandard());
 

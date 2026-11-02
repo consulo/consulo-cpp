@@ -2,6 +2,7 @@ package consulo.cpp.preprocessor.expand;
 
 import consulo.cpp.lang.psi.CPsiTokens;
 import consulo.cpp.lang.version.CLanguageVersion;
+import consulo.cpp.moduleAware.CIncludeWalker;
 import consulo.cpp.preprocessor.CPreprocessorLanguage;
 import consulo.cpp.preprocessor.psi.*;
 import consulo.cpp.preprocessor.psi.impl.visitor.CPreprocessorRecursiveElementVisitor;
@@ -61,13 +62,13 @@ public class PreprocessorExpander {
     private final List<VirtualFile> myIncludePaths;
 
     public PreprocessorExpander(PsiFile preprocessorFile, CLanguageVersion languageVersion) {
-        this(preprocessorFile, languageVersion, new HashSet<>(), Collections.emptyList(), Collections.emptyMap());
+        this(preprocessorFile, languageVersion, new HashSet<>(), Collections.emptyList(), Collections.emptyMap(), List.of());
     }
 
     public PreprocessorExpander(PsiFile preprocessorFile,
                                 CLanguageVersion languageVersion,
                                 @NotNull List<VirtualFile> includePaths) {
-        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, Collections.emptyMap());
+        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, Collections.emptyMap(), List.of());
     }
 
     /**
@@ -78,7 +79,19 @@ public class PreprocessorExpander {
                                 CLanguageVersion languageVersion,
                                 @NotNull List<VirtualFile> includePaths,
                                 @NotNull Map<String, String> seedDefines) {
-        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, seedMacros(languageVersion, seedDefines));
+        this(preprocessorFile, languageVersion, includePaths, seedDefines, List.of());
+    }
+
+    /**
+     * Expands with {@code seedDefines} in scope and then the {@code forcedIncludes} applied, as if each were included
+     * above the first line - {@code -include} of gcc and clang, {@code /FI} of MSVC.
+     */
+    public PreprocessorExpander(PsiFile preprocessorFile,
+                                CLanguageVersion languageVersion,
+                                @NotNull List<VirtualFile> includePaths,
+                                @NotNull Map<String, String> seedDefines,
+                                @NotNull List<String> forcedIncludes) {
+        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, seedMacros(languageVersion, seedDefines), forcedIncludes);
     }
 
     /**
@@ -89,7 +102,8 @@ public class PreprocessorExpander {
                                  CLanguageVersion languageVersion,
                                  Set<VirtualFile> processedFiles,
                                  List<VirtualFile> includePaths,
-                                 Map<String, ExpandedMacro> inheritedMacros) {
+                                 Map<String, ExpandedMacro> inheritedMacros,
+                                 List<String> forcedIncludes) {
         myPreprocessorFile = preprocessorFile;
         myLanguageVersion = languageVersion;
         myProcessedFiles = processedFiles;
@@ -100,6 +114,10 @@ public class PreprocessorExpander {
         VirtualFile vFile = sourceFile(preprocessorFile);
         if (vFile != null) {
             myProcessedFiles.add(vFile);
+        }
+
+        for (String forcedInclude : forcedIncludes) {
+            processForcedInclude(forcedInclude, vFile);
         }
 
         preprocessorFile.accept(new CPreprocessorRecursiveElementVisitor() {
@@ -176,6 +194,17 @@ public class PreprocessorExpander {
         else {
             // No parent directory — fall straight through to include search paths
             processIndependInclude(includeName);
+        }
+    }
+
+    private void processForcedInclude(String path, @Nullable VirtualFile currentVFile) {
+        if (currentVFile == null) {
+            processIndependInclude(path);
+            return;
+        }
+        VirtualFile found = CIncludeWalker.resolveForcedInclude(path, currentVFile, myIncludePaths);
+        if (found != null) {
+            processResolvedFile(found);
         }
     }
 
@@ -265,7 +294,7 @@ public class PreprocessorExpander {
 
         // Recursively expand the included file, sharing the processed-files set and include paths
         PreprocessorExpander childExpander =
-                new PreprocessorExpander(preprocessorRoot, myLanguageVersion, myProcessedFiles, myIncludePaths, myDefines);
+                new PreprocessorExpander(preprocessorRoot, myLanguageVersion, myProcessedFiles, myIncludePaths, myDefines, List.of());
         // The child started from our defines, so its final state is the state after the include: names it
         // undefined are gone, the rest are added or overridden.
         myDefines.keySet().retainAll(childExpander.myDefines.keySet());
@@ -487,6 +516,13 @@ public class PreprocessorExpander {
 
     public CLanguageVersion getLanguageVersion() {
         return myLanguageVersion;
+    }
+
+    /**
+     * The names of the macros defined once the file is expanded.
+     */
+    public java.util.Set<String> getMacroNames() {
+        return java.util.Collections.unmodifiableSet(myDefines.keySet());
     }
 
     @Nullable

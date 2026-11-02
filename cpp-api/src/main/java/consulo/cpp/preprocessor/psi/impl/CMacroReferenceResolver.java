@@ -31,7 +31,7 @@ import org.jspecify.annotations.Nullable;
  * @author VISTALL
  * @since 2026-10-19
  */
-final class CMacroReferenceResolver {
+public final class CMacroReferenceResolver {
     private CMacroReferenceResolver() {
     }
 
@@ -44,7 +44,30 @@ final class CMacroReferenceResolver {
         PreprocessorExpander expander = new PreprocessorExpander(preprocessorFile,
             CLanguageVersions.of(reference),
             CDefineEnv.includeRootsFor(reference),
-            CDefineEnv.seedFor(reference));
+            CDefineEnv.seedFor(reference),
+            CDefineEnv.forcedIncludesFor(reference));
         return expander.getMacro(name);
+    }
+
+    /**
+     * The names of the macros a file defines - itself, its includes, its module - kept until the next change of PSI: what
+     * the highlighting asks of every name of every directive.
+     */
+    @RequiredReadAction
+    public static java.util.Set<String> macroNames(PsiElement context) {
+        PsiFile preprocessorFile = context.getContainingFile().getViewProvider().getPsi(CPreprocessorLanguage.INSTANCE);
+        if (preprocessorFile == null) {
+            return java.util.Set.of();
+        }
+        return consulo.language.psi.util.LanguageCachedValueUtil.getProjectPsiDependentCache(preprocessorFile, CMacroReferenceResolver::computeMacroNames);
+    }
+
+    private static java.util.Set<String> computeMacroNames(PsiFile preprocessorFile) {
+        PreprocessorExpander expander = new PreprocessorExpander(preprocessorFile,
+            CLanguageVersions.of(preprocessorFile),
+            CDefineEnv.includeRootsFor(preprocessorFile),
+            CDefineEnv.seedFor(preprocessorFile),
+            CDefineEnv.forcedIncludesFor(preprocessorFile));
+        return java.util.Set.copyOf(expander.getMacroNames());
     }
 }

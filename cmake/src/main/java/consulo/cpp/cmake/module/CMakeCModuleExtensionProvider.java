@@ -40,7 +40,7 @@ public class CMakeCModuleExtensionProvider implements ModuleExtensionProvider<CM
 
     @Override
     public @Nullable String getParentId() {
-        return CDefaultModuleExtension.ID;
+        return CMakeCModuleExtension.PARENT_ID;
     }
 
     @Override

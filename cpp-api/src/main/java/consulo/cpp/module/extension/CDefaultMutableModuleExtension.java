@@ -16,14 +16,14 @@
 package consulo.cpp.module.extension;
 
 import consulo.disposer.Disposable;
-import consulo.localize.LocalizeValue;
+import consulo.cpp.localize.CLocalize;
 import consulo.module.content.layer.ModuleRootLayer;
 import consulo.ui.Component;
 import consulo.ui.Label;
 import consulo.ui.TextBox;
 import consulo.ui.annotation.RequiredUIAccess;
 import consulo.ui.layout.VerticalLayout;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
@@ -41,6 +41,11 @@ public class CDefaultMutableModuleExtension extends CDefaultModuleExtension impl
     @Override
     public void setIncludePaths(List<String> includePaths) {
         myCompileSettings.setIncludePaths(includePaths);
+    }
+
+    @Override
+    public void setForcedIncludes(List<String> forcedIncludes) {
+        myCompileSettings.setForcedIncludes(forcedIncludes);
     }
 
     @Override
@@ -64,7 +69,7 @@ public class CDefaultMutableModuleExtension extends CDefaultModuleExtension impl
     @Override
     public Component createConfigurationComponent(Disposable uiDisposable, Runnable updateOnCheck) {
         VerticalLayout layout = VerticalLayout.create();
-        layout.add(Label.create(LocalizeValue.localizeTODO("Defines (NAME=VALUE; NAME2)")));
+        layout.add(Label.create(CLocalize.extensionDefinesLabel()));
 
         TextBox definesBox = TextBox.create(CModuleExtension.formatDefines(getDefines()));
         definesBox.addValueListener(event -> {
@@ -73,7 +78,7 @@ public class CDefaultMutableModuleExtension extends CDefaultModuleExtension impl
         });
         layout.add(definesBox);
 
-        layout.add(Label.create(LocalizeValue.localizeTODO("Include directories (path; path)")));
+        layout.add(Label.create(CLocalize.extensionIncludePathsLabel()));
         TextBox includeBox = TextBox.create(CModuleExtension.formatIncludePaths(getIncludePaths()));
         includeBox.addValueListener(event -> {
             setIncludePaths(CModuleExtension.parseIncludePaths(event.getValue()));
@@ -81,7 +86,15 @@ public class CDefaultMutableModuleExtension extends CDefaultModuleExtension impl
         });
         layout.add(includeBox);
 
-        layout.add(Label.create(LocalizeValue.localizeTODO("Target (x86_64-pc-linux-gnu, arm-none-eabi; empty - the IDE's machine)")));
+        layout.add(Label.create(CLocalize.extensionForcedIncludesLabel()));
+        TextBox forcedIncludeBox = TextBox.create(CModuleExtension.formatIncludePaths(getForcedIncludes()));
+        forcedIncludeBox.addValueListener(event -> {
+            setForcedIncludes(CModuleExtension.parseIncludePaths(event.getValue()));
+            updateOnCheck.run();
+        });
+        layout.add(forcedIncludeBox);
+
+        layout.add(Label.create(CLocalize.extensionTargetLabel()));
         String target = getTarget();
         TextBox targetBox = TextBox.create(target == null ? "" : target);
         targetBox.addValueListener(event -> {

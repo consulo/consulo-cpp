@@ -31,6 +31,9 @@ import consulo.cpp.preprocessor.psi.CPsiSharpInclude;
 import consulo.it.AllowLogError;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiReference;
+import consulo.language.psi.PsiNamedElement;
+import consulo.language.psi.search.ReferencesSearch;
+import consulo.undoRedo.CommandProcessor;
 import consulo.it.HeadlessApplicationExtension;
 import consulo.module.ModifiableModuleModel;
 import consulo.module.Module;
@@ -176,6 +179,227 @@ public class CModuleAwareIndexTest {
     }
 
     /**
+     * A forced include - {@code -include Definitions.h} of an Unreal module - is preprocessed above the first line of
+     * every file of the module: its defines decide a branch of a file which never includes it.
+     */
+    @Test
+    public void forcedIncludeDecidesTheBranch(Application application, ProjectManager projectManager) throws Exception {
+        Path includeDirectory = Files.createTempDirectory("consulo-cpp-it-forced-header");
+        Path header = includeDirectory.resolve("Definitions.h");
+        Files.writeString(header, "#define FEATURE 1\n");
+
+        Path directory = Files.createTempDirectory("consulo-cpp-it-forced");
+        Path source = directory.resolve("main.c");
+        Files.writeString(source, "#ifdef FEATURE\nint enabled;\n#else\nint disabled;\n#endif\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of(), List.of(), List.of(header.toString()));
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+        assertEquals(List.of(header.toString()), CDefineEnv.optionsFor(project, file).forcedIncludes());
+
+        waitFor("the define of the forced include must decide the branch", () -> declarationsOf(project, file).contains("enabled"));
+        assertFalse(declarationsOf(project, file).contains("disabled"), "the #else declaration must not be parsed");
+    }
+
+    /**
+     * A forced include given by name is found as an {@code #include "name"} would be - here in an include directory.
+     */
+    @Test
+    public void relativeForcedIncludeIsFoundInTheIncludeDirectories(Application application, ProjectManager projectManager) throws Exception {
+        Path includeDirectory = Files.createTempDirectory("consulo-cpp-it-forced-search");
+        Files.writeString(includeDirectory.resolve("Prefix.h"), "#define FEATURE 1\n");
+
+        Path directory = Files.createTempDirectory("consulo-cpp-it-forced-relative");
+        Path source = directory.resolve("main.c");
+        Files.writeString(source, "#ifdef FEATURE\nint enabled;\n#else\nint disabled;\n#endif\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of(), List.of(includeDirectory.toString()),
+            List.of("Prefix.h"));
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("the forced include must be found in the include directories", () -> declarationsOf(project, file).contains("enabled"));
+        assertFalse(declarationsOf(project, file).contains("disabled"), "the #else declaration must not be parsed");
+    }
+
+    /**
+     * Names declared in an included header resolve into it: a type through its namespace, a function, a member through
+     * the type of a parameter, and a namespace reopened in the source.
+     */
+    @Test
+    public void namesResolveIntoIncludedHeaders(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-include-resolve");
+        Files.writeString(directory.resolve("geo.h"), "namespace geo { struct Point { int x; }; int area(Point p); }\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"geo.h\"\nnamespace geo { int perimeter(Point p) { return p.x; } }\n"
+            + "int use(geo::Point p) { return geo::area(p) + p.x; }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("geo::Point must resolve into the header", () -> "geo.h".equals(targetFileOf(project, file, "Point", 1)));
+        assertEquals("geo.h", targetFileOf(project, file, "Point", 0), "Point in the namespace reopened in the file");
+        assertEquals("geo.h", targetFileOf(project, file, "area", 0), "the function of the header");
+        assertEquals("geo.h", targetFileOf(project, file, "x", 0), "the member through the type of a parameter");
+        assertEquals("geo.h", targetFileOf(project, file, "x", 1), "the member through the qualified type of a parameter");
+        assertEquals("main.cpp", targetFileOf(project, file, "geo", 0), "the namespace reopened in the file itself");
+    }
+
+    /**
+     * A {@code using namespace} written in a header applies to the files including it, as it does in a compiler.
+     */
+    @Test
+    public void usingDirectiveOfAHeaderApplies(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-header-directive");
+        Files.writeString(directory.resolve("geo.h"), "namespace geo { struct Point { int x; }; }\nusing namespace geo;\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"geo.h\"\nint use(Point p) { return p.x; }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("Point must resolve through the directive of the header", () -> "geo.h".equals(targetFileOf(project, file, "Point", 0)));
+        assertEquals("geo.h", targetFileOf(project, file, "x", 0), "the member of the type brought in");
+    }
+
+    /**
+     * Find usages of a function finds its calls, across a header and the file including it; renaming a local renames
+     * its declaration and every use, and nothing else.
+     */
+    @Test
+    public void findUsagesAndRename(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-usages");
+        Files.writeString(directory.resolve("util.h"), "int helper(int value);\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"util.h\"\nint use() { int count = helper(1); return helper(count) + count; }\n"
+            + "int other() { int count = 2; return count; }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        VirtualFile header = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(directory.resolve("util.h"));
+        assertNotNull(file);
+        assertNotNull(header);
+
+        waitFor("helper must resolve into the header", () -> "util.h".equals(targetFileOf(project, file, "helper", 0)));
+        int usages = ReadAction.compute(() -> {
+            PsiElement helper = targetOf(project, file, "helper", 0);
+            return helper == null ? -1 : ReferencesSearch.search(helper).findAll().size();
+        });
+        assertEquals(2, usages, "the two calls of helper");
+
+        PsiElement count = targetOf(project, file, "count", 0);
+        assertNotNull(count);
+        List<PsiReference> references = ReadAction.compute(() -> List.copyOf(ReferencesSearch.search(count).findAll()));
+        assertEquals(2, references.size(), "the two uses of the first count, not those of the other function");
+        // as a rename does: in a command, on the UI thread, which a document of a physical file is changed on
+        application.getLastUIAccess().giveAndWait(() -> CommandProcessor.getInstance().executeCommand(project, () -> WriteAction.run(() -> {
+            for (PsiReference reference : references) {
+                reference.handleElementRename("total");
+            }
+            ((PsiNamedElement) count).setName("total");
+        }), "rename", null));
+        String renamed = ReadAction.compute(() -> PsiManager.getInstance(project).findFile(file).getText());
+        assertEquals("#include \"util.h\"\nint use() { int total = helper(1); return helper(total) + total; }\n"
+            + "int other() { int count = 2; return count; }\n", renamed);
+    }
+
+    private static @Nullable PsiElement targetOf(Project project, VirtualFile file, String name, int index) {
+        return ReadAction.compute(() -> {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            if (cRoot == null) {
+                return null;
+            }
+            int seen = 0;
+            for (PsiElement element : PsiTreeUtil.findChildrenOfType(cRoot, PsiElement.class)) {
+                PsiReference reference = element.getReference();
+                if (reference != null && name.equals(reference.getCanonicalText()) && seen++ == index) {
+                    return reference.resolve();
+                }
+            }
+            return null;
+        });
+    }
+
+    /**
+     * A header the file includes after one pulling in hundreds - gtest.h, the standard library - is still seen, and the
+     * names an argument of a macro call passes resolve into it: {@code calc::add} of {@code EXPECT_EQ(calc::add(2, 3), 5)}.
+     */
+    @Test
+    public void macroArgumentsResolveBehindLargeIncludes(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-large-includes");
+        int chain = 300;
+        for (int i = 0; i < chain; i++) {
+            Files.writeString(directory.resolve("h" + i + ".h"), i + 1 < chain ? "#include \"h" + (i + 1) + ".h\"\n" : "\n");
+        }
+        Files.writeString(directory.resolve("big.h"), "#include \"h0.h\"\n#define EXPECT_EQ(a, b) check((a) == (b))\nbool check(bool value);\n");
+        Files.writeString(directory.resolve("calc.hpp"), "namespace calc { int add(int a, int b); }\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"big.h\"\n#include \"calc.hpp\"\nvoid test() { EXPECT_EQ(calc::add(2, 3), 5); }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("add in the macro call must resolve into calc.hpp", () -> "calc.hpp".equals(ReadAction.compute(() -> {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            int offset = psiFile == null ? -1 : psiFile.getText().indexOf("add(2");
+            PsiReference reference = cRoot == null || offset < 0 ? null : cRoot.findReferenceAt(offset);
+            PsiElement target = reference == null ? null : reference.resolve();
+            return target == null ? null : target.getContainingFile().getName();
+        })));
+    }
+
+    /**
+     * A forced include is seen as an included header: its declarations resolve in a file which never includes it.
+     */
+    @Test
+    public void namesResolveIntoForcedIncludes(Application application, ProjectManager projectManager) throws Exception {
+        Path includeDirectory = Files.createTempDirectory("consulo-cpp-it-forced-resolve-header");
+        Path header = includeDirectory.resolve("Definitions.h");
+        Files.writeString(header, "struct Forced { int value; };\n");
+
+        Path directory = Files.createTempDirectory("consulo-cpp-it-forced-resolve");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "int use(Forced forced) { return forced.value; }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of(), List.of(), List.of(header.toString()));
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("the type must resolve into the forced include", () -> "Definitions.h".equals(targetFileOf(project, file, "Forced", 0)));
+        assertEquals("Definitions.h", targetFileOf(project, file, "value", 0), "the member through the forced type");
+    }
+
+    /**
+     * @return the name of the file the {@code index}-th reference named {@code name} in {@code file} resolves into
+     */
+    private static @Nullable String targetFileOf(Project project, VirtualFile file, String name, int index) {
+        return ReadAction.compute(() -> {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            PsiFile cRoot = psiFile == null ? null : psiFile.getViewProvider().getPsi(CLanguage.INSTANCE);
+            if (cRoot == null) {
+                return null;
+            }
+            int seen = 0;
+            for (PsiElement element : PsiTreeUtil.findChildrenOfType(cRoot, PsiElement.class)) {
+                PsiReference reference = element.getReference();
+                if (reference == null || !name.equals(reference.getCanonicalText())) {
+                    continue;
+                }
+                if (seen++ == index) {
+                    PsiElement target = reference.resolve();
+                    return target == null ? null : target.getContainingFile().getName();
+                }
+            }
+            return null;
+        });
+    }
+
+    /**
      * @return the file the first {@code #include} of {@code file} resolves to
      */
     private static @Nullable VirtualFile includeTargetOf(Project project, VirtualFile file) {
@@ -223,6 +447,15 @@ public class CModuleAwareIndexTest {
                                                  Path directory,
                                                  Map<String, String> defines,
                                                  List<String> includePaths) throws Exception {
+        return openProjectWithModule(application, projectManager, directory, defines, includePaths, List.of());
+    }
+
+    private static Project openProjectWithModule(Application application,
+                                                 ProjectManager projectManager,
+                                                 Path directory,
+                                                 Map<String, String> defines,
+                                                 List<String> includePaths,
+                                                 List<String> forcedIncludes) throws Exception {
         Project project = projectManager
             .openProjectAsync(directory, application.getLastUIAccess(), new ProjectOpenContext())
             .get(TIMEOUT_SECONDS, TimeUnit.SECONDS);
@@ -245,6 +478,7 @@ public class CModuleAwareIndexTest {
             extension.setEnabled(true);
             extension.setDefines(defines);
             extension.setIncludePaths(includePaths);
+            extension.setForcedIncludes(forcedIncludes);
 
             rootModel.commit();
         });

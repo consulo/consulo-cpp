@@ -23,7 +23,7 @@ import consulo.cpp.lang.psi.CPsiField;
  * @author VISTALL
  * @date 10:13/13.12.2011
  */
-public class CPsiFieldImpl extends CPsiElementBaseImpl implements CPsiField {
+public class CPsiFieldImpl extends CPsiNamedElementBaseImpl implements CPsiField {
 	public CPsiFieldImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
 		super(node);
 	}

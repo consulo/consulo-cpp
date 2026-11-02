@@ -49,6 +49,11 @@ public class CDefaultModuleExtension extends ModuleExtensionBase<CDefaultModuleE
     }
 
     @Override
+    public List<String> getForcedIncludes() {
+        return myCompileSettings.getForcedIncludes();
+    }
+
+    @Override
     public @Nullable CLanguageVersion getCStandard() {
         return myCompileSettings.getCStandard();
     }

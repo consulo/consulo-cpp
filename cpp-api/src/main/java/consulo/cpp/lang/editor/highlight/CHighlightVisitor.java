@@ -1,6 +1,5 @@
 package consulo.cpp.lang.editor.highlight;
 
-import consulo.cpp.lang.psi.CPsiEnumConstant;
 import consulo.cpp.lang.psi.CPsiTokens;
 import consulo.cpp.lang.psi.visitor.CPsiElementVisitor;
 import consulo.cpp.preprocessor.psi.CPreprocessorMacroReference;
@@ -29,6 +28,7 @@ public class CHighlightVisitor extends CPsiElementVisitor implements HighlightVi
 
     @Override
     public void visitPreprocessorMacroReference(CPreprocessorMacroReference reference) {
+        visitElement(reference.getElement());
         // the macro name only: the call of a function-like macro also holds its arguments
         TextRange nameRange = reference.getRangeInElement().shiftRight(reference.getElement().getTextRange().getStartOffset());
         if (expandsToKeywordsOnly(reference.getElement())) {
@@ -59,11 +59,11 @@ public class CHighlightVisitor extends CPsiElementVisitor implements HighlightVi
     }
 
     @Override
-    public void visitEnumConstant(CPsiEnumConstant element) {
-        PsiElement nameElement = element.getNameIdentifier();
-        if (nameElement != null) {
-            HighlightUtil.highlight(element, nameElement, myHolder);
-        }
+    public void visitElement(PsiElement element) {
+        CSemanticHighlighting.highlight(element, (range, key) ->
+            myHolder.add(HighlightInfo.newHighlightInfo(HighlightInfoType.INFORMATION).textAttributes(key).range(range).create()));
+        CCallChecker.check(element, (range, message) ->
+            myHolder.add(HighlightInfo.newHighlightInfo(HighlightInfoType.ERROR).range(range).descriptionAndTooltip(message).create()));
     }
 
     @Override

@@ -72,3 +72,49 @@ lt.expected:
   text: "'<' expected"
 gt.expected:
   text: "'>' expected"
+extension.defines.label:
+  text: "Defines (NAME=VALUE; NAME2)"
+extension.include.paths.label:
+  text: "Include directories (path; path)"
+extension.forced.includes.label:
+  text: "Forced includes, preprocessed before every file (path; path)"
+extension.target.label:
+  text: "Target (x86_64-pc-linux-gnu, arm-none-eabi; empty - the IDE's machine)"
+class.name:
+  text: "Class, struct, union, enum"
+type.alias:
+  text: "Typedef"
+namespace.name:
+  text: "Namespace"
+function.declaration:
+  text: "Function declaration"
+function.call:
+  text: "Function call"
+member.function:
+  text: "Member function"
+field:
+  text: "Field"
+static.field:
+  text: "Static field"
+global.variable:
+  text: "Global variable"
+local.variable:
+  text: "Local variable"
+parameter:
+  text: "Parameter"
+template.parameter:
+  text: "Template parameter"
+call.no.matching.function:
+  text: "No matching function for call to ''{0}''"
+call.argument.count:
+  text: "''{0}'' takes {1} argument(s), {2} given"
+call.argument.count.at.least:
+  text: "at least {0}"
+call.argument.count.range:
+  text: "{0} to {1}"
+call.argument.type:
+  text: "Argument {0}: cannot convert ''{1}'' to ''{2}''"
+preprocessor.directive:
+  text: "Preprocessor directive"
+include.path:
+  text: "Include path"

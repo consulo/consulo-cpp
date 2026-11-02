@@ -1,5 +1,15 @@
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.file.FileViewProvider;
 import consulo.language.impl.psi.PsiFileBase;
 import consulo.virtualFileSystem.fileType.FileType;
@@ -30,4 +40,9 @@ public class CFileImpl extends PsiFileBase implements CPsiFile
 	{
 		return findChildrenByClass(CPsiDeclaration.class);
 	}
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processFile(this, processor, state);
+    }
 }

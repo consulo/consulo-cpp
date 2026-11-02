@@ -16,6 +16,16 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.ast.ASTNode;
 import consulo.cpp.lang.psi.CPsiCallExpression;
 
@@ -27,4 +37,12 @@ public class CPsiCallExpressionImpl extends CPsiElementBaseImpl implements CPsiC
 	public CPsiCallExpressionImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
 		super(node);
 	}
+
+    /**
+     * The parser reads a lambda as a call of its capture list: its parameters are visible in its body.
+     */
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processLambda(this, processor, state, lastParent);
+    }
 }

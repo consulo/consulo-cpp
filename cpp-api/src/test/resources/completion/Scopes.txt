@@ -1,0 +1,5 @@
+13:21 compute, counter, geo, inner, point, pointer, total
+15:26 length, x, y
+16:32 length, x, y
+17:26 Color, Green, Point, Red
+18:10 Color, Point

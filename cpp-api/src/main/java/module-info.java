@@ -12,11 +12,14 @@ module consulo.cpp.api
     exports consulo.cpp.config;
     exports consulo.cpp.lang;
     exports consulo.cpp.lang.editor;
+    exports consulo.cpp.lang.editor.completion;
+    exports consulo.cpp.lang.editor.findUsage;
     exports consulo.cpp.lang.editor.highlight;
     exports consulo.cpp.lang.lexer;
     exports consulo.cpp.lang.parser;
     exports consulo.cpp.lang.psi;
     exports consulo.cpp.lang.psi.impl;
+    exports consulo.cpp.lang.psi.resolve;
     exports consulo.cpp.lang.psi.visitor;
     exports consulo.cpp.lang.version;
     exports consulo.cpp.module.extension;

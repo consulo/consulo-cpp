@@ -1,5 +1,5 @@
 extension.name:
-    text: C/C++ (CMake)
+    text: C/C++
 extension.defines.label:
     text: 'Defines:'
 extension.include.paths.label:

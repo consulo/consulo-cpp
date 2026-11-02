@@ -37,6 +37,7 @@ public final class CCompileSettings {
 
     private Map<String, String> myDefines = new TreeMap<>();
     private List<String> myIncludePaths = new ArrayList<>();
+    private List<String> myForcedIncludes = new ArrayList<>();
     // version ids rather than versions, so a standard contributed by a plugin which is not loaded right now survives a save
     private String myCStandardId = "";
     private String myCppStandardId = "";
@@ -56,6 +57,17 @@ public final class CCompileSettings {
 
     public void setIncludePaths(List<String> includePaths) {
         myIncludePaths = new ArrayList<>(includePaths);
+    }
+
+    /**
+     * @see CModuleExtension#getForcedIncludes()
+     */
+    public List<String> getForcedIncludes() {
+        return List.copyOf(myForcedIncludes);
+    }
+
+    public void setForcedIncludes(List<String> forcedIncludes) {
+        myForcedIncludes = new ArrayList<>(forcedIncludes);
     }
 
     /**
@@ -95,6 +107,7 @@ public final class CCompileSettings {
     public void copyFrom(CCompileSettings settings) {
         myDefines = new TreeMap<>(settings.myDefines);
         myIncludePaths = new ArrayList<>(settings.myIncludePaths);
+        myForcedIncludes = new ArrayList<>(settings.myForcedIncludes);
         myCStandardId = settings.myCStandardId;
         myCppStandardId = settings.myCppStandardId;
         myTarget = settings.myTarget;
@@ -112,6 +125,7 @@ public final class CCompileSettings {
         }
         CModuleExtension.writeDefines(element, myDefines);
         CModuleExtension.writeIncludePaths(element, myIncludePaths);
+        CModuleExtension.writeForcedIncludes(element, myForcedIncludes);
     }
 
     public void read(Element element) {
@@ -120,6 +134,7 @@ public final class CCompileSettings {
         myTarget = element.getAttributeValue(ATTR_TARGET, "");
         myDefines = new TreeMap<>(CModuleExtension.readDefines(element));
         myIncludePaths = new ArrayList<>(CModuleExtension.readIncludePaths(element));
+        myForcedIncludes = new ArrayList<>(CModuleExtension.readForcedIncludes(element));
     }
 
     @Override
@@ -132,6 +147,7 @@ public final class CCompileSettings {
         }
         return myDefines.equals(that.myDefines)
             && myIncludePaths.equals(that.myIncludePaths)
+            && myForcedIncludes.equals(that.myForcedIncludes)
             && myCStandardId.equals(that.myCStandardId)
             && myCppStandardId.equals(that.myCppStandardId)
             && myTarget.equals(that.myTarget);
@@ -139,6 +155,6 @@ public final class CCompileSettings {
 
     @Override
     public int hashCode() {
-        return Objects.hash(myDefines, myIncludePaths, myCStandardId, myCppStandardId, myTarget);
+        return Objects.hash(myDefines, myIncludePaths, myForcedIncludes, myCStandardId, myCppStandardId, myTarget);
     }
 }

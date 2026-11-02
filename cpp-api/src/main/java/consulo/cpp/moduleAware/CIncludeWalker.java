@@ -16,6 +16,8 @@
 package consulo.cpp.moduleAware;
 
 import consulo.util.dataholder.Key;
+import consulo.util.io.FileUtil;
+import consulo.virtualFileSystem.LocalFileSystem;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.virtualFileSystem.VirtualFileManager;
 import consulo.virtualFileSystem.util.VirtualFileUtil;
@@ -29,6 +31,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * Collects the files a C/C++ file pulls in transitively, and reduces them to a fingerprint.
@@ -73,6 +77,32 @@ public final class CIncludeWalker {
     }
 
     /**
+     * The fingerprint of what {@code start} pulls in with the headers forced in before its first line, so editing one
+     * of those re-indexes every file of the module too.
+     */
+    public static String fingerprintFor(VirtualFile start, List<String> forcedIncludes, List<VirtualFile> includeRoots) {
+        Set<VirtualFile> visited = new LinkedHashSet<>();
+        collect(start, includeRoots, visited);
+        for (String forcedInclude : forcedIncludes) {
+            collect(resolveForcedInclude(forcedInclude, start, includeRoots), includeRoots, visited);
+        }
+        visited.remove(start);
+        return fingerprint(visited);
+    }
+
+    /**
+     * A forced include of {@code from}: an absolute path, or a name looked up as an {@code #include "name"} on its first
+     * line would be.
+     */
+    public static @Nullable VirtualFile resolveForcedInclude(String path, VirtualFile from, List<VirtualFile> includeRoots) {
+        if (FileUtil.isAbsolute(path)) {
+            VirtualFile file = LocalFileSystem.getInstance().findFileByPath(path);
+            return file == null || file.isDirectory() ? null : file;
+        }
+        return resolve(path, from, includeRoots);
+    }
+
+    /**
      * Folds the identity and current state of every included file into one value, so any edit to any of them
      * produces a different fingerprint.
      */
@@ -99,7 +129,7 @@ public final class CIncludeWalker {
         return Long.toHexString(hash);
     }
 
-    private static void collect(VirtualFile file, List<VirtualFile> includeRoots, Set<VirtualFile> visited) {
+    private static void collect(@Nullable VirtualFile file, List<VirtualFile> includeRoots, Set<VirtualFile> visited) {
         if (file == null || file.isDirectory() || visited.size() >= MAX_FILES || !visited.add(file)) {
             return;
         }
@@ -114,7 +144,7 @@ public final class CIncludeWalker {
      * and of the include directories: resolving a name probes every include directory, and boost has more than a
      * hundred of them.
      */
-    private static List<VirtualFile> resolvedIncludesOf(VirtualFile file, List<VirtualFile> includeRoots) {
+    public static List<VirtualFile> resolvedIncludesOf(VirtualFile file, List<VirtualFile> includeRoots) {
         long stamp = file.getModificationStamp();
         long structureStamp = VirtualFileManager.getInstance().getStructureModificationCount();
         ResolvedIncludes cached = file.getUserData(RESOLVED_INCLUDES);
@@ -165,7 +195,7 @@ public final class CIncludeWalker {
         return result;
     }
 
-    private static VirtualFile resolve(String includeName, VirtualFile from, List<VirtualFile> includeRoots) {
+    private static @Nullable VirtualFile resolve(String includeName, VirtualFile from, List<VirtualFile> includeRoots) {
         VirtualFile parent = from.getParent();
         if (parent != null) {
             VirtualFile found = parent.findFileByRelativePath(includeName);

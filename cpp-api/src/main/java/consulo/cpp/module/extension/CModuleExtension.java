@@ -32,10 +32,19 @@ import java.util.Map;
 public interface CModuleExtension<T extends CModuleExtension<T>> extends ModuleExtension<T> {
     String ELEMENT_DEFINE = "define";
     String ELEMENT_INCLUDE_PATH = "includePath";
+    String ELEMENT_FORCED_INCLUDE = "forcedInclude";
 
     Map<String, String> getDefines();
 
     List<String> getIncludePaths();
+
+    /**
+     * Headers every file of the module is preprocessed as if it included them before its first line, as {@code -include}
+     * of gcc and clang and {@code /FI} of MSVC do: an absolute path, or one found in the include directories.
+     */
+    default List<String> getForcedIncludes() {
+        return List.of();
+    }
 
     @Nullable CLanguageVersion getCStandard();
 
@@ -121,19 +130,35 @@ public interface CModuleExtension<T extends CModuleExtension<T>> extends ModuleE
     }
 
     static void writeIncludePaths(Element element, List<String> includePaths) {
-        for (String path : includePaths) {
-            element.addContent(new Element(ELEMENT_INCLUDE_PATH).setAttribute("path", path));
-        }
+        writePaths(element, ELEMENT_INCLUDE_PATH, includePaths);
     }
 
     static List<String> readIncludePaths(Element element) {
-        List<String> includePaths = new ArrayList<>();
-        for (Element child : element.getChildren(ELEMENT_INCLUDE_PATH)) {
+        return readPaths(element, ELEMENT_INCLUDE_PATH);
+    }
+
+    static void writeForcedIncludes(Element element, List<String> forcedIncludes) {
+        writePaths(element, ELEMENT_FORCED_INCLUDE, forcedIncludes);
+    }
+
+    static List<String> readForcedIncludes(Element element) {
+        return readPaths(element, ELEMENT_FORCED_INCLUDE);
+    }
+
+    private static void writePaths(Element element, String childName, List<String> paths) {
+        for (String path : paths) {
+            element.addContent(new Element(childName).setAttribute("path", path));
+        }
+    }
+
+    private static List<String> readPaths(Element element, String childName) {
+        List<String> paths = new ArrayList<>();
+        for (Element child : element.getChildren(childName)) {
             String path = child.getAttributeValue("path");
             if (path != null) {
-                includePaths.add(path);
+                paths.add(path);
             }
         }
-        return includePaths;
+        return paths;
     }
 }

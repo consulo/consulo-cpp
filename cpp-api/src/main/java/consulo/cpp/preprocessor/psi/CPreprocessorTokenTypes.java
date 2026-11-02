@@ -36,6 +36,9 @@ public interface CPreprocessorTokenTypes
 	IElementType S_UNDEF_KEYWORD = new CBaseElementType("S_UNDEF_KEYWORD"); // #undef
 	IElementType S_IF_KEYWORD = new CBaseElementType("S_IF_KEYWORD"); // #if
 	IElementType S_ELIF_KEYWORD = new CBaseElementType("S_ELIF_KEYWORD"); // #elif
+	// a directive the preprocessor does not act on - #error, #warning, #line, #elifdef - and defined() in a condition;
+	// only the highlighting lexer makes it
+	IElementType S_DIRECTIVE_KEYWORD = new CBaseElementType("S_DIRECTIVE_KEYWORD");
 
 	IElementType SYMBOL = new CBaseElementType("C_PREPROCESSOR_SYMBOL");
 }

@@ -16,6 +16,14 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CDeclarationKind;
+
+import consulo.cpp.lang.psi.resolve.CNameChainReference;
+
+import consulo.language.psi.PsiReference;
+
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiDoubleColonTypeRef;
 import consulo.language.ast.ASTNode;
@@ -28,4 +36,9 @@ public class CPsiDoubleColonTypeRefImpl extends CPsiElementBaseImpl implements C
 	public CPsiDoubleColonTypeRefImpl(@NotNull ASTNode node) {
 		super(node);
 	}
+
+    @Override
+    public @Nullable PsiReference getReference() {
+        return CNameChainReference.of(this, CDeclarationKind.SCOPES);
+    }
 }

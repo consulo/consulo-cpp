@@ -34,6 +34,11 @@ import java.util.Map;
 public class CMakeCModuleExtension extends ModuleExtensionBase<CMakeCModuleExtension> implements CModuleExtension<CMakeCModuleExtension> {
     public static final String ID = "cmake-cpp";
 
+    /**
+     * The extension of the CMake plugin this one extends: the framework of the module, which C/C++ adds a language to.
+     */
+    public static final String PARENT_ID = "CMAKE";
+
     protected final CCompileSettings myCompileSettings = new CCompileSettings();
 
     public CMakeCModuleExtension(String id, ModuleRootLayer rootLayer) {
@@ -48,6 +53,11 @@ public class CMakeCModuleExtension extends ModuleExtensionBase<CMakeCModuleExten
     @Override
     public List<String> getIncludePaths() {
         return myCompileSettings.getIncludePaths();
+    }
+
+    @Override
+    public List<String> getForcedIncludes() {
+        return myCompileSettings.getForcedIncludes();
     }
 
     @Override

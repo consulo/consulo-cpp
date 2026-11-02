@@ -16,6 +16,16 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.ast.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiLocalVariable;
@@ -23,8 +33,13 @@ import consulo.cpp.lang.psi.CPsiLocalVariable;
 /**
  * @author VISTALL
  */
-public class CPsiLocalVariableImpl extends CPsiElementBaseImpl implements CPsiLocalVariable {
+public class CPsiLocalVariableImpl extends CPsiNamedElementBaseImpl implements CPsiLocalVariable {
     public CPsiLocalVariableImpl(@NotNull ASTNode node) {
         super(node);
+    }
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processOwnInitializer(this, processor, state, lastParent);
     }
 }

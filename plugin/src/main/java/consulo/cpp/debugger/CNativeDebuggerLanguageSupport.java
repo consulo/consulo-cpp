@@ -7,7 +7,7 @@ import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiFileFactory;
 import consulo.nativeDev.debugger.NativeDebuggerLanguageSupport;
 import consulo.project.Project;
-import jakarta.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import consulo.cpp.lang.CLanguage;
 
 /**

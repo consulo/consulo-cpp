@@ -16,6 +16,12 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CReferenceExpressionReference;
+
+import consulo.language.psi.PsiReference;
+
 import consulo.cpp.lang.psi.CPsiReferenceExpression;
 import consulo.language.ast.ASTNode;
 
@@ -27,4 +33,9 @@ public class CPsiReferenceExpressionImpl extends CPsiElementBaseImpl implements 
 	public CPsiReferenceExpressionImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
 		super(node);
 	}
+
+    @Override
+    public @Nullable PsiReference getReference() {
+        return CReferenceExpressionReference.of(this);
+    }
 }

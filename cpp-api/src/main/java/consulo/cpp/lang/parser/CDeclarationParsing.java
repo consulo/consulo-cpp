@@ -959,14 +959,15 @@ public class CDeclarationParsing extends CParsingBase {
             return true;
         }
         if (isPointerDeclaratorToken(next)) {
-            // T *x;  T *x = ...;  T **x, *y;
+            // T *x;  T *x = ...;  T **x, *y;  T *p{nullptr};  for (T &x : range)
             int step = 2;
-            while (lookAhead(step) == ASTERISK || POINTER_QUALIFIERS.contains(lookAhead(step))) {
+            while (isPointerDeclaratorToken(lookAhead(step)) || POINTER_QUALIFIERS.contains(lookAhead(step))) {
                 step++;
             }
             if (lookAhead(step) == IDENTIFIER) {
                 IElementType after = lookAhead(step + 1);
-                return after == SEMICOLON || after == EQ || after == COMMA || after == LBRACKET;
+                return after == SEMICOLON || after == EQ || after == COMMA || after == LBRACKET || after == COLON
+                    || after == LBRACE;
             }
             return false;
         }

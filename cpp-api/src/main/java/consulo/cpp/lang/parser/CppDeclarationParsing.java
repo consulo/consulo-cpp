@@ -620,9 +620,13 @@ public class CppDeclarationParsing extends CDeclarationParsing {
         if (last == null) {
             return true;
         }
-        if (at(IDENTIFIER) || at(ASTERISK) || at(AND) || at(ANDAND) || at(ELLIPSIS) || at(MODIFIERS)) {
-            // T name, T*, T&, T const
+        if (at(IDENTIFIER) || at(ELLIPSIS) || at(MODIFIERS)) {
+            // T name, T... pack, T const
             return false;
+        }
+        if (at(ASTERISK) || at(AND) || at(ANDAND)) {
+            // T*, T&, T&& - or the operator of a b * 0.5f, b & mask
+            return !isPointerDeclaratorAfter();
         }
         if (at(COMMA) || at(RPARENTH)) {
             // a bare name: a type, or a variable
@@ -639,6 +643,28 @@ public class CppDeclarationParsing extends CDeclarationParsing {
         }
         // a call, a member access, an operator
         return true;
+    }
+
+    /**
+     * At the {@code *}, {@code &} or {@code &&} after a type name in a parenthesised list: whether what follows can
+     * still be the rest of a parameter declarator - more pointers and qualifiers, then a name or nothing, and then the
+     * end of the item, an array or function suffix or a default argument. {@code b * 0.5f}, {@code b * -1} or
+     * {@code b * c.x} cannot; {@code Bar * baz} can, and a declaration is what the standard prefers then. Consumes
+     * what it looks at.
+     */
+    private boolean isPointerDeclaratorAfter() {
+        while (at(ASTERISK) || at(AND) || at(ANDAND) || at(POINTER_QUALIFIERS)) {
+            advance();
+        }
+        if (at(IDENTIFIER)) {
+            advance();
+            return at(COMMA) || at(RPARENTH) || at(LBRACKET) || at(EQ) || at(LPARENTH) || isAttributeStart();
+        }
+        if (at(LPARENTH)) {
+            // R *(*func)(P), or a parenthesised operand: b * (c + d)
+            return isNestedDeclaratorAt(0) || TYPES.contains(lookAhead(1));
+        }
+        return at(COMMA) || at(RPARENTH) || at(LBRACKET) || at(EQ) || at(ELLIPSIS);
     }
 
     /**

@@ -39,11 +39,8 @@ public class CPreprocessorOptionsExternalizer implements DataExternalizer<CPrepr
             IOUtil.writeUTF(out, entry.getValue());
         }
 
-        List<String> includePaths = value.includePaths();
-        DataInputOutputUtil.writeINT(out, includePaths.size());
-        for (String path : includePaths) {
-            IOUtil.writeUTF(out, path);
-        }
+        writePaths(out, value.includePaths());
+        writePaths(out, value.forcedIncludes());
 
         IOUtil.writeUTF(out, value.includeFingerprint());
     }
@@ -57,11 +54,24 @@ public class CPreprocessorOptionsExternalizer implements DataExternalizer<CPrepr
             defines.put(name, IOUtil.readUTF(in));
         }
 
-        int pathCount = DataInputOutputUtil.readINT(in);
-        List<String> includePaths = new ArrayList<>(pathCount);
-        for (int i = 0; i < pathCount; i++) {
-            includePaths.add(IOUtil.readUTF(in));
+        List<String> includePaths = readPaths(in);
+        List<String> forcedIncludes = readPaths(in);
+        return new CPreprocessorOptions(defines, includePaths, forcedIncludes, IOUtil.readUTF(in));
+    }
+
+    private static void writePaths(DataOutput out, List<String> paths) throws IOException {
+        DataInputOutputUtil.writeINT(out, paths.size());
+        for (String path : paths) {
+            IOUtil.writeUTF(out, path);
         }
-        return new CPreprocessorOptions(defines, includePaths, IOUtil.readUTF(in));
+    }
+
+    private static List<String> readPaths(DataInput in) throws IOException {
+        int count = DataInputOutputUtil.readINT(in);
+        List<String> paths = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            paths.add(IOUtil.readUTF(in));
+        }
+        return paths;
     }
 }

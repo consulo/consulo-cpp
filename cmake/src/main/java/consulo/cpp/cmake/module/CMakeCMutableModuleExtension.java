@@ -52,6 +52,11 @@ public class CMakeCMutableModuleExtension extends CMakeCModuleExtension implemen
     }
 
     @Override
+    public void setForcedIncludes(List<String> forcedIncludes) {
+        myCompileSettings.setForcedIncludes(forcedIncludes);
+    }
+
+    @Override
     public void setTarget(@Nullable String target) {
         myCompileSettings.setTarget(target);
     }

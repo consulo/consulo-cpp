@@ -99,7 +99,8 @@ public class CMacroExpandingLexer extends LexerBase {
             for (int j = open + 1; j < close; j++) {
                 Token argumentToken = source.get(j);
                 if (!isTrivia(argumentToken.type())) {
-                    argumentTokens.add(new CMacroToken(argumentToken.type(), textOf(argumentToken)));
+                    // where it is, so the name an argument passes stays the name written at that place of the file
+                    argumentTokens.add(new CMacroToken(argumentToken.type(), textOf(argumentToken), argumentToken.start()));
                 }
             }
             List<CMacroToken> expansion = myExpander.expand(macro, PreprocessorExpander.splitArguments(argumentTokens));
@@ -112,7 +113,10 @@ public class CMacroExpandingLexer extends LexerBase {
     private static void addExpansion(List<Token> result, int start, int end, List<CMacroToken> expansion) {
         result.add(new Token(CPreprocessorElementTypes.MACRO_INVOCATION, start, end));
         for (CMacroToken expanded : expansion) {
-            result.add(new Token(new ForeignLeafType(expanded.type(), expanded.text()), end, end));
+            IElementType type = expanded.sourceOffset() >= start && expanded.sourceOffset() < end
+                ? new CMacroArgumentLeafType(expanded.type(), expanded.text(), expanded.sourceOffset() - start)
+                : new ForeignLeafType(expanded.type(), expanded.text());
+            result.add(new Token(type, end, end));
         }
     }
 

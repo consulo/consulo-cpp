@@ -16,8 +16,14 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.psi.PsiElement;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import consulo.cpp.lang.psi.CPsiCodeBlock;
 import consulo.cpp.lang.psi.CPsiTokens;
 import consulo.language.ast.ASTNode;
@@ -42,4 +48,9 @@ public class CPsiCodeBlockImpl extends CPsiElementBaseImpl implements CPsiCodeBl
 	public PsiElement getRBrace() {
 		return findChildByType(CPsiTokens.RBRACE);
 	}
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processBlock(this, processor, state, lastParent);
+    }
 }

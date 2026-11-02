@@ -17,7 +17,10 @@ package consulo.cpp.cmake;
 
 import consulo.annotation.component.ExtensionImpl;
 import consulo.cmake.externalSystem.model.CMakeCompileData;
+import consulo.cpp.cmake.module.CMakeCModuleExtension;
 import consulo.cpp.cmake.module.CMakeCMutableModuleExtension;
+import consulo.cpp.module.extension.CDefaultModuleExtension;
+import consulo.module.extension.MutableModuleExtension;
 import consulo.cpp.module.extension.CCompileSettings;
 import consulo.externalSystem.model.DataNode;
 import consulo.externalSystem.model.Key;
@@ -73,12 +76,22 @@ public class CMakeCompileDataService implements ProjectDataService<CMakeCompileD
         });
     }
 
+    /**
+     * A module CMake imports has one framework, CMake, and C/C++ as its language: the CMake extension is enabled with the
+     * C/C++ one under it, and the C/C++ set up by hand - another framework - is not.
+     */
     private static void apply(Module module, CCompileSettings settings) {
         ModifiableRootModel rootModel = ModuleRootManager.getInstance(module).getModifiableModel();
         CMakeCMutableModuleExtension extension = rootModel.getExtensionWithoutCheck(CMakeCMutableModuleExtension.class);
         if (extension == null) {
             rootModel.dispose();
             return;
+        }
+        if (rootModel.getExtensionWithoutCheck(CMakeCModuleExtension.PARENT_ID) instanceof MutableModuleExtension<?> cmake) {
+            cmake.setEnabled(true);
+        }
+        if (rootModel.getExtensionWithoutCheck(CDefaultModuleExtension.ID) instanceof MutableModuleExtension<?> manual) {
+            manual.setEnabled(false);
         }
         extension.setEnabled(true);
         extension.setCompileSettings(settings);

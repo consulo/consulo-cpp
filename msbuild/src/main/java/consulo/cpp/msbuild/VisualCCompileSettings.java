@@ -43,6 +43,7 @@ import java.util.Set;
  * @since 2026-10-10
  */
 public record VisualCCompileSettings(List<String> includeDirectories,
+                                     List<String> forcedIncludes,
                                      Map<String, String> defines,
                                      List<Path> sourceDirectories,
                                      boolean hasCpp,
@@ -78,6 +79,7 @@ public record VisualCCompileSettings(List<String> includeDirectories,
 
     public static VisualCCompileSettings of(Path projectDir, List<? extends MSBuildEvaluatedItem> items) {
         Set<String> includeDirectories = new LinkedHashSet<>();
+        Set<String> forcedIncludes = new LinkedHashSet<>();
         Map<String, String> defines = new LinkedHashMap<>();
         Set<Path> sourceDirectories = new LinkedHashSet<>();
         boolean hasCpp = false;
@@ -133,6 +135,13 @@ public record VisualCCompileSettings(List<String> includeDirectories,
                 }
             }
 
+            // /FI: a header resolved as an #include "..." of the source would be - kept as written when it is relative
+            for (String entry : MSBuildImportUtil.splitList(metadata(metadata, "ForcedIncludeFiles"))) {
+                if (!isUnexpanded(entry)) {
+                    forcedIncludes.add(FileUtil.toSystemIndependentName(entry));
+                }
+            }
+
             Map<String, String> itemDefines = parseDefines(metadata(metadata, "PreprocessorDefinitions"));
             for (String name : MSBuildImportUtil.splitList(metadata(metadata, "UndefinePreprocessorDefinitions"))) {
                 itemDefines.remove(name);
@@ -144,6 +153,7 @@ public record VisualCCompileSettings(List<String> includeDirectories,
 
         return new VisualCCompileSettings(
             new ArrayList<>(includeDirectories),
+            new ArrayList<>(forcedIncludes),
             defines,
             new ArrayList<>(sourceDirectories),
             hasCpp,

@@ -95,6 +95,16 @@ public class CPPParsingTest extends CParsingBaseTest {
     }
 
     /**
+     * {@code const FVector2f Half(BallSize * 0.5f, ...)} - a name, an operator and then what no declarator can hold make
+     * the items arguments, not pointer or reference parameters; {@code Foo f(Bar * baz)} stays a function
+     * (Unreal {@code Brick2D/BrickPawn.cpp})
+     */
+    @Test
+    public void testDirectInitOperators(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * {@code std::locale path::imbue(std::locale const& loc)} – a qualified return type before a qualified function name
      */
     @Test

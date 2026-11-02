@@ -16,6 +16,16 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import org.jspecify.annotations.Nullable;
+
+import consulo.cpp.lang.psi.resolve.CScopes;
+
+import consulo.language.psi.PsiElement;
+
+import consulo.language.psi.resolve.ResolveState;
+
+import consulo.language.psi.resolve.PsiScopeProcessor;
+
 import consulo.language.ast.ASTNode;
 import consulo.cpp.lang.psi.CPsiForStatement;
 
@@ -26,5 +36,10 @@ import consulo.cpp.lang.psi.CPsiForStatement;
 public class CPsiForStatementImpl extends CPsiElementBaseImpl implements CPsiForStatement {
     public CPsiForStatementImpl(@org.jetbrains.annotations.NotNull ASTNode node) {
         super(node);
+    }
+
+    @Override
+    public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
+        return CScopes.processStatementVariables(this, processor, state, lastParent);
     }
 }

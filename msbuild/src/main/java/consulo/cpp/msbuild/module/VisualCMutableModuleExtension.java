@@ -71,6 +71,11 @@ public class VisualCMutableModuleExtension extends VisualCModuleExtension implem
     }
 
     @Override
+    public void setForcedIncludes(List<String> forcedIncludes) {
+        myCompileSettings.setForcedIncludes(forcedIncludes);
+    }
+
+    @Override
     public void setTarget(@Nullable String target) {
         myCompileSettings.setTarget(target);
     }

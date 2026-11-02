@@ -75,7 +75,8 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
     @Override
     public int getVersion() {
         // 3: the language version id moved to CLanguageVersionIndexOptionProvider
-        return 3;
+        // 4: the forced includes
+        return 4;
     }
 
     @Override
@@ -103,7 +104,7 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
         if (ProjectFileIndex.getInstance(module.getProject()).getModuleForFile(file) == null) {
             return "";
         }
-        return CIncludeWalker.fingerprintFor(file, resolveIncludeRoots(extension.getIncludePaths()));
+        return CIncludeWalker.fingerprintFor(file, extension.getForcedIncludes(), resolveIncludeRoots(extension.getIncludePaths()));
     }
 
     @Override

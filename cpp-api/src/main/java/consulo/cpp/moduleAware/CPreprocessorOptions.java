@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 /**
  * What decides how a C/C++ file preprocesses: the defines it is compiled with, the directories its includes resolve
- * against, and a fingerprint of the files it pulls in. Two files sharing these share their indexed data, so this is
+ * against, the headers forced in before its first line, and a fingerprint of the files it pulls in. Two files sharing these share their indexed data, so this is
  * the option the module-aware index keys its variants on; the fingerprint is what makes an edit to an included
  * header re-index the files that include it.
  * <p>
@@ -32,14 +32,16 @@ import java.util.TreeMap;
  */
 public record CPreprocessorOptions(Map<String, String> defines,
                                    List<String> includePaths,
+                                   List<String> forcedIncludes,
                                    String includeFingerprint) {
-    public static final CPreprocessorOptions EMPTY = new CPreprocessorOptions(Map.of(), List.of(), "");
+    public static final CPreprocessorOptions EMPTY = new CPreprocessorOptions(Map.of(), List.of(), List.of(), "");
 
     public CPreprocessorOptions {
         // not Map.copyOf - its iteration order changes from one JVM run to the next, and the externalizer writes the
         // defines in iteration order, so the stored payload would differ after every restart
         defines = Collections.unmodifiableMap(new TreeMap<>(defines));
         includePaths = List.copyOf(includePaths);
+        forcedIncludes = List.copyOf(forcedIncludes);
         includeFingerprint = includeFingerprint == null ? "" : includeFingerprint;
     }
 
@@ -49,10 +51,10 @@ public record CPreprocessorOptions(Map<String, String> defines,
      * @param includeFingerprint the fingerprint of the files the file includes - only computed when indexing
      */
     public static CPreprocessorOptions of(CModuleExtension<?> extension, String includeFingerprint) {
-        return new CPreprocessorOptions(extension.getDefines(), extension.getIncludePaths(), includeFingerprint);
+        return new CPreprocessorOptions(extension.getDefines(), extension.getIncludePaths(), extension.getForcedIncludes(), includeFingerprint);
     }
 
     public boolean isEmpty() {
-        return defines.isEmpty() && includePaths.isEmpty() && includeFingerprint.isEmpty();
+        return defines.isEmpty() && includePaths.isEmpty() && forcedIncludes.isEmpty() && includeFingerprint.isEmpty();
     }
 }
