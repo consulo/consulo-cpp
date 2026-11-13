@@ -151,7 +151,7 @@ public class VisualCRunConfiguration extends ModuleBasedConfiguration<RunConfigu
         NativeDebuggerProvider provider = getProject().getApplication()
             .getExtensionPoint(NativeDebuggerProvider.class)
             .findExtension(CppdbgNativeDebuggerProvider.class);
-        return provider != null && !provider.findInstallations().isEmpty() ? provider.getId() : null;
+        return provider != null && !provider.findInstallations(Platform.current()).isEmpty() ? provider.getId() : null;
     }
 
     public GeneralCommandLine createCommandLine(VisualCLaunchTarget target) {
