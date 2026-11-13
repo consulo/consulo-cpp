@@ -30,7 +30,6 @@ import consulo.language.psi.stub.ModuleAwareIndexOptionProvider;
 import consulo.localize.LocalizeValue;
 import consulo.module.Module;
 import consulo.module.content.ProjectFileIndex;
-import consulo.virtualFileSystem.LocalFileSystem;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.virtualFileSystem.fileType.FileType;
 import consulo.virtualFileSystem.fileType.FileTypeRegistry;
@@ -90,7 +89,7 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
     private static List<VirtualFile> resolveIncludeRoots(List<String> includePaths) {
         List<VirtualFile> roots = new ArrayList<>();
         for (String path : includePaths) {
-            VirtualFile root = LocalFileSystem.getInstance().findFileByPath(path);
+            VirtualFile root = CIncludeWalker.findFile(path);
             if (root != null && root.isDirectory()) {
                 roots.add(root);
             }

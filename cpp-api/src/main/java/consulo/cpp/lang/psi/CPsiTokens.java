@@ -86,6 +86,16 @@ public interface CPsiTokens extends StandardTokenTypes, CPreprocessorTokenTypes 
     IElementType ATTRIBUTE_KEYWORD = new CBaseElementType("ATTRIBUTE_KEYWORD"); // __attribute__
     IElementType DECLSPEC_KEYWORD = new CBaseElementType("DECLSPEC_KEYWORD"); // __declspec
     IElementType EXTENSION_KEYWORD = new CBaseElementType("EXTENSION_KEYWORD"); // __extension__
+    /**
+     * A dialect's address space - {@code device}, {@code constant}, {@code threadgroup} of Metal: a qualifier, accepted
+     * where {@code const} is, see {@link consulo.cpp.lang.version.CLanguageVersion#getDialectKeywords()}.
+     */
+    IElementType ADDRESS_SPACE_KEYWORD = new CBaseElementType("ADDRESS_SPACE_KEYWORD");
+    /**
+     * A dialect's function qualifier - {@code kernel}, {@code vertex}, {@code fragment} of Metal: accepted where
+     * {@code inline} is.
+     */
+    IElementType FUNCTION_QUALIFIER_KEYWORD = new CBaseElementType("FUNCTION_QUALIFIER_KEYWORD");
     IElementType ASM_KEYWORD = new CBaseElementType("ASM_KEYWORD"); // asm, __asm__
 
     // C++
@@ -194,13 +204,13 @@ public interface CPsiTokens extends StandardTokenTypes, CPreprocessorTokenTypes 
         STATIC_KEYWORD, EXTERN_KEYWORD, REGISTER_KEYWORD, AUTO_KEYWORD, THREAD_LOCAL_KEYWORD, MUTABLE_KEYWORD,
         CONST_KEYWORD, VOLATILE_KEYWORD, RESTRICT_KEYWORD, ATOMIC_KEYWORD,
         INLINE_KEYWORD, NORETURN_KEYWORD, VIRTUAL_KEYWORD, EXPLICIT_KEYWORD, FRIEND_KEYWORD, CONSTEXPR_KEYWORD,
-        EXTENSION_KEYWORD
+        EXTENSION_KEYWORD, ADDRESS_SPACE_KEYWORD, FUNCTION_QUALIFIER_KEYWORD
     );
 
     /**
      * Qualifiers which may follow a {@code *} of a declarator.
      */
-    TokenSet POINTER_QUALIFIERS = TokenSet.create(CONST_KEYWORD, VOLATILE_KEYWORD, RESTRICT_KEYWORD, ATOMIC_KEYWORD);
+    TokenSet POINTER_QUALIFIERS = TokenSet.create(CONST_KEYWORD, VOLATILE_KEYWORD, RESTRICT_KEYWORD, ATOMIC_KEYWORD, ADDRESS_SPACE_KEYWORD);
 
     TokenSet WHITE_SPACE_SET = TokenSet.create(WHITE_SPACE);
     TokenSet STRING_LITERAL_SET = TokenSet.create(STRING_LITERAL, CHARACTER_LITERAL);
@@ -256,6 +266,7 @@ public interface CPsiTokens extends StandardTokenTypes, CPreprocessorTokenTypes 
             VIRTUAL_KEYWORD, EXPLICIT_KEYWORD, FRIEND_KEYWORD, MUTABLE_KEYWORD,
             STRUCT_KEYWORD, UNION_KEYWORD, SIZEOF_KEYWORD,
             INLINE_KEYWORD, VOLATILE_KEYWORD, REGISTER_KEYWORD, AUTO_KEYWORD, RESTRICT_KEYWORD, NORETURN_KEYWORD,
+            ADDRESS_SPACE_KEYWORD, FUNCTION_QUALIFIER_KEYWORD,
             THREAD_LOCAL_KEYWORD, ATOMIC_KEYWORD, STATIC_ASSERT_KEYWORD, ALIGNOF_KEYWORD, ALIGNAS_KEYWORD,
             TYPEOF_KEYWORD, GENERIC_KEYWORD, CONSTEXPR_KEYWORD, NULLPTR_KEYWORD,
             ATTRIBUTE_KEYWORD, DECLSPEC_KEYWORD, EXTENSION_KEYWORD, ASM_KEYWORD,

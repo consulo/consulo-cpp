@@ -321,7 +321,10 @@ public class CDeclarationParsing extends CParsingBase {
             boolean standaloneAllowed = scope == Scope.FILE || scope == Scope.BLOCK || scope == Scope.MEMBER;
             specifiers.myStandalone = parseAggregate(standaloneAllowed);
             specifiers.myType = true;
-            parseTrailingModifiers();
+            if (!specifiers.myStandalone) {
+                // struct S { ... } const s; - a standalone one has taken its ';', what follows is the next declaration
+                parseTrailingModifiers();
+            }
             return specifiers;
         }
 

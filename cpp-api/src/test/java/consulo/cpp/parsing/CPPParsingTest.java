@@ -19,8 +19,10 @@ package consulo.cpp.parsing;
 import consulo.cpp.CParsingBaseTest;
 import consulo.annotation.access.RequiredReadAction;
 import consulo.cpp.lang.CPPSourceFileType;
+import consulo.cpp.lang.version.CDialectKeyword;
 import consulo.cpp.lang.version.CLanguageFeature;
 import consulo.cpp.lang.version.CLanguageVersion;
+import consulo.cpp.lang.version.Cpp14LanguageVersion;
 import consulo.cpp.lang.version.Cpp20LanguageVersion;
 import consulo.language.file.LanguageFileType;
 import consulo.language.version.LanguageVersion;
@@ -28,6 +30,8 @@ import consulo.virtualFileSystem.fileType.FileType;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 /**
  * Parsing tests for the C++ language (.cpp files).
@@ -49,11 +53,31 @@ public class CPPParsingTest extends CParsingBaseTest {
         }
     };
 
+    /**
+     * C++14 with Metal's words, as a dialect's version adds them.
+     */
+    private static final CLanguageVersion DIALECT_KEYWORDS_VERSION = new Cpp14LanguageVersion("TEST_DIALECT_KEYWORDS", "C++14 with dialect keywords") {
+        @Override
+        public Map<String, CDialectKeyword> getDialectKeywords() {
+            return Map.of(
+                "device", CDialectKeyword.ADDRESS_SPACE,
+                "constant", CDialectKeyword.ADDRESS_SPACE,
+                "threadgroup", CDialectKeyword.ADDRESS_SPACE,
+                "kernel", CDialectKeyword.FUNCTION_QUALIFIER,
+                "vertex", CDialectKeyword.FUNCTION_QUALIFIER
+            );
+        }
+    };
+
     @RequiredReadAction
     @Override
     protected LanguageVersion resolveLanguageVersion(Context context, @Nullable Object testContext, FileType fileType) {
-        if (context.testInfo().getTestMethod().map(method -> method.getName().equals("testKernelLaunch")).orElse(false)) {
+        String test = context.testInfo().getTestMethod().map(method -> method.getName()).orElse("");
+        if (test.equals("testKernelLaunch")) {
             return KERNEL_LAUNCH_VERSION;
+        }
+        if (test.equals("testDialectKeywords")) {
+            return DIALECT_KEYWORDS_VERSION;
         }
         return super.resolveLanguageVersion(context, testContext, fileType);
     }
@@ -238,6 +262,15 @@ public class CPPParsingTest extends CParsingBaseTest {
      */
     @Test
     public void testMacroContinuation(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * A dialect's words in a version which has them: address spaces where {@code const} goes - before the type, after a
+     * {@code *} - and function qualifiers where {@code inline} goes
+     */
+    @Test
+    public void testDialectKeywords(Context context) throws Exception {
         doTest(context, null);
     }
 }

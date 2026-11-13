@@ -20,7 +20,6 @@ import consulo.cpp.lang.version.CLanguageVersions;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.stub.ModuleAwareIndexOptions;
 import consulo.project.Project;
-import consulo.virtualFileSystem.LocalFileSystem;
 import consulo.virtualFileSystem.VirtualFile;
 
 import java.util.ArrayList;
@@ -105,7 +104,7 @@ public final class CDefineEnv {
     public static List<VirtualFile> includeRootsFor(PsiElement context) {
         List<VirtualFile> roots = new ArrayList<>();
         for (String path : optionsFor(context).includePaths()) {
-            VirtualFile root = LocalFileSystem.getInstance().findFileByPath(path);
+            VirtualFile root = CIncludeWalker.findFile(path);
             if (root != null && root.isDirectory()) {
                 roots.add(root);
             }

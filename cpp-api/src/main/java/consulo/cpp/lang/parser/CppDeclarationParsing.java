@@ -81,6 +81,12 @@ public class CppDeclarationParsing extends CDeclarationParsing {
             parseLinkageSpecification(scope);
             return true;
         }
+        if (type == EXTERN_KEYWORD && lookAhead(1) == TEMPLATE_KEYWORD) {
+            // extern template class basic_streambuf<char>; - an explicit instantiation declaration
+            advance();
+            parseTemplate(scope);
+            return true;
+        }
         return false;
     }
 

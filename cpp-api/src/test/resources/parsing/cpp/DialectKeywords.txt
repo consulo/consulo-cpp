@@ -1,0 +1,292 @@
+FILE
+  CPsiStructDeclarationImpl: struct Uniforms { float scale; };
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('Uniforms')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiDeclarationFieldImpl: float scale;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: float
+        PsiElement(FLOAT_KEYWORD)('float')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('scale')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiImplementingMethodImpl: kernel void scale(device const float* a [[buffer(0)]], constant Uniforms& u [[buffer(1)]],
+                  device float* c [[buffer(2)]], uint id [[thread_position_in_grid]])
+{
+    threadgroup float tile[64];
+    tile[id % 64] = a[id];
+    c[id] = tile[id % 64] * u.scale;
+}
+    CPsiModifierListImpl: kernel
+      PsiElement(FUNCTION_QUALIFIER_KEYWORD)('kernel')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('scale')
+    CPsiParameterListImpl: (device const float* a [[buffer(0)]], constant Uniforms& u [[buffer(1)]],
+                  device float* c [[buffer(2)]], uint id [[thread_position_in_grid]])
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: device const float* a [[buffer(0)]]
+        CPsiModifierListImpl: device const
+          PsiElement(ADDRESS_SPACE_KEYWORD)('device')
+          PsiWhiteSpace(' ')
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: float
+          PsiElement(FLOAT_KEYWORD)('float')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('a')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[buffer(0)]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('buffer')
+          PsiElement(LPARENTH)('(')
+          PsiElement(INTEGER_LITERAL)('0')
+          PsiElement(RPARENTH)(')')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: constant Uniforms& u [[buffer(1)]]
+        CPsiModifierListImpl: constant
+          PsiElement(ADDRESS_SPACE_KEYWORD)('constant')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: Uniforms
+          PsiElement(IDENTIFIER)('Uniforms')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('u')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[buffer(1)]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('buffer')
+          PsiElement(LPARENTH)('(')
+          PsiElement(INTEGER_LITERAL)('1')
+          PsiElement(RPARENTH)(')')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace('\n                  ')
+      CPsiParameterImpl: device float* c [[buffer(2)]]
+        CPsiModifierListImpl: device
+          PsiElement(ADDRESS_SPACE_KEYWORD)('device')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: float
+          PsiElement(FLOAT_KEYWORD)('float')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('c')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[buffer(2)]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('buffer')
+          PsiElement(LPARENTH)('(')
+          PsiElement(INTEGER_LITERAL)('2')
+          PsiElement(RPARENTH)(')')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: uint id [[thread_position_in_grid]]
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: uint
+          PsiElement(IDENTIFIER)('uint')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('id')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[thread_position_in_grid]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('thread_position_in_grid')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    threadgroup float tile[64];
+    tile[id % 64] = a[id];
+    c[id] = tile[id % 64] * u.scale;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: threadgroup float tile[64];
+        CPsiModifierListImpl: threadgroup
+          PsiElement(ADDRESS_SPACE_KEYWORD)('threadgroup')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: float
+          PsiElement(FLOAT_KEYWORD)('float')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('tile')
+        PsiElement(LBRACKET)('[')
+        CPsiLiteralExpressionImpl: 64
+          PsiElement(INTEGER_LITERAL)('64')
+        PsiElement(RBRACKET)(']')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: tile[id % 64] = a[id];
+        CPsiAssignmentExpressionImpl: tile[id % 64] = a[id]
+          CPsiIndexedPropertyAccessExpressionImpl: tile[id % 64]
+            CPsiReferenceExpressionImpl: tile
+              PsiElement(IDENTIFIER)('tile')
+            PsiElement(LBRACKET)('[')
+            CPsiBinaryExpressionImpl: id % 64
+              CPsiReferenceExpressionImpl: id
+                PsiElement(IDENTIFIER)('id')
+              PsiWhiteSpace(' ')
+              PsiElement(PERC)('%')
+              PsiWhiteSpace(' ')
+              CPsiLiteralExpressionImpl: 64
+                PsiElement(INTEGER_LITERAL)('64')
+            PsiElement(RBRACKET)(']')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiIndexedPropertyAccessExpressionImpl: a[id]
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(LBRACKET)('[')
+            CPsiReferenceExpressionImpl: id
+              PsiElement(IDENTIFIER)('id')
+            PsiElement(RBRACKET)(']')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: c[id] = tile[id % 64] * u.scale;
+        CPsiAssignmentExpressionImpl: c[id] = tile[id % 64] * u.scale
+          CPsiIndexedPropertyAccessExpressionImpl: c[id]
+            CPsiReferenceExpressionImpl: c
+              PsiElement(IDENTIFIER)('c')
+            PsiElement(LBRACKET)('[')
+            CPsiReferenceExpressionImpl: id
+              PsiElement(IDENTIFIER)('id')
+            PsiElement(RBRACKET)(']')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiBinaryExpressionImpl: tile[id % 64] * u.scale
+            CPsiIndexedPropertyAccessExpressionImpl: tile[id % 64]
+              CPsiReferenceExpressionImpl: tile
+                PsiElement(IDENTIFIER)('tile')
+              PsiElement(LBRACKET)('[')
+              CPsiBinaryExpressionImpl: id % 64
+                CPsiReferenceExpressionImpl: id
+                  PsiElement(IDENTIFIER)('id')
+                PsiWhiteSpace(' ')
+                PsiElement(PERC)('%')
+                PsiWhiteSpace(' ')
+                CPsiLiteralExpressionImpl: 64
+                  PsiElement(INTEGER_LITERAL)('64')
+              PsiElement(RBRACKET)(']')
+            PsiWhiteSpace(' ')
+            PsiElement(ASTERISK)('*')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: u.scale
+              CPsiReferenceExpressionImpl: u
+                PsiElement(IDENTIFIER)('u')
+              PsiElement(DOT)('.')
+              PsiElement(IDENTIFIER)('scale')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')
+  CPsiDeclarationMethodImpl: vertex float4 position(uint vid [[vertex_id]], const device float4* device vertices [[buffer(0)]]);
+    CPsiModifierListImpl: vertex
+      PsiElement(FUNCTION_QUALIFIER_KEYWORD)('vertex')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: float4
+      PsiElement(IDENTIFIER)('float4')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('position')
+    CPsiParameterListImpl: (uint vid [[vertex_id]], const device float4* device vertices [[buffer(0)]])
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: uint vid [[vertex_id]]
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: uint
+          PsiElement(IDENTIFIER)('uint')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('vid')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[vertex_id]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('vertex_id')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: const device float4* device vertices [[buffer(0)]]
+        CPsiModifierListImpl: const device
+          PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          PsiElement(ADDRESS_SPACE_KEYWORD)('device')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: float4
+          PsiElement(IDENTIFIER)('float4')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(ADDRESS_SPACE_KEYWORD)('device')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('vertices')
+        PsiWhiteSpace(' ')
+        CPsiAttributeListImpl: [[buffer(0)]]
+          PsiElement(LBRACKET)('[')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('buffer')
+          PsiElement(LPARENTH)('(')
+          PsiElement(INTEGER_LITERAL)('0')
+          PsiElement(RPARENTH)(')')
+          PsiElement(RBRACKET)(']')
+          PsiElement(RBRACKET)(']')
+      PsiElement(RPARENTH)(')')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiStructDeclarationImpl: struct after { int x; };
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('after')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiDeclarationFieldImpl: int x;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: int
+        PsiElement(INT_KEYWORD)('int')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('x')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  PsiElement(EXTERN_KEYWORD)('extern')
+  PsiWhiteSpace(' ')
+  PsiElement(STRING_LITERAL)('"C"')
+  PsiWhiteSpace(' ')
+  PsiElement(LBRACE)('{')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: int y;
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('y')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

@@ -17,7 +17,9 @@ package consulo.cpp.moduleAware;
 
 import consulo.util.dataholder.Key;
 import consulo.util.io.FileUtil;
+import consulo.util.io.URLUtil;
 import consulo.virtualFileSystem.LocalFileSystem;
+import consulo.virtualFileSystem.VirtualFileManager;
 import consulo.virtualFileSystem.VirtualFile;
 import consulo.virtualFileSystem.VirtualFileManager;
 import consulo.virtualFileSystem.util.VirtualFileUtil;
@@ -95,11 +97,26 @@ public final class CIncludeWalker {
      * line would be.
      */
     public static @Nullable VirtualFile resolveForcedInclude(String path, VirtualFile from, List<VirtualFile> includeRoots) {
-        if (FileUtil.isAbsolute(path)) {
-            VirtualFile file = LocalFileSystem.getInstance().findFileByPath(path);
+        if (isUrl(path) || FileUtil.isAbsolute(path)) {
+            VirtualFile file = findFile(path);
             return file == null || file.isDirectory() ? null : file;
         }
         return resolve(path, from, includeRoots);
+    }
+
+    /**
+     * The file or directory an include path or a forced include names: a local path, or the URL of any file system -
+     * {@code jar://.../plugin.jar!/include} for the headers a dialect's plugin bundles.
+     */
+    public static @Nullable VirtualFile findFile(String pathOrUrl) {
+        if (isUrl(pathOrUrl)) {
+            return VirtualFileManager.getInstance().findFileByUrl(pathOrUrl);
+        }
+        return LocalFileSystem.getInstance().findFileByPath(pathOrUrl);
+    }
+
+    private static boolean isUrl(String path) {
+        return path.contains(URLUtil.SCHEME_SEPARATOR);
     }
 
     /**

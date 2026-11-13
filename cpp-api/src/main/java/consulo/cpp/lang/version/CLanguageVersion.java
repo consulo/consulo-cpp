@@ -17,6 +17,7 @@ package consulo.cpp.lang.version;
 
 import consulo.cpp.lang.CLanguage;
 import consulo.cpp.lang.editor.highlight.CSyntaxHighlighter;
+import consulo.cpp.lang.lexer.CDialectKeywordLexer;
 import consulo.cpp.lang.lexer._CppLexer;
 import consulo.cpp.lang.parser.CPsiParserImpl;
 import consulo.cpp.lang.psi.CPsiTokens;
@@ -186,7 +187,19 @@ public abstract class CLanguageVersion extends LanguageVersion implements Langua
 
     @Override
     public Lexer createLexer() {
-        return new FlexAdapter(new _CppLexer(this));
+        Lexer lexer = new FlexAdapter(new _CppLexer(this));
+        Map<String, CDialectKeyword> keywords = getDialectKeywords();
+        return keywords.isEmpty() ? lexer : new CDialectKeywordLexer(lexer, keywords);
+    }
+
+    /**
+     * The words a dialect adds to the language, and what each is - Metal's address spaces ({@code device},
+     * {@code constant}, {@code threadgroup}) and function qualifiers ({@code kernel}, {@code vertex}). The lexer reads
+     * them as keywords of their kind, the parser accepts them with the words of that kind, the highlighter colors
+     * them as keywords. A standard has none.
+     */
+    public Map<String, CDialectKeyword> getDialectKeywords() {
+        return Map.of();
     }
 
     @Override
