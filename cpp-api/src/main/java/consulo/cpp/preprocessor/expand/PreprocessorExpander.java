@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -41,6 +42,25 @@ public class PreprocessorExpander {
     public static final Key<PreprocessorExpander> EXPANDER_KEY = Key.create("PreprocessorExpander");
 
     private final Map<String, ExpandedMacro> myDefines = new LinkedHashMap<>();
+
+    /**
+     * A change of a macro by a directive of the file: from {@code offset} on, the macro is {@code macro} - {@code null}
+     * once it is undefined. The first change of a name is preceded by one at {@code -1}, what it was before the file.
+     */
+    private record MacroChange(int offset, @Nullable ExpandedMacro macro) {
+    }
+
+    /**
+     * The changes of the macros the file's own directives - and the headers it includes - define or undefine, in the
+     * order of the file: a macro is what its last change before a use made it, not what it is at the end of the file -
+     * {@code #undef __STORAGE__} after the declarations using it does not take it from them.
+     */
+    private final Map<String, List<MacroChange>> myChanges = new HashMap<>();
+
+    /**
+     * The offset of the directive being expanded; {@code -1} outside the file's own directives (forced includes).
+     */
+    private int myDirectiveOffset = -1;
 
     private final CTemplateDataModifications myModifications = new CTemplateDataModifications();
 
@@ -124,6 +144,7 @@ public class PreprocessorExpander {
             @Override
             public void visitElement(PsiElement element) {
                 if (element instanceof CPreprocessorDirective directive) {
+                    myDirectiveOffset = directive.getTextRange().getStartOffset();
                     directive.expand(mySourceContext);
                 }
                 else {
@@ -297,6 +318,18 @@ public class PreprocessorExpander {
                 new PreprocessorExpander(preprocessorRoot, myLanguageVersion, myProcessedFiles, myIncludePaths, myDefines, List.of());
         // The child started from our defines, so its final state is the state after the include: names it
         // undefined are gone, the rest are added or overridden.
+        if (myDirectiveOffset >= 0) {
+            for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
+                if (!childExpander.myDefines.containsKey(entry.getKey())) {
+                    recordChange(entry.getKey(), null);
+                }
+            }
+            for (Map.Entry<String, ExpandedMacro> entry : childExpander.myDefines.entrySet()) {
+                if (myDefines.get(entry.getKey()) != entry.getValue()) {
+                    recordChange(entry.getKey(), entry.getValue());
+                }
+            }
+        }
         myDefines.keySet().retainAll(childExpander.myDefines.keySet());
         myDefines.putAll(childExpander.myDefines);
     }
@@ -348,11 +381,14 @@ public class PreprocessorExpander {
     private abstract class BaseContext implements CPreprocessorExpandContext {
         @Override
         public void define(String name, @Nullable List<String> parameters, CharSequence value, @Nullable CPreprocessorDefineDirective element) {
-            myDefines.put(name, new ExpandedMacro(myLanguageVersion, name, parameters, element, value));
+            ExpandedMacro macro = new ExpandedMacro(myLanguageVersion, name, parameters, element, value);
+            recordChange(name, macro);
+            myDefines.put(name, macro);
         }
 
         @Override
         public void undefine(String name) {
+            recordChange(name, null);
             myDefines.remove(name);
         }
 
@@ -530,6 +566,62 @@ public class PreprocessorExpander {
         return myDefines.get(name);
     }
 
+    /**
+     * The macro {@code name} is at {@code offset} of the text the C lexer reads - defined by the last {@code #define}
+     * before it and not undefined since; {@code -1} for the macro at the end of the file.
+     */
+    public @Nullable ExpandedMacro getMacroAt(String name, int offset) {
+        List<MacroChange> changes = offset < 0 ? null : myChanges.get(name);
+        if (changes == null) {
+            return myDefines.get(name);
+        }
+        ExpandedMacro macro = null;
+        for (MacroChange change : changes) {
+            // a directive is removed from that text, so one right before a use has the use's offset
+            if (change.offset() > offset) {
+                break;
+            }
+            macro = change.macro();
+        }
+        return macro;
+    }
+
+    /**
+     * Records that the directive being expanded makes {@code name} {@code macro}; before {@link #myDefines} changes.
+     */
+    private void recordChange(String name, @Nullable ExpandedMacro macro) {
+        if (myDirectiveOffset < 0) {
+            return;
+        }
+        List<MacroChange> changes = myChanges.get(name);
+        if (changes == null) {
+            changes = new ArrayList<>(2);
+            changes.add(new MacroChange(-1, myDefines.get(name)));
+            myChanges.put(name, changes);
+        }
+        changes.add(new MacroChange(templateOffsetOf(myDirectiveOffset), macro));
+    }
+
+    /**
+     * Where {@code sourceOffset} is in the text the C lexer reads - the file without its directives and inactive
+     * branches, the ranges {@link #myModifications} has removed so far, which are those before it.
+     */
+    private int templateOffsetOf(int sourceOffset) {
+        int removed = 0;
+        for (TextRange range : myModifications.myOuterAndRemoveRanges) {
+            if (range instanceof CPreprocessorDirectiveCollector.RangeToRemove) {
+                continue;
+            }
+            if (range.getEndOffset() <= sourceOffset) {
+                removed += range.getLength();
+            }
+            else if (range.getStartOffset() < sourceOffset) {
+                removed += sourceOffset - range.getStartOffset();
+            }
+        }
+        return sourceOffset - removed;
+    }
+
     // -----------------------------------------------------------------------
     // Expansion
     // -----------------------------------------------------------------------
@@ -542,18 +634,25 @@ public class PreprocessorExpander {
      * @param arguments the argument tokens of a function-like macro, {@code null} for an object-like one
      */
     public List<CMacroToken> expand(ExpandedMacro macro, @Nullable List<List<CMacroToken>> arguments) {
-        return expand(macro, arguments, new HashSet<>());
+        return expand(macro, arguments, -1);
     }
 
-    private List<CMacroToken> expand(ExpandedMacro macro, @Nullable List<List<CMacroToken>> arguments, Set<String> disabled) {
-        List<CMacroToken> tokens = macro.isFunctionLike() ? substitute(macro, arguments == null ? List.of() : arguments, disabled) : macro.getBody();
+    /**
+     * The same, for a use at {@code offset} of the file: the macros its expansion uses are those defined there.
+     */
+    public List<CMacroToken> expand(ExpandedMacro macro, @Nullable List<List<CMacroToken>> arguments, int offset) {
+        return expand(macro, arguments, new HashSet<>(), offset);
+    }
+
+    private List<CMacroToken> expand(ExpandedMacro macro, @Nullable List<List<CMacroToken>> arguments, Set<String> disabled, int offset) {
+        List<CMacroToken> tokens = macro.isFunctionLike() ? substitute(macro, arguments == null ? List.of() : arguments, disabled, offset) : macro.getBody();
 
         Set<String> inner = new HashSet<>(disabled);
         inner.add(macro.getName());
-        return rescan(tokens, inner);
+        return rescan(tokens, inner, offset);
     }
 
-    private List<CMacroToken> substitute(ExpandedMacro macro, List<List<CMacroToken>> arguments, Set<String> disabled) {
+    private List<CMacroToken> substitute(ExpandedMacro macro, List<List<CMacroToken>> arguments, Set<String> disabled, int offset) {
         List<String> parameters = macro.getParameters();
         List<CMacroToken> body = macro.getBody();
         List<CMacroToken> result = new ArrayList<>();
@@ -578,7 +677,7 @@ public class PreprocessorExpander {
                 // an operand of ## is pasted as written, any other argument is expanded first
                 boolean pasted = i > 0 && body.get(i - 1).type() == CPsiTokens.SHARPSHARP
                     || i + 1 < body.size() && body.get(i + 1).type() == CPsiTokens.SHARPSHARP;
-                result.addAll(pasted ? argument : rescan(argument, disabled));
+                result.addAll(pasted ? argument : rescan(argument, disabled, offset));
             }
         }
         return paste(result);
@@ -651,16 +750,16 @@ public class PreprocessorExpander {
      * Expands the macros used in {@code tokens} - which is how a macro body using another macro, or an argument
      * naming one, ends up as plain tokens.
      */
-    private List<CMacroToken> rescan(List<CMacroToken> tokens, Set<String> disabled) {
+    private List<CMacroToken> rescan(List<CMacroToken> tokens, Set<String> disabled, int offset) {
         List<CMacroToken> result = new ArrayList<>(tokens.size());
         for (int i = 0; i < tokens.size(); i++) {
             CMacroToken token = tokens.get(i);
-            ExpandedMacro macro = token.type() == CPsiTokens.IDENTIFIER && !disabled.contains(token.text()) ? myDefines.get(token.text()) : null;
+            ExpandedMacro macro = token.type() == CPsiTokens.IDENTIFIER && !disabled.contains(token.text()) ? getMacroAt(token.text(), offset) : null;
             if (macro == null) {
                 result.add(token);
             }
             else if (!macro.isFunctionLike()) {
-                result.addAll(expand(macro, null, disabled));
+                result.addAll(expand(macro, null, disabled, offset));
             }
             else {
                 int close = i + 1 < tokens.size() && tokens.get(i + 1).type() == CPsiTokens.LPARENTH ? closingParenthesis(tokens, i + 1) : -1;
@@ -669,7 +768,7 @@ public class PreprocessorExpander {
                     result.add(token);
                 }
                 else {
-                    result.addAll(expand(macro, splitArguments(tokens.subList(i + 2, close)), disabled));
+                    result.addAll(expand(macro, splitArguments(tokens.subList(i + 2, close)), disabled, offset));
                     i = close;
                 }
             }

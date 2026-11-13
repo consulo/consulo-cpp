@@ -31,6 +31,9 @@ import consulo.language.parser.PsiParser;
 import consulo.language.version.LanguageVersion;
 import consulo.language.version.LanguageVersionWithParsing;
 
+import consulo.virtualFileSystem.fileType.FileType;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
@@ -114,6 +117,21 @@ public abstract class CLanguageVersion extends LanguageVersion implements Langua
 
     public boolean hasFeature(CLanguageFeature feature) {
         return myFeatures.contains(feature);
+    }
+
+    /**
+     * The standard a dialect builds on - CUDA C++20 builds on C++20; {@code null} for a standard itself. A file of a
+     * type the dialect {@link #isDialectFileType claims} gets the dialect of the standard its module configures.
+     */
+    public @Nullable CLanguageVersion getBaseVersion() {
+        return null;
+    }
+
+    /**
+     * Whether files of {@code fileType} are of this dialect - {@code .cu} of CUDA.
+     */
+    public boolean isDialectFileType(FileType fileType) {
+        return false;
     }
 
     public String getPresentableName() {

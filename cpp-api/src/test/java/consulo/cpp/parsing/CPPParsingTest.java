@@ -17,8 +17,14 @@
 package consulo.cpp.parsing;
 
 import consulo.cpp.CParsingBaseTest;
+import consulo.annotation.access.RequiredReadAction;
 import consulo.cpp.lang.CPPSourceFileType;
+import consulo.cpp.lang.version.CLanguageFeature;
+import consulo.cpp.lang.version.CLanguageVersion;
+import consulo.cpp.lang.version.Cpp20LanguageVersion;
 import consulo.language.file.LanguageFileType;
+import consulo.language.version.LanguageVersion;
+import consulo.virtualFileSystem.fileType.FileType;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.Test;
@@ -34,6 +40,24 @@ import org.junit.jupiter.api.Test;
  * </ul>
  */
 public class CPPParsingTest extends CParsingBaseTest {
+    /**
+     * C++20 with the kernel launches of CUDA and HIP, as their plugins' versions have them.
+     */
+    private static final CLanguageVersion KERNEL_LAUNCH_VERSION = new Cpp20LanguageVersion("TEST_KERNEL_LAUNCH", "C++20 with kernel launches") {
+        {
+            addFeature(CLanguageFeature.KERNEL_LAUNCH);
+        }
+    };
+
+    @RequiredReadAction
+    @Override
+    protected LanguageVersion resolveLanguageVersion(Context context, @Nullable Object testContext, FileType fileType) {
+        if (context.testInfo().getTestMethod().map(method -> method.getName().equals("testKernelLaunch")).orElse(false)) {
+            return KERNEL_LAUNCH_VERSION;
+        }
+        return super.resolveLanguageVersion(context, testContext, fileType);
+    }
+
     public CPPParsingTest() {
         super("parsing/cpp", "cpp");
     }
@@ -196,6 +220,24 @@ public class CPPParsingTest extends CParsingBaseTest {
      */
     @Test
     public void testMacroInvocationLines(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * Kernel launches of CUDA and HIP, in a version which has them: {@code <<<...>>>} holds the execution configuration - a shift inside it still shifts,
+     * the {@code >>>} closes it - and plain shifts stay shifts
+     */
+    @Test
+    public void testKernelLaunch(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * A macro defined on continued lines in a branch of a conditional, used between the type and the name - CUDA's
+     * {@code uint3 __device_builtin__ __STORAGE__ threadIdx;}
+     */
+    @Test
+    public void testMacroContinuation(Context context) throws Exception {
         doTest(context, null);
     }
 }

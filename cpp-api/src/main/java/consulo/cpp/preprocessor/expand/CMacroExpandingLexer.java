@@ -76,14 +76,15 @@ public class CMacroExpandingLexer extends LexerBase {
         List<Token> result = new ArrayList<>(source.size());
         for (int i = 0; i < source.size(); i++) {
             Token token = source.get(i);
-            ExpandedMacro macro = token.type() == CPsiTokens.IDENTIFIER ? myExpander.getMacro(textOf(token)) : null;
+            // the macro as defined where it is used, not where the file ends
+            ExpandedMacro macro = token.type() == CPsiTokens.IDENTIFIER ? myExpander.getMacroAt(textOf(token), token.start()) : null;
             if (macro == null) {
                 result.add(token);
                 continue;
             }
 
             if (!macro.isFunctionLike()) {
-                addExpansion(result, token.start(), token.end(), myExpander.expand(macro, null));
+                addExpansion(result, token.start(), token.end(), myExpander.expand(macro, null, token.start()));
                 continue;
             }
 
@@ -103,7 +104,7 @@ public class CMacroExpandingLexer extends LexerBase {
                     argumentTokens.add(new CMacroToken(argumentToken.type(), textOf(argumentToken), argumentToken.start()));
                 }
             }
-            List<CMacroToken> expansion = myExpander.expand(macro, PreprocessorExpander.splitArguments(argumentTokens));
+            List<CMacroToken> expansion = myExpander.expand(macro, PreprocessorExpander.splitArguments(argumentTokens), token.start());
             addExpansion(result, token.start(), source.get(close).end(), expansion);
             i = close;
         }

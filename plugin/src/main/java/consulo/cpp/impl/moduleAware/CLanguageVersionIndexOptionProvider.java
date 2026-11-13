@@ -17,6 +17,8 @@ package consulo.cpp.impl.moduleAware;
 
 import consulo.annotation.component.ExtensionImpl;
 import consulo.cpp.module.extension.CModuleExtension;
+import consulo.cpp.moduleAware.CFileOptions;
+import consulo.cpp.moduleAware.CFileOptionsContributor;
 import consulo.cpp.moduleAware.CLanguageVersionOption;
 import consulo.cpp.moduleAware.CLanguageVersionOptionExternalizer;
 import consulo.language.psi.stub.IndexOption;
@@ -28,6 +30,7 @@ import consulo.virtualFileSystem.fileType.FileType;
 import consulo.virtualFileSystem.fileType.FileTypeRegistry;
 import jakarta.inject.Inject;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -51,7 +54,8 @@ public class CLanguageVersionIndexOptionProvider implements ModuleAwareIndexOpti
 
     @Override
     public int getVersion() {
-        return 1;
+        // 2: the standard of CFileOptionsContributor
+        return 2;
     }
 
     @Override
@@ -62,11 +66,12 @@ public class CLanguageVersionIndexOptionProvider implements ModuleAwareIndexOpti
     @Override
     public IndexOption getOptions(Module module, VirtualFile file) {
         CModuleExtension<?> extension = module.getExtension(CModuleExtension.class);
-        if (extension == null) {
+        List<CFileOptions> contributed = CFileOptionsContributor.optionsOf(module, file);
+        if (extension == null && contributed.isEmpty()) {
             return IndexOption.fullySharable();
         }
 
-        CLanguageVersionOption option = CLanguageVersionOption.of(extension, file);
+        CLanguageVersionOption option = CLanguageVersionOption.of(extension, contributed, file);
         if (option.isEmpty()) {
             return IndexOption.fullySharable();
         }

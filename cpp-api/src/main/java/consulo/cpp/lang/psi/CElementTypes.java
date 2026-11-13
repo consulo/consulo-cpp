@@ -114,6 +114,9 @@ public interface CElementTypes {
     IElementType INDEXED_PROPERTY_ACCESS_EXPRESSION =
         new CElementType(CPsiIndexedPropertyAccessExpression.class.getSimpleName(), CPsiIndexedPropertyAccessExpressionImpl::new);
 
+    IElementType KERNEL_LAUNCH_CONFIGURATION =
+        new CElementType(CPsiKernelLaunchConfiguration.class.getSimpleName(), CPsiKernelLaunchConfigurationImpl::new);
+
     IElementType LABELED_STATEMENT =
         new CElementType(CPsiLabeledStatement.class.getSimpleName(), CPsiLabeledStatementImpl::new);
 

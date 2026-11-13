@@ -113,10 +113,55 @@ public final class CLanguageVersions {
             cpp = true;
         }
 
+        CLanguageVersion standard;
         if (cpp) {
-            return cppVersion != null && cppVersion.isCpp() ? cppVersion : getDefaultCpp();
+            standard = cppVersion != null && cppVersion.isCpp() ? cppVersion : getDefaultCpp();
         }
-        return cVersion != null && !cVersion.isCpp() ? cVersion : getDefaultC();
+        else {
+            standard = cVersion != null && !cVersion.isCpp() ? cVersion : getDefaultC();
+        }
+        return fileType == null ? standard : dialectOf(fileType, standard);
+    }
+
+    /**
+     * The dialect files of {@code fileType} are of, built on {@code standard}: the one built on that very standard, else
+     * the newest built on an older one, else the oldest - a module on C++23 gets CUDA C++20 when CUDA goes no further.
+     * {@code standard} itself when no dialect claims the type, or when it is a dialect already.
+     */
+    private static CLanguageVersion dialectOf(FileType fileType, CLanguageVersion standard) {
+        if (standard.getBaseVersion() != null) {
+            return standard;
+        }
+        CLanguageVersion exact = null;
+        CLanguageVersion older = null;
+        int olderWeight = Integer.MIN_VALUE;
+        CLanguageVersion oldest = null;
+        int oldestWeight = Integer.MAX_VALUE;
+        for (CLanguageVersion version : getVersions()) {
+            CLanguageVersion base = version.getBaseVersion();
+            if (base == null || base.isCpp() != standard.isCpp() || !version.isDialectFileType(fileType)) {
+                continue;
+            }
+            int weight = base.getWeight();
+            if (base.getId().equals(standard.getId())) {
+                exact = version;
+            }
+            else if (weight < standard.getWeight() && weight > olderWeight) {
+                older = version;
+                olderWeight = weight;
+            }
+            if (weight < oldestWeight) {
+                oldest = version;
+                oldestWeight = weight;
+            }
+        }
+        if (exact != null) {
+            return exact;
+        }
+        if (older != null) {
+            return older;
+        }
+        return oldest != null ? oldest : standard;
     }
 
     /**

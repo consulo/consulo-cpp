@@ -1,0 +1,208 @@
+FILE
+  CPsiImplementingMethodImpl: void launch(int n, float* a, int s)
+{
+    add<<<(n + 255) / 256, 256>>>(a, n);
+    add<<<n >> 8, 256, 0, s>>>(a, n);
+    fill<<<1, 1>>>();
+    scale<float><<<n, 128>>>(a);
+    int shifted = n << 2 >> 1;
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('launch')
+    CPsiParameterListImpl: (int n, float* a, int s)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: int n
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('n')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: float* a
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: float
+          PsiElement(FLOAT_KEYWORD)('float')
+        PsiElement(ASTERISK)('*')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('a')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: int s
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('s')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace('\n')
+    CPsiCodeBlockImpl: {
+    add<<<(n + 255) / 256, 256>>>(a, n);
+    add<<<n >> 8, 256, 0, s>>>(a, n);
+    fill<<<1, 1>>>();
+    scale<float><<<n, 128>>>(a);
+    int shifted = n << 2 >> 1;
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: add<<<(n + 255) / 256, 256>>>(a, n);
+        CPsiCallExpressionImpl: add<<<(n + 255) / 256, 256>>>(a, n)
+          CPsiReferenceExpressionImpl: add
+            PsiElement(IDENTIFIER)('add')
+          CPsiKernelLaunchConfigurationImpl: <<<(n + 255) / 256, 256>>>
+            PsiElement(LTLT)('<<')
+            PsiElement(LT)('<')
+            CPsiBinaryExpressionImpl: (n + 255) / 256
+              CPsiParenthesizedExpressionImpl: (n + 255)
+                PsiElement(LPARENTH)('(')
+                CPsiBinaryExpressionImpl: n + 255
+                  CPsiReferenceExpressionImpl: n
+                    PsiElement(IDENTIFIER)('n')
+                  PsiWhiteSpace(' ')
+                  PsiElement(PLUS)('+')
+                  PsiWhiteSpace(' ')
+                  CPsiLiteralExpressionImpl: 255
+                    PsiElement(INTEGER_LITERAL)('255')
+                PsiElement(RPARENTH)(')')
+              PsiWhiteSpace(' ')
+              PsiElement(DIV)('/')
+              PsiWhiteSpace(' ')
+              CPsiLiteralExpressionImpl: 256
+                PsiElement(INTEGER_LITERAL)('256')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 256
+              PsiElement(INTEGER_LITERAL)('256')
+            PsiElement(GTGT)('>>')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (a, n)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: n
+              PsiElement(IDENTIFIER)('n')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: add<<<n >> 8, 256, 0, s>>>(a, n);
+        CPsiCallExpressionImpl: add<<<n >> 8, 256, 0, s>>>(a, n)
+          CPsiReferenceExpressionImpl: add
+            PsiElement(IDENTIFIER)('add')
+          CPsiKernelLaunchConfigurationImpl: <<<n >> 8, 256, 0, s>>>
+            PsiElement(LTLT)('<<')
+            PsiElement(LT)('<')
+            CPsiBinaryExpressionImpl: n >> 8
+              CPsiReferenceExpressionImpl: n
+                PsiElement(IDENTIFIER)('n')
+              PsiWhiteSpace(' ')
+              PsiElement(GTGT)('>>')
+              PsiWhiteSpace(' ')
+              CPsiLiteralExpressionImpl: 8
+                PsiElement(INTEGER_LITERAL)('8')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 256
+              PsiElement(INTEGER_LITERAL)('256')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 0
+              PsiElement(INTEGER_LITERAL)('0')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: s
+              PsiElement(IDENTIFIER)('s')
+            PsiElement(GTGT)('>>')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (a, n)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiReferenceExpressionImpl: n
+              PsiElement(IDENTIFIER)('n')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: fill<<<1, 1>>>();
+        CPsiCallExpressionImpl: fill<<<1, 1>>>()
+          CPsiReferenceExpressionImpl: fill
+            PsiElement(IDENTIFIER)('fill')
+          CPsiKernelLaunchConfigurationImpl: <<<1, 1>>>
+            PsiElement(LTLT)('<<')
+            PsiElement(LT)('<')
+            CPsiLiteralExpressionImpl: 1
+              PsiElement(INTEGER_LITERAL)('1')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 1
+              PsiElement(INTEGER_LITERAL)('1')
+            PsiElement(GTGT)('>>')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: scale<float><<<n, 128>>>(a);
+        CPsiCallExpressionImpl: scale<float><<<n, 128>>>(a)
+          CPsiReferenceExpressionImpl: scale<float>
+            PsiElement(IDENTIFIER)('scale')
+            PsiElement(LT)('<')
+            PsiElement(FLOAT_KEYWORD)('float')
+            PsiElement(GT)('>')
+          CPsiKernelLaunchConfigurationImpl: <<<n, 128>>>
+            PsiElement(LTLT)('<<')
+            PsiElement(LT)('<')
+            CPsiReferenceExpressionImpl: n
+              PsiElement(IDENTIFIER)('n')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 128
+              PsiElement(INTEGER_LITERAL)('128')
+            PsiElement(GTGT)('>>')
+            PsiElement(GT)('>')
+          CPsiArgumentListImpl: (a)
+            PsiElement(LPARENTH)('(')
+            CPsiReferenceExpressionImpl: a
+              PsiElement(IDENTIFIER)('a')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: int shifted = n << 2 >> 1;
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('shifted')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiBinaryExpressionImpl: n << 2 >> 1
+          CPsiBinaryExpressionImpl: n << 2
+            CPsiReferenceExpressionImpl: n
+              PsiElement(IDENTIFIER)('n')
+            PsiWhiteSpace(' ')
+            PsiElement(LTLT)('<<')
+            PsiWhiteSpace(' ')
+            CPsiLiteralExpressionImpl: 2
+              PsiElement(INTEGER_LITERAL)('2')
+          PsiWhiteSpace(' ')
+          PsiElement(GTGT)('>>')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: 1
+            PsiElement(INTEGER_LITERAL)('1')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

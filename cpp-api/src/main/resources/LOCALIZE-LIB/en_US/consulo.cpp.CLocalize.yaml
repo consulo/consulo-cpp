@@ -72,6 +72,8 @@ lt.expected:
   text: "'<' expected"
 gt.expected:
   text: "'>' expected"
+kernel.launch.end.expected:
+  text: "'>>>' expected"
 extension.defines.label:
   text: "Defines (NAME=VALUE; NAME2)"
 extension.include.paths.label:

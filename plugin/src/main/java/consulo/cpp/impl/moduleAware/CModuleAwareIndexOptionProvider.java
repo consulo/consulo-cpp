@@ -19,6 +19,8 @@ import consulo.annotation.component.ExtensionImpl;
 import consulo.cpp.lang.CLanguage;
 import consulo.cpp.module.extension.CModuleExtension;
 import consulo.cpp.moduleAware.CDefineEnv;
+import consulo.cpp.moduleAware.CFileOptions;
+import consulo.cpp.moduleAware.CFileOptionsContributor;
 import consulo.cpp.moduleAware.CIncludeWalker;
 import consulo.cpp.moduleAware.CPreprocessorOptions;
 import consulo.cpp.moduleAware.CPreprocessorOptionsExternalizer;
@@ -76,7 +78,8 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
     public int getVersion() {
         // 3: the language version id moved to CLanguageVersionIndexOptionProvider
         // 4: the forced includes
-        return 4;
+        // 5: the options of CFileOptionsContributor
+        return 5;
     }
 
     @Override
@@ -100,21 +103,24 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
      * reached through the module's header library - is not edited in the project, and walking the includes of every
      * one of the thousands of headers there would cost more than the whole index, so it has none.
      */
-    private static String includeFingerprint(Module module, CModuleExtension<?> extension, VirtualFile file) {
+    private static String includeFingerprint(Module module, List<String> forcedIncludes, List<String> includePaths, VirtualFile file) {
         if (ProjectFileIndex.getInstance(module.getProject()).getModuleForFile(file) == null) {
             return "";
         }
-        return CIncludeWalker.fingerprintFor(file, extension.getForcedIncludes(), resolveIncludeRoots(extension.getIncludePaths()));
+        return CIncludeWalker.fingerprintFor(file, forcedIncludes, resolveIncludeRoots(includePaths));
     }
 
     @Override
     public IndexOption getOptions(Module module, VirtualFile file) {
         CModuleExtension<?> extension = module.getExtension(CModuleExtension.class);
-        if (extension == null) {
+        List<CFileOptions> contributed = CFileOptionsContributor.optionsOf(module, file);
+        if (extension == null && contributed.isEmpty()) {
             return IndexOption.fullySharable();
         }
 
-        CPreprocessorOptions options = CPreprocessorOptions.of(extension, includeFingerprint(module, extension, file));
+        CPreprocessorOptions merged = CPreprocessorOptions.of(extension, contributed, "");
+        CPreprocessorOptions options = CPreprocessorOptions.of(extension, contributed,
+            includeFingerprint(module, merged.forcedIncludes(), merged.includePaths(), file));
         if (options.isEmpty()) {
             return IndexOption.fullySharable();
         }

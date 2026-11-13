@@ -19,6 +19,7 @@ import consulo.cpp.lang.psi.CElementTypes;
 import consulo.cpp.localize.CLocalize;
 import consulo.language.ast.IElementType;
 import consulo.language.ast.TokenSet;
+import consulo.cpp.lang.version.CLanguageFeature;
 import consulo.language.parser.PsiBuilder;
 import org.jspecify.annotations.Nullable;
 
@@ -166,7 +167,7 @@ public class CExpressionParsing extends CParsingBase {
             return false;
         }
 
-        while (at(BINARY_LEVELS[level])) {
+        while (at(BINARY_LEVELS[level]) && !atKernelLaunchEnd()) {
             advanceBinaryOperator();
             if (!parseBinaryExpression(level + 1)) {
                 error(CLocalize.expressionExpected());
@@ -345,6 +346,17 @@ public class CExpressionParsing extends CParsingBase {
             parseArgumentList();
             return CElementTypes.CALL_EXPRESSION;
         }
+        if (at(LTLT) && lookAhead(1) == LT && myContext.getLanguageVersion().hasFeature(CLanguageFeature.KERNEL_LAUNCH)) {
+            // a kernel launch of CUDA or HIP, kernel<<<grid, block>>>(args) - only their versions have it
+            parseKernelLaunchConfiguration();
+            if (at(LPARENTH)) {
+                parseArgumentList();
+            }
+            else {
+                error(CLocalize.lparenthExpected());
+            }
+            return CElementTypes.CALL_EXPRESSION;
+        }
         if (at(DOT) || at(ARROW)) {
             advance();
             expect(IDENTIFIER, CLocalize.nameExpected());
@@ -355,6 +367,54 @@ public class CExpressionParsing extends CParsingBase {
             return CElementTypes.POSTFIX_EXPRESSION;
         }
         return null;
+    }
+
+    /**
+     * How deep the parser is in the {@code <<<...>>>} of kernel launches: within one, {@code >>} followed by {@code >}
+     * ends it rather than shifting.
+     */
+    private int myKernelLaunchDepth;
+
+    /**
+     * The {@code <<<grid, block, sharedMemory, stream>>>} of a kernel launch, at its {@code <<}.
+     */
+    private void parseKernelLaunchConfiguration() {
+        PsiBuilder.Marker marker = mark();
+        advance();
+        advance();
+        myKernelLaunchDepth++;
+        try {
+            if (!atKernelLaunchEnd()) {
+                while (true) {
+                    if (!parseAssignmentExpression()) {
+                        error(CLocalize.expressionExpected());
+                        break;
+                    }
+                    if (!at(COMMA)) {
+                        break;
+                    }
+                    advance();
+                }
+            }
+            if (atKernelLaunchEnd()) {
+                advance();
+                advance();
+            }
+            else {
+                error(CLocalize.kernelLaunchEndExpected());
+            }
+        }
+        finally {
+            myKernelLaunchDepth--;
+        }
+        marker.done(CElementTypes.KERNEL_LAUNCH_CONFIGURATION);
+    }
+
+    /**
+     * At the {@code >>>} which ends the configuration of the kernel launch being parsed.
+     */
+    private boolean atKernelLaunchEnd() {
+        return myKernelLaunchDepth > 0 && at(GTGT) && lookAhead(1) == GT;
     }
 
     /**

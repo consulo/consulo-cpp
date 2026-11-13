@@ -1,0 +1,48 @@
+FILE
+  CPsiStructDeclarationImpl: struct uint3 { unsigned x; };
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('uint3')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiDeclarationFieldImpl: unsigned x;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: unsigned
+        PsiElement(UNSIGNED_KEYWORD)('unsigned')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('x')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#if !defined(__STORAGE__)\n\n#if defined(__CUDACC_RTC__)\n#define __STORAGE__ \\n        extern const __device__\n#else ')
+  PsiComment(C_STYLE_COMMENT)('/* !__CUDACC_RTC__ */')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define __STORAGE__ \\n        extern const')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#endif')
+  PsiWhiteSpace(' ')
+  PsiComment(C_STYLE_COMMENT)('/* __CUDACC_RTC__ */')
+  PsiWhiteSpace('\n\n')
+  PsiElement(OUTER)('#endif')
+  PsiWhiteSpace(' ')
+  PsiComment(C_STYLE_COMMENT)('/* __STORAGE__ */')
+  PsiWhiteSpace('\n\n')
+  CPsiFieldImpl: uint3 __STORAGE__ threadIdx;
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: uint3 __STORAGE__
+      PsiElement(IDENTIFIER)('uint3')
+      PsiWhiteSpace(' ')
+      CPreprocessorMacroInvocation(__STORAGE__)('__STORAGE__')
+      ForeignLeaf(EXTERN_KEYWORD: extern)('extern')
+      ForeignLeaf(CONST_KEYWORD: const)('const')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('threadIdx')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  PsiElement(OUTER)('#undef __STORAGE__')
+  PsiWhiteSpace('\n')

@@ -40,7 +40,12 @@ public enum CLanguageFeature {
     DECLTYPE("decltype"),
     NOEXCEPT("noexcept"),
     UNICODE_CHAR_TYPES("char16_t and char32_t"),
-    RAW_STRINGS("Raw string literals");
+    RAW_STRINGS("Raw string literals"),
+    /**
+     * The kernel launches of CUDA and HIP, {@code kernel<<<grid, block>>>(args)}: no C or C++ standard has them, the
+     * versions of those dialects add them.
+     */
+    KERNEL_LAUNCH("Kernel launches, kernel<<<grid, block>>>(args)");
 
     private final String myName;
 

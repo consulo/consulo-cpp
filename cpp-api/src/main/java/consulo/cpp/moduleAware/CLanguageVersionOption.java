@@ -19,6 +19,9 @@ import consulo.cpp.lang.version.CLanguageVersion;
 import consulo.cpp.lang.version.CLanguageVersions;
 import consulo.cpp.module.extension.CModuleExtension;
 import consulo.virtualFileSystem.VirtualFile;
+import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /**
  * The id of the language version a C/C++ file is parsed with, empty when its module configures no standard.
@@ -43,6 +46,27 @@ public record CLanguageVersionOption(String languageVersionId) {
     public static CLanguageVersionOption of(CModuleExtension<?> extension, VirtualFile file) {
         CLanguageVersion cStandard = extension.getCStandard();
         CLanguageVersion cppStandard = extension.getCppStandard();
+        if (cStandard == null && cppStandard == null) {
+            return EMPTY;
+        }
+        return new CLanguageVersionOption(CLanguageVersions.select(file.getFileType(), cStandard, cppStandard).getId());
+    }
+
+    /**
+     * The version {@code file} is parsed with: as its module's {@code extension} configures, or else the C++ standard a
+     * {@link CFileOptionsContributor contributor} gives the file - nvcc's default for a {@code .cu}.
+     */
+    public static CLanguageVersionOption of(@Nullable CModuleExtension<?> extension, List<CFileOptions> contributed, VirtualFile file) {
+        CLanguageVersion cStandard = extension == null ? null : extension.getCStandard();
+        CLanguageVersion cppStandard = extension == null ? null : extension.getCppStandard();
+        if (cppStandard == null) {
+            for (CFileOptions options : contributed) {
+                CLanguageVersion contributedStandard = options.cppStandard() == null ? null : CLanguageVersions.findById(options.cppStandard());
+                if (contributedStandard != null) {
+                    cppStandard = contributedStandard;
+                }
+            }
+        }
         if (cStandard == null && cppStandard == null) {
             return EMPTY;
         }
