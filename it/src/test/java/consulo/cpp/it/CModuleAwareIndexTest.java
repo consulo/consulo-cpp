@@ -247,6 +247,53 @@ public class CModuleAwareIndexTest {
     }
 
     /**
+     * A namespace declared only in an included header - {@code std::} of the standard headers, {@code metal::} of
+     * Metal's: its members resolve qualified, and unqualified through a {@code using namespace} of the file.
+     */
+    @Test
+    public void namespaceOfAHeaderResolves(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-header-namespace");
+        Files.writeString(directory.resolve("lib.h"), "namespace lib { enum class flags { none, all }; void barrier(flags f); }\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"lib.h\"\nvoid qualified() { lib::barrier(lib::flags::none); }\n"
+            + "using namespace lib;\nvoid unqualified() { barrier(flags::all); }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("lib must resolve into the header", () -> "lib.h".equals(targetFileOf(project, file, "lib", 0)));
+        assertEquals("lib.h", targetFileOf(project, file, "barrier", 0), "the qualified function");
+        assertEquals("lib.h", targetFileOf(project, file, "flags", 0), "the qualified enum");
+        assertEquals("lib.h", targetFileOf(project, file, "none", 0), "the qualified enumerator");
+        assertEquals("lib.h", targetFileOf(project, file, "barrier", 1), "the function through the directive");
+        assertEquals("lib.h", targetFileOf(project, file, "flags", 1), "the enum through the directive");
+        assertEquals("lib.h", targetFileOf(project, file, "all", 0), "the enumerator through the directive");
+    }
+
+    /**
+     * A namespace reopened in two headers - as {@code std} is in hundreds: the qualifier and the directive resolve to
+     * the block of one of them, the members of the other still resolve.
+     */
+    @Test
+    public void namespaceAcrossHeadersResolves(Application application, ProjectManager projectManager) throws Exception {
+        Path directory = Files.createTempDirectory("consulo-cpp-it-namespace-headers");
+        Files.writeString(directory.resolve("a.h"), "namespace lib { struct A {}; }\n");
+        Files.writeString(directory.resolve("b.h"), "namespace lib { void barrier(); }\n");
+        Path source = directory.resolve("main.cpp");
+        Files.writeString(source, "#include \"a.h\"\n#include \"b.h\"\nvoid f() { lib::barrier(); }\n"
+            + "using namespace lib;\nvoid g() { barrier(); A a; }\n");
+
+        Project project = openProjectWithModule(application, projectManager, directory, Map.of());
+        VirtualFile file = LocalFileSystem.getInstance().refreshAndFindFileByNioFile(source);
+        assertNotNull(file);
+
+        waitFor("lib::barrier must resolve into b.h", () -> "b.h".equals(targetFileOf(project, file, "barrier", 0)));
+        assertEquals("b.h", targetFileOf(project, file, "barrier", 1), "the function through the directive");
+        assertEquals("a.h", targetFileOf(project, file, "A", 0), "the struct of the other header through the directive");
+    }
+
+    /**
      * A {@code using namespace} written in a header applies to the files including it, as it does in a compiler.
      */
     @Test

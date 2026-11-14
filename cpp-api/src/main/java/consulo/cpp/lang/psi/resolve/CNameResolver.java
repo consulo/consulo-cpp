@@ -59,7 +59,7 @@ public final class CNameResolver {
 
     public static List<PsiElement> resolveUnqualified(PsiElement place, String name, Set<CDeclarationKind> kinds, ResolveState state) {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
-        PsiScopesUtilCore.treeWalkUp(processor, place, null, state);
+        PsiScopesUtilCore.treeWalkUp(processor, place, null, CScopes.withOrigin(state, place));
         return processor.getResults();
     }
 
@@ -74,7 +74,7 @@ public final class CNameResolver {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
         PsiFile file = place.getContainingFile();
         if (file != null) {
-            CScopes.processFile(file, processor, state);
+            CScopes.processFile(file, processor, CScopes.withOrigin(state, place));
         }
         return processor.getResults();
     }
@@ -85,6 +85,16 @@ public final class CNameResolver {
     public static List<PsiElement> resolveMember(PsiElement owner, String name, Set<CDeclarationKind> kinds) {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
         CScopes.processMembers(owner, processor, ResolveState.initial());
+        return processor.getResults();
+    }
+
+    /**
+     * The same, used at {@code place}: the members of a namespace include its blocks in the headers the file of
+     * {@code place} includes, not only in those around the block the qualifier resolved to.
+     */
+    public static List<PsiElement> resolveMember(PsiElement place, PsiElement owner, String name, Set<CDeclarationKind> kinds, ResolveState state) {
+        CResolveProcessor processor = new CResolveProcessor(name, kinds);
+        CScopes.processMembers(owner, processor, CScopes.withOrigin(state, place));
         return processor.getResults();
     }
 
@@ -247,7 +257,7 @@ public final class CNameResolver {
                 found = chain.global() ? resolveGlobal(place, name, kinds, state) : resolveUnqualified(place, name, kinds, state);
             }
             else if (owner != null) {
-                found = resolveMember(owner, name, kinds);
+                found = resolveMember(place, owner, name, kinds, state);
             }
             else {
                 found = List.of();
@@ -280,6 +290,6 @@ public final class CNameResolver {
         List<@Nullable PsiElement> qualifiers = resolveChain(place, new NameChain(segments.subList(0, segments.size() - 1), chain.global()),
             CDeclarationKind.SCOPES, state);
         PsiElement owner = scopeOf(qualifiers.get(qualifiers.size() - 1));
-        return owner == null ? List.of() : resolveMember(owner, lastName, lastKinds);
+        return owner == null ? List.of() : resolveMember(place, owner, lastName, lastKinds, state);
     }
 }

@@ -23,7 +23,9 @@ import consulo.language.psi.PsiComment;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiWhiteSpace;
 import consulo.language.psi.resolve.PsiScopeProcessor;
+import consulo.cpp.lang.CLanguage;
 import consulo.language.psi.resolve.ResolveState;
+import consulo.util.dataholder.Key;
 import consulo.language.psi.util.LanguageCachedValueUtil;
 import consulo.language.psi.util.PsiTreeUtil;
 import org.jspecify.annotations.Nullable;
@@ -31,6 +33,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -214,7 +217,7 @@ public final class CScopes {
         }
         if (owner instanceof CPsiNamespaceDeclaration) {
             // the members of the namespace and those its using-directives bring in are one level
-            if (!offerAll(namespaceCandidates(owner, processor), processor, state)
+            if (!offerAll(namespaceCandidates(owner, processor, state), processor, state)
                 || !offerDirectives(directivesAmong(owner), processor, state)) {
                 return false;
             }
@@ -265,7 +268,7 @@ public final class CScopes {
         }
         for (PsiElement directive : directives) {
             PsiElement namespace = CNameResolver.resolveFirst(directive);
-            if (namespace instanceof CPsiNamespaceDeclaration && !offerAll(namespaceCandidates(namespace, processor), processor, state)) {
+            if (namespace instanceof CPsiNamespaceDeclaration && !offerAll(namespaceCandidates(namespace, processor, state), processor, state)) {
                 return false;
             }
         }
@@ -324,7 +327,7 @@ public final class CScopes {
             return true;
         }
         if (scope instanceof CPsiNamespaceDeclaration) {
-            return offerLevel(namespaceCandidates(scope, processor), processor, state);
+            return offerLevel(namespaceCandidates(scope, processor, state), processor, state);
         }
         if (!offerByName(ownMemberMap(scope), processor, state)) {
             return false;
@@ -398,19 +401,52 @@ public final class CScopes {
     }
 
     /**
-     * The members of a namespace: of its blocks in its file, and - by name only - of its blocks in the headers the file
-     * includes.
+     * The file a lookup started in: a namespace's members are those of its blocks in that file and in the headers it
+     * includes, whichever block the namespace's name resolved to - {@code std} is reopened in hundreds of headers.
      */
-    private static List<PsiElement> namespaceCandidates(PsiElement namespace, PsiScopeProcessor processor) {
+    public static final Key<PsiFile> ORIGIN_FILE = Key.create("c.resolve.origin.file");
+
+    /**
+     * {@code state} knowing the file of {@code place} as the one the lookup started in, unless it knows one already.
+     */
+    public static ResolveState withOrigin(ResolveState state, PsiElement place) {
+        if (state.get(ORIGIN_FILE) != null) {
+            return state;
+        }
+        PsiFile file = place.getContainingFile();
+        return file == null ? state : state.put(ORIGIN_FILE, file);
+    }
+
+    /**
+     * The members of a namespace: of its blocks in its own file, and - by name only - of its blocks in the file the
+     * lookup started in and in the headers either includes. The block the name resolved to may be in a header which
+     * declares only part of the namespace.
+     */
+    private static List<PsiElement> namespaceCandidates(PsiElement namespace, PsiScopeProcessor processor, ResolveState state) {
         List<PsiElement> candidates = new ArrayList<>(memberCandidates(namespaceMemberMap(namespace), processor));
         String name = processor.getHint(CResolveProcessor.NAME_HINT);
         PsiFile file = namespace.getContainingFile();
         if (name != null && file != null) {
             List<String> path = namespacePath(namespace);
-            for (PsiFile header : CIncludedDeclarations.headersMentioning(file, name)) {
+            Set<PsiFile> files = new LinkedHashSet<>();
+            PsiFile origin = state.get(ORIGIN_FILE);
+            if (origin != null) {
+                PsiFile originRoot = origin.getViewProvider().getPsi(CLanguage.INSTANCE);
+                if (originRoot != null) {
+                    files.add(originRoot);
+                    files.addAll(CIncludedDeclarations.headersMentioning(originRoot, name));
+                }
+            }
+            files.addAll(CIncludedDeclarations.headersMentioning(file, name));
+            files.remove(file);
+            for (PsiFile header : files) {
                 Map<String, List<PsiElement>> members = namespaceMapsOf(header).get(path);
                 if (members != null) {
-                    candidates.addAll(members.getOrDefault(name, List.of()));
+                    for (PsiElement member : members.getOrDefault(name, List.of())) {
+                        if (!candidates.contains(member)) {
+                            candidates.add(member);
+                        }
+                    }
                 }
             }
         }

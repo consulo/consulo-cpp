@@ -106,7 +106,9 @@ public final class CIncludeWalker {
 
     /**
      * The file or directory an include path or a forced include names: a local path, or the URL of any file system -
-     * {@code jar://.../plugin.jar!/include} for the headers a dialect's plugin bundles.
+     * {@code zip://.../plugin.jar!/include} for the headers a dialect's plugin bundles. The platform has no {@code jar}
+     * file system: a {@code jar:} URL of a class loader resource is converted with
+     * {@code VirtualFileUtil.convertFromUrl(url, VirtualFileManager.getInstance())}.
      */
     public static @Nullable VirtualFile findFile(String pathOrUrl) {
         if (isUrl(pathOrUrl)) {

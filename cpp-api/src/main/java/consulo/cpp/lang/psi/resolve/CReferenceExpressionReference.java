@@ -23,6 +23,7 @@ import consulo.document.util.TextRange;
 import consulo.language.ast.IElementType;
 import consulo.language.psi.PsiComment;
 import consulo.language.psi.PsiElement;
+import consulo.language.psi.resolve.ResolveState;
 import consulo.language.psi.PsiElementResolveResult;
 import consulo.language.psi.ResolveResult;
 import consulo.language.psi.util.PsiTreeUtil;
@@ -102,12 +103,12 @@ public final class CReferenceExpressionReference extends CReferenceBase<CPsiRefe
                 return CNameResolver.resolveGlobal(getElement(), name, kinds);
             }
             PsiElement owner = CNameResolver.scopeOf(CNameResolver.resolveFirst(qualifier));
-            return owner == null ? List.of() : CNameResolver.resolveMember(owner, name, kinds);
+            return owner == null ? List.of() : CNameResolver.resolveMember(getElement(), owner, name, kinds, ResolveState.initial());
         }
         if (operatorType == CPsiTokens.DOT || operatorType == CPsiTokens.ARROW) {
             PsiElement qualifier = previousSignificant(operator);
             PsiElement owner = qualifier == null ? null : CNameResolver.typeScopeOfValue(qualifier);
-            return owner == null ? List.of() : CNameResolver.resolveMember(owner, name, VALUE);
+            return owner == null ? List.of() : CNameResolver.resolveMember(getElement(), owner, name, VALUE, ResolveState.initial());
         }
         return CNameResolver.resolveUnqualified(getElement(), name, kinds);
     }
