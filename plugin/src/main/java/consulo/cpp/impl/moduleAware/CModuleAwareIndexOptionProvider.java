@@ -37,8 +37,10 @@ import jakarta.inject.Inject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -78,7 +80,8 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
         // 3: the language version id moved to CLanguageVersionIndexOptionProvider
         // 4: the forced includes
         // 5: the options of CFileOptionsContributor
-        return 5;
+        // 6: the shared part of the options stored as one blob
+        return 6;
     }
 
     @Override
@@ -118,15 +121,35 @@ public class CModuleAwareIndexOptionProvider implements ModuleAwareIndexOptionPr
         }
 
         CPreprocessorOptions merged = CPreprocessorOptions.of(extension, contributed, "");
-        CPreprocessorOptions options = CPreprocessorOptions.of(extension, contributed,
-            includeFingerprint(module, merged.forcedIncludes(), merged.includePaths(), file));
+        String fingerprint = includeFingerprint(module, merged.forcedIncludes(), merged.includePaths(), file);
+        CPreprocessorOptions options = fingerprint.isEmpty() ? merged
+            : new CPreprocessorOptions(merged.defines(), merged.includePaths(), merged.forcedIncludes(), fingerprint);
         if (options.isEmpty()) {
             return IndexOption.fullySharable();
         }
-        return IndexOption.sharablePerOption(
-            options,
+        // the headers of a library have the same options: one object, and one option shown with its defines formatted once
+        CPreprocessorOptions interned = options.intern();
+        synchronized (OPTIONS) {
+            IndexOption known = OPTIONS.get(interned);
+            if (known != null) {
+                return known;
+            }
+        }
+        IndexOption option = IndexOption.sharablePerOption(
+            interned,
             CPreprocessorOptionsExternalizer.INSTANCE,
-            LocalizeValue.of(CModuleExtension.formatDefines(options.defines()))
+            LocalizeValue.of(CModuleExtension.formatDefines(interned.defines()))
         );
+        synchronized (OPTIONS) {
+            OPTIONS.put(interned, option);
+        }
+        return option;
     }
+
+    private static final Map<CPreprocessorOptions, IndexOption> OPTIONS = new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<CPreprocessorOptions, IndexOption> eldest) {
+            return size() > 64;
+        }
+    };
 }

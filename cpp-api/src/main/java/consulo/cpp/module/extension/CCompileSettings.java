@@ -20,7 +20,7 @@ import consulo.cpp.lang.version.CLanguageVersions;
 import org.jdom.Element;
 import org.jspecify.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,39 +35,41 @@ public final class CCompileSettings {
     private static final String ATTR_CPP_STANDARD = "cpp-standard";
     private static final String ATTR_TARGET = "target";
 
-    private Map<String, String> myDefines = new TreeMap<>();
-    private List<String> myIncludePaths = new ArrayList<>();
-    private List<String> myForcedIncludes = new ArrayList<>();
+    // immutable snapshots, replaced as a whole: handed out as they are - the module-aware index asks them for every file
+    // it indexes, thousands of headers of a library
+    private Map<String, String> myDefines = sortedCopy(Map.of());
+    private List<String> myIncludePaths = List.of();
+    private List<String> myForcedIncludes = List.of();
     // version ids rather than versions, so a standard contributed by a plugin which is not loaded right now survives a save
     private String myCStandardId = "";
     private String myCppStandardId = "";
     private String myTarget = "";
 
     public Map<String, String> getDefines() {
-        return Map.copyOf(myDefines);
+        return myDefines;
     }
 
     public void setDefines(Map<String, String> defines) {
-        myDefines = new TreeMap<>(defines);
+        myDefines = sortedCopy(defines);
     }
 
     public List<String> getIncludePaths() {
-        return List.copyOf(myIncludePaths);
+        return myIncludePaths;
     }
 
     public void setIncludePaths(List<String> includePaths) {
-        myIncludePaths = new ArrayList<>(includePaths);
+        myIncludePaths = List.copyOf(includePaths);
     }
 
     /**
      * @see CModuleExtension#getForcedIncludes()
      */
     public List<String> getForcedIncludes() {
-        return List.copyOf(myForcedIncludes);
+        return myForcedIncludes;
     }
 
     public void setForcedIncludes(List<String> forcedIncludes) {
-        myForcedIncludes = new ArrayList<>(forcedIncludes);
+        myForcedIncludes = List.copyOf(forcedIncludes);
     }
 
     /**
@@ -105,9 +107,9 @@ public final class CCompileSettings {
     }
 
     public void copyFrom(CCompileSettings settings) {
-        myDefines = new TreeMap<>(settings.myDefines);
-        myIncludePaths = new ArrayList<>(settings.myIncludePaths);
-        myForcedIncludes = new ArrayList<>(settings.myForcedIncludes);
+        myDefines = settings.myDefines;
+        myIncludePaths = settings.myIncludePaths;
+        myForcedIncludes = settings.myForcedIncludes;
         myCStandardId = settings.myCStandardId;
         myCppStandardId = settings.myCppStandardId;
         myTarget = settings.myTarget;
@@ -132,9 +134,9 @@ public final class CCompileSettings {
         myCStandardId = element.getAttributeValue(ATTR_C_STANDARD, "");
         myCppStandardId = element.getAttributeValue(ATTR_CPP_STANDARD, "");
         myTarget = element.getAttributeValue(ATTR_TARGET, "");
-        myDefines = new TreeMap<>(CModuleExtension.readDefines(element));
-        myIncludePaths = new ArrayList<>(CModuleExtension.readIncludePaths(element));
-        myForcedIncludes = new ArrayList<>(CModuleExtension.readForcedIncludes(element));
+        myDefines = sortedCopy(CModuleExtension.readDefines(element));
+        myIncludePaths = List.copyOf(CModuleExtension.readIncludePaths(element));
+        myForcedIncludes = List.copyOf(CModuleExtension.readForcedIncludes(element));
     }
 
     @Override
@@ -156,5 +158,9 @@ public final class CCompileSettings {
     @Override
     public int hashCode() {
         return Objects.hash(myDefines, myIncludePaths, myForcedIncludes, myCStandardId, myCppStandardId, myTarget);
+    }
+
+    private static Map<String, String> sortedCopy(Map<String, String> defines) {
+        return Collections.unmodifiableSortedMap(new TreeMap<>(defines));
     }
 }

@@ -156,27 +156,43 @@ public class CExpressionParsing extends CParsingBase {
         }
     }
 
-    private boolean parseBinaryExpression(int level) {
-        if (level == BINARY_LEVELS.length) {
-            return parseCastExpression();
-        }
-
-        PsiBuilder.Marker marker = mark();
-        if (!parseBinaryExpression(level + 1)) {
-            marker.drop();
+    /**
+     * The binary operators of {@code minLevel} of {@link #BINARY_LEVELS} and tighter, by precedence climbing: one marker
+     * for the left operand, wrapped for each operator found, instead of one at each of the levels for every operand.
+     * Operators of one level associate to the left - the right operand takes only tighter ones.
+     */
+    private boolean parseBinaryExpression(int minLevel) {
+        PsiBuilder.Marker left = mark();
+        if (!parseCastExpression()) {
+            left.drop();
             return false;
         }
-
-        while (at(BINARY_LEVELS[level]) && !atKernelLaunchEnd()) {
+        while (true) {
+            int level = binaryLevelAt();
+            if (level < minLevel || atKernelLaunchEnd()) {
+                break;
+            }
             advanceBinaryOperator();
-            if (!parseBinaryExpression(level + 1)) {
+            if (level + 1 == BINARY_LEVELS.length ? !parseCastExpression() : !parseBinaryExpression(level + 1)) {
                 error(CLocalize.expressionExpected());
             }
-            marker.done(CElementTypes.BINARY_EXPRESSION);
-            marker = marker.precede();
+            left.done(CElementTypes.BINARY_EXPRESSION);
+            left = left.precede();
         }
-        marker.drop();
+        left.drop();
         return true;
+    }
+
+    /**
+     * The level of the binary operator here, {@code -1} for none.
+     */
+    private int binaryLevelAt() {
+        for (int level = 0; level < BINARY_LEVELS.length; level++) {
+            if (at(BINARY_LEVELS[level])) {
+                return level;
+            }
+        }
+        return -1;
     }
 
     /**

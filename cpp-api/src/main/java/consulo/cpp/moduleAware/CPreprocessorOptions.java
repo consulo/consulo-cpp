@@ -44,7 +44,8 @@ public record CPreprocessorOptions(Map<String, String> defines,
     public CPreprocessorOptions {
         // not Map.copyOf - its iteration order changes from one JVM run to the next, and the externalizer writes the
         // defines in iteration order, so the stored payload would differ after every restart
-        defines = Collections.unmodifiableMap(new TreeMap<>(defines));
+        // a map already sorted and unmodifiable - of an interned options, or decoded once for many files - is kept
+        defines = defines.getClass() == SORTED_DEFINES_CLASS ? defines : Collections.unmodifiableSortedMap(new TreeMap<>(defines));
         includePaths = List.copyOf(includePaths);
         forcedIncludes = List.copyOf(forcedIncludes);
         includeFingerprint = includeFingerprint == null ? "" : includeFingerprint;
@@ -65,6 +66,33 @@ public record CPreprocessorOptions(Map<String, String> defines,
      * include directories are searched after the module's, and their forced includes come first.
      */
     public static CPreprocessorOptions of(@Nullable CModuleExtension<?> extension, List<CFileOptions> contributed, String includeFingerprint) {
+        if (extension != null && contributed.isEmpty() && includeFingerprint.isEmpty()) {
+            // a file nothing contributes to has its module's options: merged once while they are the same snapshots
+            Map<String, String> moduleDefines = extension.getDefines();
+            List<String> moduleIncludePaths = extension.getIncludePaths();
+            List<String> moduleForcedIncludes = extension.getForcedIncludes();
+            ModuleMerge last = ourLastModuleMerge;
+            if (last != null && last.defines() == moduleDefines && last.includePaths() == moduleIncludePaths
+                && last.forcedIncludes() == moduleForcedIncludes) {
+                return last.options();
+            }
+            CPreprocessorOptions merged = merge(extension, contributed, includeFingerprint);
+            ourLastModuleMerge = new ModuleMerge(moduleDefines, moduleIncludePaths, moduleForcedIncludes, merged);
+            return merged;
+        }
+        return merge(extension, contributed, includeFingerprint);
+    }
+
+    /**
+     * The last options merged from a module alone, by the identity of the module's settings it was merged from.
+     */
+    private record ModuleMerge(Map<String, String> defines, List<String> includePaths, List<String> forcedIncludes,
+                               CPreprocessorOptions options) {
+    }
+
+    private static volatile @Nullable ModuleMerge ourLastModuleMerge;
+
+    private static CPreprocessorOptions merge(@Nullable CModuleExtension<?> extension, List<CFileOptions> contributed, String includeFingerprint) {
         Map<String, String> defines = new LinkedHashMap<>();
         List<String> includePaths = new ArrayList<>();
         List<String> forcedIncludes = new ArrayList<>();
@@ -85,6 +113,33 @@ public record CPreprocessorOptions(Map<String, String> defines,
 
     private static List<String> distinct(List<String> values) {
         return List.copyOf(new LinkedHashSet<>(values));
+    }
+
+    private static final Class<?> SORTED_DEFINES_CLASS = Collections.unmodifiableSortedMap(new TreeMap<>()).getClass();
+
+    /**
+     * The options interned: thousands of files - the headers of a library - have the same, which are then one object,
+     * serialized and shown once.
+     */
+    private static final Map<CPreprocessorOptions, CPreprocessorOptions> INTERNED = new LinkedHashMap<>(16, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<CPreprocessorOptions, CPreprocessorOptions> eldest) {
+            return size() > 64;
+        }
+    };
+
+    /**
+     * The one instance of options equal to these.
+     */
+    public CPreprocessorOptions intern() {
+        synchronized (INTERNED) {
+            CPreprocessorOptions known = INTERNED.get(this);
+            if (known != null) {
+                return known;
+            }
+            INTERNED.put(this, this);
+            return this;
+        }
     }
 
     public boolean isEmpty() {
