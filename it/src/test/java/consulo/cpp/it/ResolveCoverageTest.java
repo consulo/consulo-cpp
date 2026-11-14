@@ -77,16 +77,18 @@ public class ResolveCoverageTest {
      */
     private static final java.util.Set<String> CONTEXTUAL_KEYWORDS = java.util.Set.of("override", "final");
 
+    /**
+     * The C++ samples in one project - indexing the include directories once - with Qt's when Qt is installed.
+     */
     @Test
     public void modernCpp(Application application, ProjectManager projectManager) throws Exception {
-        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp", "geometry.h", "geometry.cpp", "app.cpp", "gtest_sample.cpp"));
-    }
-
-    @Test
-    public void qtCore(Application application, ProjectManager projectManager) throws Exception {
-        assumeTrue(Files.isDirectory(Path.of("/usr/include/qt6/QtCore")), "Qt 6 is not installed");
-        check(application, projectManager, "/usr/bin/g++",
-            List.of("-x", "c++", "-std=c++20", "-fPIC", "-I/usr/include/qt6", "-I/usr/include/qt6/QtCore"), List.of("qt_sample.cpp"));
+        List<String> options = new ArrayList<>(List.of("-x", "c++", "-std=c++20"));
+        List<String> samples = new ArrayList<>(List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp", "geometry.h", "geometry.cpp", "app.cpp", "gtest_sample.cpp"));
+        if (Files.isDirectory(Path.of("/usr/include/qt6/QtCore"))) {
+            options.addAll(List.of("-fPIC", "-I/usr/include/qt6", "-I/usr/include/qt6/QtCore"));
+            samples.add("qt_sample.cpp");
+        }
+        check(application, projectManager, "/usr/bin/g++", options, samples);
     }
 
     @Test

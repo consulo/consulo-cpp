@@ -46,7 +46,7 @@ public class PreprocessorExpander {
      * The macros in scope - of an included file, its includer's own map, which it changes in place: copying thousands
      * of macros for each {@code #include} is most of the cost of expanding a header.
      */
-    private final Map<String, ExpandedMacro> myDefines;
+    private final MacroTable myDefines;
 
     /**
      * The names this expansion - and the includes it expands - defined or undefined, each with what it was before the
@@ -140,7 +140,7 @@ public class PreprocessorExpander {
         myLanguageVersion = languageVersion;
         myProcessedFiles = processedFiles;
         myIncludePaths = includePaths;
-        myDefines = inheritedMacros;
+        myDefines = inheritedMacros instanceof MacroTable table ? table : new MacroTable(inheritedMacros);
 
         VirtualFile vFile = sourceFile(preprocessorFile);
         if (vFile != null) {
@@ -298,8 +298,62 @@ public class PreprocessorExpander {
     private void processResolvedFile(@NotNull VirtualFile includedVFile) {
         // Cycle detection: skip files we are already expanding
         if (!myProcessedFiles.add(includedVFile)) {
+            myDefines.noteSkipped(includedVFile);
             return;
         }
+        myDefines.noteFile(includedVFile);
+
+        // included before, reading the macros it reads as they are now: it does what it did then
+        IncludeEffects known = IncludeEffects.find(includedVFile, myDefines, myProcessedFiles, myIncludePaths, myLanguageVersion);
+        if (known != null) {
+            replay(known);
+            return;
+        }
+        MacroTable.Recording recording = myDefines.startRecording();
+        try {
+            expandIncluded(includedVFile);
+        }
+        finally {
+            myDefines.stopRecording(recording);
+        }
+        IncludeEffects.remember(includedVFile, recording, myDefines, myIncludePaths, myLanguageVersion);
+    }
+
+    /**
+     * Applies what an include did before: its reads are reads of the include around it, its changes changes of the
+     * macros, its files expanded.
+     */
+    private void replay(IncludeEffects known) {
+        for (String name : known.reads()) {
+            myDefines.containsKey(name);
+        }
+        for (VirtualFile file : known.files()) {
+            myProcessedFiles.add(file);
+            myDefines.noteFile(file);
+        }
+        for (VirtualFile file : known.skipped()) {
+            myDefines.noteSkipped(file);
+        }
+        for (Map.Entry<String, ExpandedMacro> effect : known.effects().entrySet()) {
+            String name = effect.getKey();
+            ExpandedMacro before = myDefines.peek(name);
+            ExpandedMacro after = effect.getValue();
+            if (!myTouched.containsKey(name)) {
+                myTouched.put(name, before);
+            }
+            if (after == null) {
+                myDefines.remove(name);
+            }
+            else {
+                myDefines.put(name, after);
+            }
+            if (before != after) {
+                recordChange(name, before, after);
+            }
+        }
+    }
+
+    private void expandIncluded(VirtualFile includedVFile) {
 
         // Prefer stubs — safe during indexing, no cascading PSI loads
         Project project = myPreprocessorFile.getProject();
@@ -332,8 +386,10 @@ public class PreprocessorExpander {
         for (Map.Entry<String, ExpandedMacro> entry : childExpander.myTouched.entrySet()) {
             String name = entry.getKey();
             ExpandedMacro before = entry.getValue();
-            myTouched.putIfAbsent(name, before);
-            ExpandedMacro after = myDefines.get(name);
+            if (!myTouched.containsKey(name)) {
+                myTouched.put(name, before);
+            }
+            ExpandedMacro after = myDefines.peek(name);
             if (before != after) {
                 recordChange(name, before, after);
             }
@@ -388,21 +444,22 @@ public class PreprocessorExpander {
         @Override
         public void define(String name, @Nullable List<String> parameters, CharSequence value, @Nullable CPreprocessorDefineDirective element) {
             ExpandedMacro macro = new ExpandedMacro(myLanguageVersion, name, parameters, element, value);
-            recordChange(name, myDefines.get(name), macro);
+            // a define does not read what the name was: it is the same whatever it was
+            recordChange(name, myDefines.peek(name), macro);
             touch(name);
             myDefines.put(name, macro);
         }
 
         @Override
         public void undefine(String name) {
-            recordChange(name, myDefines.get(name), null);
+            recordChange(name, myDefines.peek(name), null);
             touch(name);
             myDefines.remove(name);
         }
 
         private void touch(String name) {
             if (!myTouched.containsKey(name)) {
-                myTouched.put(name, myDefines.get(name));
+                myTouched.put(name, myDefines.peek(name));
             }
         }
 
