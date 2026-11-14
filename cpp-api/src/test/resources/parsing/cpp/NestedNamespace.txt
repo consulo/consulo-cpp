@@ -1,0 +1,45 @@
+FILE
+  CPsiNamespaceDeclarationImpl: namespace a::b::inline c {
+    int x;
+}
+    PsiElement(NAMESPACE_KEYWORD)('namespace')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a')
+    PsiElement(DOUBLE_COLON)('::')
+    CPsiNamespaceDeclarationImpl: b::inline c {
+    int x;
+}
+      PsiElement(IDENTIFIER)('b')
+      PsiElement(DOUBLE_COLON)('::')
+      CPsiNamespaceDeclarationImpl: inline c {
+    int x;
+}
+        PsiElement(INLINE_KEYWORD)('inline')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('c')
+        PsiWhiteSpace(' ')
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace('\n    ')
+        CPsiFieldImpl: int x;
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('x')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace('\n')
+        PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  CPsiNamespaceDeclarationImpl: namespace alias = a::b;
+    PsiElement(NAMESPACE_KEYWORD)('namespace')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('alias')
+    PsiWhiteSpace(' ')
+    PsiElement(EQ)('=')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a')
+    PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('b')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')

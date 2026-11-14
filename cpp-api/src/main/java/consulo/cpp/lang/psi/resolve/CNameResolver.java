@@ -16,7 +16,9 @@
 package consulo.cpp.lang.psi.resolve;
 
 import consulo.cpp.lang.psi.*;
+import consulo.language.ast.ASTNode;
 import consulo.language.ast.IElementType;
+import consulo.language.psi.PsiComment;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
 import consulo.language.psi.PsiReference;
@@ -26,6 +28,7 @@ import consulo.util.dataholder.Key;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +63,7 @@ public final class CNameResolver {
     public static List<PsiElement> resolveUnqualified(PsiElement place, String name, Set<CDeclarationKind> kinds, ResolveState state) {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
         PsiScopesUtilCore.treeWalkUp(processor, place, null, CScopes.withOrigin(state, place));
-        return processor.getResults();
+        return CDeclarations.definitionsFirst(processor.getResults());
     }
 
     /**
@@ -76,7 +79,7 @@ public final class CNameResolver {
         if (file != null) {
             CScopes.processFile(file, processor, CScopes.withOrigin(state, place));
         }
-        return processor.getResults();
+        return CDeclarations.definitionsFirst(processor.getResults());
     }
 
     /**
@@ -85,7 +88,7 @@ public final class CNameResolver {
     public static List<PsiElement> resolveMember(PsiElement owner, String name, Set<CDeclarationKind> kinds) {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
         CScopes.processMembers(owner, processor, ResolveState.initial());
-        return processor.getResults();
+        return CDeclarations.definitionsFirst(processor.getResults());
     }
 
     /**
@@ -95,7 +98,7 @@ public final class CNameResolver {
     public static List<PsiElement> resolveMember(PsiElement place, PsiElement owner, String name, Set<CDeclarationKind> kinds, ResolveState state) {
         CResolveProcessor processor = new CResolveProcessor(name, kinds);
         CScopes.processMembers(owner, processor, CScopes.withOrigin(state, place));
-        return processor.getResults();
+        return CDeclarations.definitionsFirst(processor.getResults());
     }
 
     /**
@@ -113,10 +116,73 @@ public final class CNameResolver {
             CPsiTypeRef typeRef = CDeclarations.typeRefOf(current);
             current = typeRef == null ? null : resolveFirst(typeRef);
         }
+        for (int depth = 0; current instanceof CPsiNamespaceDeclaration && depth < MAX_TYPEDEF_DEPTH; depth++) {
+            NameChain target = namespaceAliasTarget(current);
+            if (target == null) {
+                return current;
+            }
+            // namespace alias = a::b;
+            current = aliasedNamespace(current, target);
+        }
         if (current == null) {
             return null;
         }
-        return CDeclarations.isAggregate(current) || current instanceof CPsiNamespaceDeclaration ? current : null;
+        return CDeclarations.isAggregate(current) ? current : null;
+    }
+
+    /**
+     * The aliases being followed on this thread: {@code namespace views = ranges::views;} looks its name up where the alias
+     * itself is visible.
+     */
+    private static final ThreadLocal<Set<PsiElement>> FOLLOWED_ALIASES = ThreadLocal.withInitial(HashSet::new);
+
+    private static @Nullable PsiElement aliasedNamespace(PsiElement alias, NameChain target) {
+        Set<PsiElement> followed = FOLLOWED_ALIASES.get();
+        if (!followed.add(alias)) {
+            return null;
+        }
+        try {
+            for (PsiElement found : resolveChainTargets(alias, target, CDeclarationKind.SCOPES)) {
+                if (found != alias) {
+                    return found;
+                }
+            }
+            return null;
+        }
+        finally {
+            followed.remove(alias);
+        }
+    }
+
+    /**
+     * The name a namespace alias stands for, {@code a::b} of {@code namespace alias = a::b;}; {@code null} for a
+     * namespace which is no alias.
+     */
+    public static @Nullable NameChain namespaceAliasTarget(PsiElement namespace) {
+        // namespace alias = ...: the = right after the name, not one a broken declaration of a namespace's body left
+        ASTNode name = namespace.getNode().findChildByType(CPsiTokens.IDENTIFIER);
+        ASTNode eq = name == null ? null : name.getTreeNext();
+        while (eq != null && (CPsiTokens.WHITE_SPACE_SET.contains(eq.getElementType()) || eq.getPsi() instanceof PsiComment)) {
+            eq = eq.getTreeNext();
+        }
+        if (eq == null || eq.getElementType() != CPsiTokens.EQ) {
+            return null;
+        }
+        List<PsiElement> names = new ArrayList<>();
+        boolean global = false;
+        for (ASTNode node = eq.getTreeNext(); node != null; node = node.getTreeNext()) {
+            IElementType type = node.getElementType();
+            if (type == CPsiTokens.IDENTIFIER) {
+                names.add(node.getPsi());
+            }
+            else if (type == CPsiTokens.DOUBLE_COLON) {
+                global |= names.isEmpty();
+            }
+            else if (!CPsiTokens.WHITE_SPACE_SET.contains(type)) {
+                break;
+            }
+        }
+        return names.isEmpty() ? null : new NameChain(names, global);
     }
 
     private static @Nullable PsiElement innerAggregate(PsiElement typedef) {

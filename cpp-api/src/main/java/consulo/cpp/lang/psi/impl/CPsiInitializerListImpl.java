@@ -15,6 +15,10 @@
  */
 package consulo.cpp.lang.psi.impl;
 
+import consulo.language.psi.PsiReference;
+import java.util.List;
+import java.util.ArrayList;
+import consulo.cpp.lang.psi.resolve.CRawNameReferences;
 import consulo.cpp.lang.psi.CPsiInitializerList;
 import consulo.language.ast.ASTNode;
 
@@ -25,5 +29,15 @@ import consulo.language.ast.ASTNode;
 public class CPsiInitializerListImpl extends CPsiElementBaseImpl implements CPsiInitializerList {
     public CPsiInitializerListImpl(ASTNode node) {
         super(node);
+    }
+
+    /**
+     * The references of the fields its designators name, {@code .kind} of {@code {.kind = CIRCLE}}.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        List<PsiReference> references = new ArrayList<>();
+        CRawNameReferences.addDesignators(this, references);
+        return references.toArray(PsiReference.EMPTY_ARRAY);
     }
 }

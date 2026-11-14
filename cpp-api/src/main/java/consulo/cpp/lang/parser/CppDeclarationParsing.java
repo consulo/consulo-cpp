@@ -21,6 +21,8 @@ import consulo.language.ast.IElementType;
 import consulo.language.parser.PsiBuilder;
 import org.jspecify.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -250,8 +252,8 @@ public class CppDeclarationParsing extends CDeclarationParsing {
         if (at(IDENTIFIER)) {
             IElementType next = lookAhead(1);
             if (myContext.isTypeName(tokenText())) {
-                if (next == DOUBLE_COLON) {
-                    // T::f() defines a member of T, T::type x declares x
+                if (next == DOUBLE_COLON || next == LT && isQualifierAhead()) {
+                    // T::f() defines a member of T, T::type x declares x; T<U>::T() defines a constructor of T
                     return isQualifiedTypeAhead(scope);
                 }
                 if (next == LPARENTH && scope != Scope.PARAMETER) {
@@ -438,11 +440,11 @@ public class CppDeclarationParsing extends CDeclarationParsing {
     // -----------------------------------------------------------------------
 
     /**
-     * A structured binding, {@code auto [key, value] = pair}.
+     * A structured binding, {@code auto [key, value] = pair}, {@code auto& [key, value] : map}.
      */
     @Override
     protected boolean parseLanguageDeclarator(Scope scope, Declarator declarator) {
-        if (!at(LBRACKET) || lookAhead(1) != IDENTIFIER || declarator.myConsumed
+        if (!at(LBRACKET) || lookAhead(1) != IDENTIFIER || declarator.myConsumed && !declarator.myReferenceOnly
             || !(scope == Scope.BLOCK || scope == Scope.FILE || scope == Scope.FOR_INIT || scope == Scope.CONDITION)) {
             return false;
         }
@@ -552,9 +554,10 @@ public class CppDeclarationParsing extends CDeclarationParsing {
             expressions().parseArgumentList();
             return true;
         }
-        if (firstSuffix && !nested && declarator.myName != null
+        if (firstSuffix && !nested && declarator.myName != null && !"operator".equals(declarator.myName)
             && (scope == Scope.BLOCK || scope == Scope.FILE || scope == Scope.FOR_INIT) && isArgumentListAhead(scope)) {
-            // T x(a + b): a variable initialized by constructor arguments, not a function
+            // T x(a + b): a variable initialized by constructor arguments, not a function; what follows an operator's
+            // name is always its parameters
             expressions().parseArgumentList();
             declarator.myConsumed = true;
             return true;
@@ -582,6 +585,10 @@ public class CppDeclarationParsing extends CDeclarationParsing {
                 while (!eof() && !at(COMMA) && !at(RPARENTH) && !at(SEMICOLON) && !at(LBRACE)) {
                     if (at(LPARENTH) || at(LBRACKET)) {
                         skipBalanced();
+                    }
+                    else if (at(LT)) {
+                        // in an item which is no expression, the arguments of a template, const Ptr<T, U>& p
+                        parseTemplateArguments();
                     }
                     else {
                         advance();
@@ -975,12 +982,21 @@ public class CppDeclarationParsing extends CDeclarationParsing {
         // namespace [[deprecated]] N { ... }
         parseAttributes();
 
+        // namespace a::b { ... } is namespace a { namespace b { ... } }: each name after a :: opens a namespace inside
+        List<PsiBuilder.Marker> nested = new ArrayList<>();
         if (at(IDENTIFIER)) {
-            parseQualifiedName();
+            advance();
+            while (at(DOUBLE_COLON) && (lookAhead(1) == IDENTIFIER || lookAhead(1) == INLINE_KEYWORD)) {
+                advance();
+                nested.add(mark());
+                consume(INLINE_KEYWORD);
+                expect(IDENTIFIER, CLocalize.identifierExpected());
+            }
         }
         parseAttributes();
 
-        if (consume(EQ)) {
+        if (nested.isEmpty() && consume(EQ)) {
+            // namespace alias = a::b;
             parseQualifiedName();
             expect(SEMICOLON, CLocalize.semicolonExpected());
             marker.done(CElementTypes.NAMESPACE_DECLARATION);
@@ -992,6 +1008,9 @@ public class CppDeclarationParsing extends CDeclarationParsing {
                 parseExternalDeclaration();
             }
             expect(RBRACE, CLocalize.rbraceExpected());
+        }
+        for (int i = nested.size() - 1; i >= 0; i--) {
+            nested.get(i).done(CElementTypes.NAMESPACE_DECLARATION);
         }
         marker.done(CElementTypes.NAMESPACE_DECLARATION);
     }
@@ -1018,6 +1037,8 @@ public class CppDeclarationParsing extends CDeclarationParsing {
                 advance();
                 parseOperatorName();
             }
+            // using Bases::f...;
+            consume(ELLIPSIS);
             parseAttributes();
             if (consume(EQ)) {
                 parseTypeName();

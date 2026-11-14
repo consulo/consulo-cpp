@@ -22,8 +22,10 @@ import consulo.cpp.lang.psi.resolve.CDeclarationKind;
 
 import consulo.cpp.lang.psi.resolve.CNameChainReference;
 
+import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import consulo.language.psi.PsiReference;
 
+import consulo.cpp.lang.psi.CPsiTokens;
 import consulo.cpp.lang.psi.CPsiTypeRef;
 import consulo.language.ast.ASTNode;
 
@@ -38,6 +40,18 @@ public class CPsiTypeRefImpl extends CPsiElementBaseImpl implements CPsiTypeRef 
 
     @Override
     public @Nullable PsiReference getReference() {
+        if (getNode().findChildByType(CPsiTokens.DECLTYPE_KEYWORD) != null) {
+            // decltype(points) names a value, a reference of its arguments
+            return null;
+        }
         return CNameChainReference.of(this, CDeclarationKind.TYPES);
+    }
+
+    /**
+     * Its own reference and those of the names of its template arguments.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        return CTemplateArgumentReferences.withArguments(this, getReference());
     }
 }

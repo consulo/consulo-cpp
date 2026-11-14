@@ -22,6 +22,7 @@ import consulo.language.ast.IElementType;
 import consulo.language.psi.PsiComment;
 import consulo.language.psi.PsiElement;
 import consulo.language.psi.PsiFile;
+import consulo.language.psi.PsiWhiteSpace;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -113,6 +114,66 @@ public final class CDeclarations {
     }
 
     /**
+     * Whether {@code namespace} is an inline one - {@code inline namespace __cxx11 { }} of libstdc++, written or made by a
+     * macro: its members are members of the namespace around it too. The parser leaves a written {@code inline} right
+     * before the namespace, and keeps one a macro expanded to as the namespace's first leaf.
+     */
+    public static boolean isInlineNamespace(PsiElement namespace) {
+        PsiElement previous = namespace.getPrevSibling();
+        while (previous != null && (previous instanceof PsiWhiteSpace || previous instanceof PsiComment)) {
+            previous = previous.getPrevSibling();
+        }
+        if (previous != null && previous.getNode() != null && previous.getNode().getElementType() == CPsiTokens.INLINE_KEYWORD) {
+            return true;
+        }
+        // made by a macro - _GLIBCXX_BEGIN_NAMESPACE_CXX11 - the expanded inline is the namespace's own first leaf
+        for (PsiElement child = namespace.getFirstChild(); child != null; child = child.getNextSibling()) {
+            IElementType type = child.getNode() == null ? null : child.getNode().getElementType();
+            if (type == CPsiTokens.INLINE_KEYWORD) {
+                return true;
+            }
+            if (type == CPsiTokens.NAMESPACE_KEYWORD || type == CPsiTokens.LBRACE) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Whether a class, struct, union or enum is defined here - has its body - rather than only declared,
+     * {@code class optional;}.
+     */
+    public static boolean hasBody(PsiElement aggregate) {
+        return aggregate.getNode() != null && aggregate.getNode().findChildByType(CPsiTokens.LBRACE) != null;
+    }
+
+    /**
+     * {@code declarations} with the definitions of classes before their mere declarations: a name declared ahead and
+     * defined later - {@code template <class T> class optional;} then its definition - means the definition, which has
+     * the members. The order is kept otherwise.
+     */
+    public static List<PsiElement> definitionsFirst(List<PsiElement> declarations) {
+        if (declarations.size() < 2) {
+            return declarations;
+        }
+        List<PsiElement> definitions = new ArrayList<>(declarations.size());
+        List<PsiElement> rest = new ArrayList<>();
+        for (PsiElement declaration : declarations) {
+            if (kindOf(declaration) == CDeclarationKind.TYPE && !isTypeAlias(declaration) && !hasBody(declaration)) {
+                rest.add(declaration);
+            }
+            else {
+                definitions.add(declaration);
+            }
+        }
+        if (rest.isEmpty() || definitions.isEmpty()) {
+            return declarations;
+        }
+        definitions.addAll(rest);
+        return definitions;
+    }
+
+    /**
      * The identifier naming a declaration, {@code null} for an anonymous one - {@code namespace { }}, {@code struct { } s;},
      * an unnamed parameter. Of a declaration a macro expanded to, it is a leaf of no length in the source.
      */
@@ -126,6 +187,31 @@ public final class CDeclarations {
         }
         ASTNode identifier = declaration.getNode().findChildByType(CPsiTokens.IDENTIFIER);
         return identifier == null ? null : identifier.getPsi();
+    }
+
+    /**
+     * The names of a structured binding, {@code key} and {@code value} of {@code auto& [key, value] = entry}; none for any
+     * other declaration. The first is the name of the declaration.
+     */
+    public static List<PsiElement> bindingNames(PsiElement declaration) {
+        if (!(declaration instanceof CPsiLocalVariable)) {
+            return List.of();
+        }
+        ASTNode bracket = declaration.getNode().findChildByType(CPsiTokens.LBRACKET);
+        if (bracket == null) {
+            return List.of();
+        }
+        List<PsiElement> names = new ArrayList<>();
+        for (ASTNode node = bracket.getTreeNext(); node != null && node.getElementType() != CPsiTokens.RBRACKET; node = node.getTreeNext()) {
+            if (node.getElementType() == CPsiTokens.IDENTIFIER) {
+                names.add(node.getPsi());
+            }
+            else if (node.getElementType() != CPsiTokens.COMMA && !CPsiTokens.WHITE_SPACE_SET.contains(node.getElementType())) {
+                // an array suffix, int a[3]
+                return List.of();
+            }
+        }
+        return names;
     }
 
     public static @Nullable String nameOf(PsiElement declaration) {
@@ -150,16 +236,27 @@ public final class CDeclarations {
      * first one.
      */
     public static @Nullable CPsiTypeRef typeRefOf(PsiElement declaration) {
+        // a declarator after a comma, b of int a, b; - not the next declaration, point_t origin; union { } u;
+        boolean afterComma = false;
         for (PsiElement element = declaration; element != null; element = element.getPrevSibling()) {
             if (element != declaration && element.getClass() != declaration.getClass()) {
                 if (isDeclaratorSeparator(element)) {
+                    afterComma |= element.getNode().getElementType() == CPsiTokens.COMMA;
                     continue;
                 }
                 return null;
             }
+            if (element != declaration && !afterComma) {
+                return null;
+            }
+            afterComma = false;
             for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
                 if (child instanceof CPsiTypeRef typeRef) {
                     return typeRef;
+                }
+                if (isAggregate(child)) {
+                    // struct { ... } a, b;
+                    return null;
                 }
             }
         }

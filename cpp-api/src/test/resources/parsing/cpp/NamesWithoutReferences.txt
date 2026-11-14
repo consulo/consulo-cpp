@@ -1,0 +1,249 @@
+FILE
+  CPsiNamespaceDeclarationImpl: namespace a { namespace b { struct X { int v; }; } }
+    PsiElement(NAMESPACE_KEYWORD)('namespace')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiNamespaceDeclarationImpl: namespace b { struct X { int v; }; }
+      PsiElement(NAMESPACE_KEYWORD)('namespace')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('b')
+      PsiWhiteSpace(' ')
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace(' ')
+      CPsiStructDeclarationImpl: struct X { int v; };
+        PsiElement(STRUCT_KEYWORD)('struct')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('X')
+        PsiWhiteSpace(' ')
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiDeclarationFieldImpl: int v;
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('v')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      PsiElement(RBRACE)('}')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')
+  CPsiNamespaceDeclarationImpl: namespace alias = a::b;
+    PsiElement(NAMESPACE_KEYWORD)('namespace')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('alias')
+    PsiWhiteSpace(' ')
+    PsiElement(EQ)('=')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('a')
+    PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('b')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiDeclarationImpl: using alias::X;
+    PsiElement(USING_KEYWORD)('using')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('alias')
+    PsiElement(DOUBLE_COLON)('::')
+    PsiElement(IDENTIFIER)('X')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  CPsiStructDeclarationImpl: struct Base { Base(int) {} };
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('Base')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace(' ')
+    CPsiImplementingMethodImpl: Base(int) {}
+      CPsiModifierListImpl: 
+        <empty list>
+      PsiElement(IDENTIFIER)('Base')
+      CPsiParameterListImpl: (int)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: int
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: {}
+        PsiElement(LBRACE)('{')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace(' ')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiStructDeclarationImpl: struct Derived : Base {
+    int field;
+    Derived(int value) : Base(value), field(value) {}
+};
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('Derived')
+    PsiWhiteSpace(' ')
+    CPsiSuperClassListImpl: : Base
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      CPsiSuperClassImpl: Base
+        PsiElement(IDENTIFIER)('Base')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n    ')
+    CPsiDeclarationFieldImpl: int field;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: int
+        PsiElement(INT_KEYWORD)('int')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('field')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n    ')
+    CPsiImplementingMethodImpl: Derived(int value) : Base(value), field(value) {}
+      CPsiModifierListImpl: 
+        <empty list>
+      PsiElement(IDENTIFIER)('Derived')
+      CPsiParameterListImpl: (int value)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: int value
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: int
+            PsiElement(INT_KEYWORD)('int')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('value')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(COLON)(':')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('Base')
+      CPsiArgumentListImpl: (value)
+        PsiElement(LPARENTH)('(')
+        CPsiReferenceExpressionImpl: value
+          PsiElement(IDENTIFIER)('value')
+        PsiElement(RPARENTH)(')')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('field')
+      CPsiArgumentListImpl: (value)
+        PsiElement(LPARENTH)('(')
+        CPsiReferenceExpressionImpl: value
+          PsiElement(IDENTIFIER)('value')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: {}
+        PsiElement(LBRACE)('{')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  CPsiImplementingMethodImpl: void f(int top) {
+    auto g = [top, &top2 = top](int n) { return n < top; };
+    (void) typeid(Derived).name();
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('f')
+    CPsiParameterListImpl: (int top)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: int top
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: int
+          PsiElement(INT_KEYWORD)('int')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('top')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    CPsiCodeBlockImpl: {
+    auto g = [top, &top2 = top](int n) { return n < top; };
+    (void) typeid(Derived).name();
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto g = [top, &top2 = top](int n) { return n < top; };
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('g')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: [top, &top2 = top](int n) { return n < top; }
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('top')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('top2')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('top')
+          PsiElement(RBRACKET)(']')
+          CPsiParameterListImpl: (int n)
+            PsiElement(LPARENTH)('(')
+            CPsiParameterImpl: int n
+              CPsiModifierListImpl: 
+                <empty list>
+              CPsiTypeRefImpl: int
+                PsiElement(INT_KEYWORD)('int')
+              PsiWhiteSpace(' ')
+              PsiElement(IDENTIFIER)('n')
+            PsiElement(RPARENTH)(')')
+          PsiWhiteSpace(' ')
+          CPsiCodeBlockImpl: { return n < top; }
+            PsiElement(LBRACE)('{')
+            PsiWhiteSpace(' ')
+            CPsiReturnStatementImpl: return n < top;
+              PsiElement(RETURN_KEYWORD)('return')
+              PsiWhiteSpace(' ')
+              CPsiBinaryExpressionImpl: n < top
+                CPsiReferenceExpressionImpl: n
+                  PsiElement(IDENTIFIER)('n')
+                PsiWhiteSpace(' ')
+                PsiElement(LT)('<')
+                PsiWhiteSpace(' ')
+                CPsiReferenceExpressionImpl: top
+                  PsiElement(IDENTIFIER)('top')
+              PsiElement(SEMICOLON)(';')
+            PsiWhiteSpace(' ')
+            PsiElement(RBRACE)('}')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiExpressionStatementImpl: (void) typeid(Derived).name();
+        CPsiCastExpressionImpl: (void) typeid(Derived).name()
+          PsiElement(LPARENTH)('(')
+          CPsiTypeRefImpl: void
+            PsiElement(VOID_KEYWORD)('void')
+          PsiElement(RPARENTH)(')')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: typeid(Derived).name()
+            CPsiReferenceExpressionImpl: typeid(Derived).name
+              CPsiCallExpressionImpl: typeid(Derived)
+                PsiElement(TYPEID_KEYWORD)('typeid')
+                PsiElement(LPARENTH)('(')
+                PsiElement(IDENTIFIER)('Derived')
+                PsiElement(RPARENTH)(')')
+              PsiElement(DOT)('.')
+              PsiElement(IDENTIFIER)('name')
+            CPsiArgumentListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

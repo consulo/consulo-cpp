@@ -1,0 +1,26 @@
+FILE
+  CPsiTypeDeclarationImpl: #if (!defined(_STDDEF_H) && !defined(_STDDEF_H_) && !defined(_ANSI_STDDEF_H) \
+     && !defined(__STDDEF_H__)) \
+    || defined(__need_wchar_t) || defined(__need_size_t) \
+    || defined(__need_ptrdiff_t) || defined(__need_NULL) \
+    || defined(__need_wint_t)
+typedef unsigned long size_t;
+    CPsiModifierListImpl: #if (!defined(_STDDEF_H) && !defined(_STDDEF_H_) && !defined(_ANSI_STDDEF_H) \
+     && !defined(__STDDEF_H__)) \
+    || defined(__need_wchar_t) || defined(__need_size_t) \
+    || defined(__need_ptrdiff_t) || defined(__need_NULL) \
+    || defined(__need_wint_t)
+typedef
+      PsiElement(OUTER)('#if (!defined(_STDDEF_H) && !defined(_STDDEF_H_) && !defined(_ANSI_STDDEF_H) \\n     && !defined(__STDDEF_H__)) \\n    || defined(__need_wchar_t) || defined(__need_size_t) \\n    || defined(__need_ptrdiff_t) || defined(__need_NULL) \\n    || defined(__need_wint_t)\n')
+      PsiElement(TYPEDEF_KEYWORD)('typedef')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: unsigned long
+      PsiElement(UNSIGNED_KEYWORD)('unsigned')
+      PsiWhiteSpace(' ')
+      PsiElement(LONG_KEYWORD)('long')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('size_t')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#endif')
+  PsiWhiteSpace('\n')

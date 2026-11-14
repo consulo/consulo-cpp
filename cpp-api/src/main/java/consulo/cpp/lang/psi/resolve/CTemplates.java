@@ -51,7 +51,8 @@ public final class CTemplates {
     public static List<Parameter> parametersOf(PsiElement declaration) {
         List<Parameter> parameters = new ArrayList<>();
         PsiElement end = previousSignificant(declaration);
-        while (end != null && end.getNode().getElementType() == CPsiTokens.GT) {
+        // template <typename T, typename C = less<T>> ends with the >> of the default and of the head
+        while (end != null && (end.getNode().getElementType() == CPsiTokens.GT || end.getNode().getElementType() == CPsiTokens.GTGT)) {
             PsiElement keyword = headStart(end);
             if (keyword == null) {
                 break;
@@ -82,6 +83,9 @@ public final class CTemplates {
             IElementType type = element.getNode().getElementType();
             if (type == CPsiTokens.GT) {
                 depth++;
+            }
+            else if (type == CPsiTokens.GTGT) {
+                depth += 2;
             }
             else if (type == CPsiTokens.LT) {
                 if (depth > 0) {
@@ -126,6 +130,9 @@ public final class CTemplates {
             if (type == CPsiTokens.GT) {
                 depth++;
             }
+            else if (type == CPsiTokens.GTGT) {
+                depth += 2;
+            }
             else if (type == CPsiTokens.LT && --depth == 0) {
                 PsiElement keyword = previousSignificant(element);
                 return keyword != null && keyword.getNode().getElementType() == CPsiTokens.TEMPLATE_KEYWORD ? keyword : null;
@@ -150,6 +157,9 @@ public final class CTemplates {
             else if (type == CPsiTokens.GT && --depth == 0) {
                 return element;
             }
+            else if (type == CPsiTokens.GTGT && (depth -= 2) <= 0) {
+                return element;
+            }
         }
         return null;
     }
@@ -171,7 +181,7 @@ public final class CTemplates {
             IElementType type = element.getNode().getElementType();
             boolean opens = type == CPsiTokens.LT || type == CPsiTokens.LPARENTH;
             boolean closes = type == CPsiTokens.GT || type == CPsiTokens.RPARENTH;
-            if (depth == 1 && (type == CPsiTokens.COMMA || element == end)) {
+            if (depth == 1 && type == CPsiTokens.COMMA || element == end) {
                 if (name != null) {
                     parameters.add(new Parameter(name, first == CPsiTokens.TYPENAME_KEYWORD || first == CPsiTokens.CLASS_KEYWORD
                         || first == CPsiTokens.TEMPLATE_KEYWORD));
@@ -196,6 +206,9 @@ public final class CTemplates {
             }
             else if (closes) {
                 depth--;
+            }
+            else if (type == CPsiTokens.GTGT) {
+                depth -= 2;
             }
             if (element == end) {
                 break;

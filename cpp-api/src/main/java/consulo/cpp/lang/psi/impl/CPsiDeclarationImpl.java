@@ -16,6 +16,11 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import java.util.List;
+import java.util.ArrayList;
+import consulo.cpp.lang.psi.CPsiDeclarationMethod;
+import consulo.cpp.lang.psi.resolve.CRawNameReferences;
+import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
 import consulo.language.util.IncorrectOperationException;
@@ -66,5 +71,29 @@ public class CPsiDeclarationImpl extends CPsiNamedElementBaseImpl implements CPs
 	public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place)
 	{
 		return CScopes.processDeclaration(this, processor, state, lastParent);
+	}
+
+	/**
+	 * Its own reference, those of the qualifiers of a using-declaration and of the names of a constructor's
+	 * initializers.
+	 */
+	@Override
+	public PsiReference[] getReferences()
+	{
+		List<PsiReference> references = new ArrayList<>();
+		PsiReference own = getReference();
+		if(own != null)
+		{
+			references.add(own);
+		}
+		if(CDeclarations.usingOf(this) != null)
+		{
+			CTemplateArgumentReferences.addArguments(this, references);
+		}
+		if(this instanceof CPsiDeclarationMethod)
+		{
+			CRawNameReferences.addMemberInitializers(this, references);
+		}
+		return references.toArray(PsiReference.EMPTY_ARRAY);
 	}
 }

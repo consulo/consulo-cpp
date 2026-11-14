@@ -1,0 +1,117 @@
+FILE
+  CPsiImplementingMethodImpl: void f(std::map<int, int>& m, Point p) {
+    auto [x, y] = p;
+    for (const auto& [key, value] : m) {
+        use(key, value);
+    }
+}
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: void
+      PsiElement(VOID_KEYWORD)('void')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('f')
+    CPsiParameterListImpl: (std::map<int, int>& m, Point p)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: std::map<int, int>& m
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: std::map<int, int>
+          PsiElement(IDENTIFIER)('std')
+          PsiElement(DOUBLE_COLON)('::')
+          PsiElement(IDENTIFIER)('map')
+          PsiElement(LT)('<')
+          PsiElement(INT_KEYWORD)('int')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiElement(INT_KEYWORD)('int')
+          PsiElement(GT)('>')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('m')
+      PsiElement(COMMA)(',')
+      PsiWhiteSpace(' ')
+      CPsiParameterImpl: Point p
+        CPsiModifierListImpl: 
+          <empty list>
+        CPsiTypeRefImpl: Point
+          PsiElement(IDENTIFIER)('Point')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('p')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    CPsiCodeBlockImpl: {
+    auto [x, y] = p;
+    for (const auto& [key, value] : m) {
+        use(key, value);
+    }
+}
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiLocalVariableImpl: auto [x, y] = p;
+        CPsiModifierListImpl: auto
+          PsiElement(AUTO_KEYWORD)('auto')
+        PsiWhiteSpace(' ')
+        PsiElement(LBRACKET)('[')
+        PsiElement(IDENTIFIER)('x')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('y')
+        PsiElement(RBRACKET)(']')
+        PsiWhiteSpace(' ')
+        PsiElement(EQ)('=')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: p
+          PsiElement(IDENTIFIER)('p')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n    ')
+      CPsiForStatementImpl: for (const auto& [key, value] : m) {
+        use(key, value);
+    }
+        PsiElement(FOR_KEYWORD)('for')
+        PsiWhiteSpace(' ')
+        PsiElement(LPARENTH)('(')
+        CPsiLocalVariableImpl: const auto& [key, value]
+          CPsiModifierListImpl: const auto
+            PsiElement(CONST_KEYWORD)('const')
+            PsiWhiteSpace(' ')
+            PsiElement(AUTO_KEYWORD)('auto')
+          PsiElement(AND)('&')
+          PsiWhiteSpace(' ')
+          PsiElement(LBRACKET)('[')
+          PsiElement(IDENTIFIER)('key')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('value')
+          PsiElement(RBRACKET)(']')
+        PsiWhiteSpace(' ')
+        PsiElement(COLON)(':')
+        PsiWhiteSpace(' ')
+        CPsiReferenceExpressionImpl: m
+          PsiElement(IDENTIFIER)('m')
+        PsiElement(RPARENTH)(')')
+        PsiWhiteSpace(' ')
+        CPsiCodeBlockImpl: {
+        use(key, value);
+    }
+          PsiElement(LBRACE)('{')
+          PsiWhiteSpace('\n        ')
+          CPsiExpressionStatementImpl: use(key, value);
+            CPsiCallExpressionImpl: use(key, value)
+              CPsiReferenceExpressionImpl: use
+                PsiElement(IDENTIFIER)('use')
+              CPsiArgumentListImpl: (key, value)
+                PsiElement(LPARENTH)('(')
+                CPsiReferenceExpressionImpl: key
+                  PsiElement(IDENTIFIER)('key')
+                PsiElement(COMMA)(',')
+                PsiWhiteSpace(' ')
+                CPsiReferenceExpressionImpl: value
+                  PsiElement(IDENTIFIER)('value')
+                PsiElement(RPARENTH)(')')
+            PsiElement(SEMICOLON)(';')
+          PsiWhiteSpace('\n    ')
+          PsiElement(RBRACE)('}')
+      PsiWhiteSpace('\n')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

@@ -45,6 +45,14 @@ public class CParsingTest extends CParsingBaseTest {
     }
 
     /**
+     * An {@code #if} continued over lines with backslashes, as gcc's {@code stddef.h} opens
+     */
+    @Test
+    public void testContinuedCondition(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * {@code int x;} – simple global variable declaration
      */
     @Test

@@ -1,0 +1,226 @@
+FILE
+  CPsiNamespaceDeclarationImpl: namespace std
+{
+  template<typename _Ch, typename _Tr, typename _Tp, _Lock_policy _Lp>
+    inline std::basic_ostream<_Ch, _Tr>&
+    operator<<(std::basic_ostream<_Ch, _Tr>& __os,
+	       const __shared_ptr<_Tp, _Lp>& __p)
+    {
+      __os << __p.get();
+      return __os;
+    }
+
+  template<typename _Tp>
+    class shared_ptr
+    {
+    };
+}
+    PsiElement(NAMESPACE_KEYWORD)('namespace')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('std')
+    PsiWhiteSpace('\n')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n  ')
+    PsiElement(TEMPLATE_KEYWORD)('template')
+    PsiElement(LT)('<')
+    PsiElement(TYPENAME_KEYWORD)('typename')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Ch')
+    PsiElement(COMMA)(',')
+    PsiWhiteSpace(' ')
+    PsiElement(TYPENAME_KEYWORD)('typename')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Tr')
+    PsiElement(COMMA)(',')
+    PsiWhiteSpace(' ')
+    PsiElement(TYPENAME_KEYWORD)('typename')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Tp')
+    PsiElement(COMMA)(',')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Lock_policy')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Lp')
+    PsiElement(GT)('>')
+    PsiWhiteSpace('\n    ')
+    CPsiImplementingMethodImpl: inline std::basic_ostream<_Ch, _Tr>&
+    operator<<(std::basic_ostream<_Ch, _Tr>& __os,
+	       const __shared_ptr<_Tp, _Lp>& __p)
+    {
+      __os << __p.get();
+      return __os;
+    }
+      CPsiModifierListImpl: inline
+        PsiElement(INLINE_KEYWORD)('inline')
+      PsiWhiteSpace(' ')
+      CPsiTypeRefImpl: std::basic_ostream<_Ch, _Tr>
+        PsiElement(IDENTIFIER)('std')
+        PsiElement(DOUBLE_COLON)('::')
+        PsiElement(IDENTIFIER)('basic_ostream')
+        PsiElement(LT)('<')
+        PsiElement(IDENTIFIER)('_Ch')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('_Tr')
+        PsiElement(GT)('>')
+      PsiElement(AND)('&')
+      PsiWhiteSpace('\n    ')
+      PsiElement(OPERATOR_KEYWORD)('operator')
+      PsiElement(LTLT)('<<')
+      CPsiParameterListImpl: (std::basic_ostream<_Ch, _Tr>& __os,
+	       const __shared_ptr<_Tp, _Lp>& __p)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: std::basic_ostream<_Ch, _Tr>& __os
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: std::basic_ostream<_Ch, _Tr>
+            PsiElement(IDENTIFIER)('std')
+            PsiElement(DOUBLE_COLON)('::')
+            PsiElement(IDENTIFIER)('basic_ostream')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('_Ch')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('_Tr')
+            PsiElement(GT)('>')
+          PsiElement(AND)('&')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('__os')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace('\n\t       ')
+        CPsiParameterImpl: const __shared_ptr<_Tp, _Lp>& __p
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: __shared_ptr<_Tp, _Lp>
+            PsiElement(IDENTIFIER)('__shared_ptr')
+            PsiElement(LT)('<')
+            PsiElement(IDENTIFIER)('_Tp')
+            PsiElement(COMMA)(',')
+            PsiWhiteSpace(' ')
+            PsiElement(IDENTIFIER)('_Lp')
+            PsiElement(GT)('>')
+          PsiElement(AND)('&')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('__p')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace('\n    ')
+      CPsiCodeBlockImpl: {
+      __os << __p.get();
+      return __os;
+    }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace('\n      ')
+        CPsiExpressionStatementImpl: __os << __p.get();
+          CPsiBinaryExpressionImpl: __os << __p.get()
+            CPsiReferenceExpressionImpl: __os
+              PsiElement(IDENTIFIER)('__os')
+            PsiWhiteSpace(' ')
+            PsiElement(LTLT)('<<')
+            PsiWhiteSpace(' ')
+            CPsiCallExpressionImpl: __p.get()
+              CPsiReferenceExpressionImpl: __p.get
+                CPsiReferenceExpressionImpl: __p
+                  PsiElement(IDENTIFIER)('__p')
+                PsiElement(DOT)('.')
+                PsiElement(IDENTIFIER)('get')
+              CPsiArgumentListImpl: ()
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace('\n      ')
+        CPsiReturnStatementImpl: return __os;
+          PsiElement(RETURN_KEYWORD)('return')
+          PsiWhiteSpace(' ')
+          CPsiReferenceExpressionImpl: __os
+            PsiElement(IDENTIFIER)('__os')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace('\n    ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n\n  ')
+    PsiElement(TEMPLATE_KEYWORD)('template')
+    PsiElement(LT)('<')
+    PsiElement(TYPENAME_KEYWORD)('typename')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('_Tp')
+    PsiElement(GT)('>')
+    PsiWhiteSpace('\n    ')
+    CPsiClassImpl: class shared_ptr
+    {
+    };
+      PsiElement(CLASS_KEYWORD)('class')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('shared_ptr')
+      PsiWhiteSpace('\n    ')
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      PsiElement(RBRACE)('}')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n\n')
+  PsiElement(TEMPLATE_KEYWORD)('template')
+  PsiElement(LT)('<')
+  PsiElement(TYPENAME_KEYWORD)('typename')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('_Del')
+  PsiElement(COMMA)(',')
+  PsiWhiteSpace(' ')
+  PsiElement(TYPENAME_KEYWORD)('typename')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('_Tp')
+  PsiElement(COMMA)(',')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('_Lock_policy')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('_Lp')
+  PsiElement(GT)('>')
+  PsiWhiteSpace('\n  ')
+  CPsiImplementingMethodImpl: inline _Del*
+  get_deleter(const __shared_ptr<_Tp, _Lp>& __p) noexcept
+  {
+    return 0;
+  }
+    CPsiModifierListImpl: inline
+      PsiElement(INLINE_KEYWORD)('inline')
+    PsiWhiteSpace(' ')
+    CPsiTypeRefImpl: _Del
+      PsiElement(IDENTIFIER)('_Del')
+    PsiElement(ASTERISK)('*')
+    PsiWhiteSpace('\n  ')
+    PsiElement(IDENTIFIER)('get_deleter')
+    CPsiParameterListImpl: (const __shared_ptr<_Tp, _Lp>& __p)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: const __shared_ptr<_Tp, _Lp>& __p
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: __shared_ptr<_Tp, _Lp>
+          PsiElement(IDENTIFIER)('__shared_ptr')
+          PsiElement(LT)('<')
+          PsiElement(IDENTIFIER)('_Tp')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('_Lp')
+          PsiElement(GT)('>')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('__p')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+    PsiWhiteSpace('\n  ')
+    CPsiCodeBlockImpl: {
+    return 0;
+  }
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace('\n    ')
+      CPsiReturnStatementImpl: return 0;
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiLiteralExpressionImpl: 0
+          PsiElement(INTEGER_LITERAL)('0')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace('\n  ')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

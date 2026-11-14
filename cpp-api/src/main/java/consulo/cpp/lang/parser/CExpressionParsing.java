@@ -54,7 +54,7 @@ public class CExpressionParsing extends CParsingBase {
      */
     private static final TokenSet UNAMBIGUOUS_OPERAND_STARTS = TokenSet.orSet(
         TokenSet.create(IDENTIFIER, LPARENTH, EXCL, TILDE, SIZEOF_KEYWORD, ALIGNOF_KEYWORD, THIS_KEYWORD, NEW_KEYWORD,
-            DELETE_KEYWORD, CAST_KEYWORD),
+            DELETE_KEYWORD, CAST_KEYWORD, TYPEID_KEYWORD),
         LITERAL_EXPRESSION_SET
     );
 

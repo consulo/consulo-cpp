@@ -141,7 +141,7 @@ public class CppExpressionParsing extends CExpressionParsing {
             parseArgumentList();
         }
 
-        declarations().parseTypeName();
+        declarations().parseTypeName(CDeclarationParsing.Scope.NEW_TYPE);
 
         if (at(LPARENTH)) {
             parseArgumentList();
@@ -180,8 +180,14 @@ public class CppExpressionParsing extends CExpressionParsing {
                 // t.template get<1>(), any.cast<int>()
                 parseTemplateArgumentsIfAhead(explicit);
                 // a qualified member, p->Base<T>::member
-                while (at(DOUBLE_COLON) && (lookAhead(1) == IDENTIFIER || lookAhead(1) == TILDE || lookAhead(1) == TEMPLATE_KEYWORD)) {
+                while (at(DOUBLE_COLON) && (lookAhead(1) == IDENTIFIER || lookAhead(1) == TILDE || lookAhead(1) == TEMPLATE_KEYWORD
+                    || lookAhead(1) == OPERATOR_KEYWORD)) {
                     advance();
+                    if (at(OPERATOR_KEYWORD)) {
+                        // this->Base<T>::operator=(r)
+                        cpp().parseOperatorName();
+                        break;
+                    }
                     boolean explicitPart = consume(TEMPLATE_KEYWORD);
                     consume(TILDE);
                     advance();

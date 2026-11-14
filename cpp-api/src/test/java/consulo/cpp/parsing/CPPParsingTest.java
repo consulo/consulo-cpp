@@ -101,6 +101,47 @@ public class CPPParsingTest extends CParsingBaseTest {
     }
 
     /**
+     * Names in member initializers, lambda captures, {@code typeid} and a namespace alias
+     */
+    @Test
+    public void testNamesWithoutReferences(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * {@code namespace a::b::inline c { }} – namespaces inside each other – and {@code namespace alias = a::b;}
+     */
+    @Test
+    public void testNestedNamespace(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * {@code auto [x, y] = p;} and {@code for (auto& [key, value] : m)} – structured bindings
+     */
+    @Test
+    public void testStructuredBinding(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * An out-of-class constructor of a class template, {@code ::new (p) T(...)} and
+     * {@code this->Base<T>::operator=(r)}, as libstdc++ writes them
+     */
+    @Test
+    public void testLibstdcxxConstructs(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * {@code template<...> inline R& operator<<(...) { ... }} – a free operator template, inside a namespace
+     */
+    @Test
+    public void testTemplateOperatorFunction(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * {@code namespace std { void foo(); }} – namespace with a method declaration
      */
     @Test

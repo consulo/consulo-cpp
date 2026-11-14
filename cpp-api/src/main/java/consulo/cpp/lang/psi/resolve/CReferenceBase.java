@@ -29,8 +29,8 @@ import java.util.List;
 
 /**
  * A name of the C tree: the identifier is its range, and what it means is computed once per change of PSI, by a
- * stateless resolver, in the {@link ResolveCache}. Two references of one element are equal, which is what the cache
- * keys on.
+ * stateless resolver, in the {@link ResolveCache}. Two references of one element and one range are equal, which is
+ * what the cache keys on - an element has a reference for each name of its template arguments too.
  *
  * @author VISTALL
  * @since 2026-11-02
@@ -114,11 +114,12 @@ public abstract class CReferenceBase<T extends PsiElement> extends PsiPolyVarian
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof CReferenceBase<?> that && getClass() == that.getClass() && getElement().equals(that.getElement());
+        return o instanceof CReferenceBase<?> that && getClass() == that.getClass() && getElement().equals(that.getElement())
+            && getRangeInElement().equals(that.getRangeInElement());
     }
 
     @Override
     public int hashCode() {
-        return getElement().hashCode();
+        return getElement().hashCode() * 31 + getRangeInElement().hashCode();
     }
 }

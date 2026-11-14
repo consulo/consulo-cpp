@@ -62,7 +62,7 @@ public final class CResolveProcessor implements PsiScopeProcessor {
         if (kind == null || !myKinds.contains(kind)) {
             return true;
         }
-        if (myName != null && !myName.equals(CDeclarations.nameOf(element))) {
+        if (myName != null && !myName.equals(CDeclarations.nameOf(element)) && !isBindingName(element)) {
             return true;
         }
         if (!myResults.contains(element)) {
@@ -110,5 +110,14 @@ public final class CResolveProcessor implements PsiScopeProcessor {
             return (T) myKinds;
         }
         return null;
+    }
+
+    private boolean isBindingName(PsiElement element) {
+        for (PsiElement name : CDeclarations.bindingNames(element)) {
+            if (name.getText().equals(myName)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

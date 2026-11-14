@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 
 import consulo.cpp.lang.psi.resolve.CReferenceExpressionReference;
 
+import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import consulo.language.psi.PsiReference;
 
 import consulo.cpp.lang.psi.CPsiReferenceExpression;
@@ -37,5 +38,13 @@ public class CPsiReferenceExpressionImpl extends CPsiElementBaseImpl implements 
     @Override
     public @Nullable PsiReference getReference() {
         return CReferenceExpressionReference.of(this);
+    }
+
+    /**
+     * Its own reference and those of the names of its template arguments.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        return CTemplateArgumentReferences.withArguments(this, getReference());
     }
 }

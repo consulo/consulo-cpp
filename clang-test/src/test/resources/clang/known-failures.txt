@@ -3,9 +3,7 @@ CXX/basic/basic.lookup/basic.lookup.argdep/p4-friend-in-reachable-class.cpp
 CXX/basic/basic.start/basic.start.main/p2.cpp
 CXX/basic/basic.start/basic.start.main/p3.cpp
 CXX/cpp/cpp.predefined/p2.cpp
-CXX/except/except.spec/canonical.cpp
 CXX/over/over.over/p1.cpp
-CXX/temp/temp.decls/temp.class.spec/temp.class.spec.mfunc/p1.cpp
 CXX/temp/temp.deduct/p5.cpp
 Parser/c2x-func-prototype.c
 Parser/cxx-typeof.cpp

@@ -46,4 +46,6 @@ public enum CDeclarationKind {
     public static final Set<CDeclarationKind> NAMESPACES = Set.of(NAMESPACE);
 
     public static final Set<CDeclarationKind> FUNCTIONS = Set.of(FUNCTION);
+
+    public static final Set<CDeclarationKind> VARIABLES = Set.of(VARIABLE);
 }

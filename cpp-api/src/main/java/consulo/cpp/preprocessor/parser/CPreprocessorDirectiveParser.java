@@ -173,13 +173,24 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
         PsiBuilder.Marker marker = builder.mark();
 
         // #pragma — consume everything until end-of-line
-        while (!builder.eof() && builder.getTokenType() != NEW_LINE) {
-            builder.advanceLexer();
-        }
+        skipToLineEnd(builder);
 
         marker.done(CPreprocessorElementTypes.PRAGMA_DIRECTIVE);
 
         skipLines(builder);
+    }
+
+    /**
+     * To the end of a directive's line, over the lines a backslash at the end of one continues it on.
+     */
+    private static void skipToLineEnd(PsiBuilder builder) {
+        while (!builder.eof() && builder.getTokenType() != NEW_LINE) {
+            boolean continuation = builder.getTokenType() == NEXT_LINE;
+            builder.advanceLexer();
+            if (continuation && builder.getTokenType() == NEW_LINE) {
+                builder.advanceLexer();
+            }
+        }
     }
 
     public static void parseIf(PsiBuilder builder) {
@@ -200,9 +211,7 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
         }
         else {
             // #if: consume the condition expression tokens until end-of-line
-            while (!builder.eof() && builder.getTokenType() != NEW_LINE) {
-                builder.advanceLexer();
-            }
+            skipToLineEnd(builder);
         }
 
         if (builder.getTokenType() == NEW_LINE) {
@@ -230,9 +239,7 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
                 builder.advanceLexer();
 
                 // consume the #elif condition until end-of-line
-                while (!builder.eof() && builder.getTokenType() != NEW_LINE) {
-                    builder.advanceLexer();
-                }
+                skipToLineEnd(builder);
                 if (builder.getTokenType() == NEW_LINE) {
                     builder.advanceLexer();
                 }

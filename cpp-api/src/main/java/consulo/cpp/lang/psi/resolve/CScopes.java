@@ -223,7 +223,8 @@ public final class CScopes {
             }
             return isLevelOpen(processor);
         }
-        return processMembers(owner, processor, state) && processTemplateParameters(owner, processor, state);
+        // the parameters of a class template hide the names of its bases, _T2 of pair<_T1, _T2> : __pair_base<_T1, _T2>
+        return processMembers(owner, processor, state, new HashSet<>(), 0, owner);
     }
 
     /**
@@ -313,18 +314,26 @@ public final class CScopes {
      * with those of the type it names.
      */
     public static boolean processMembers(PsiElement owner, PsiScopeProcessor processor, ResolveState state) {
-        return processMembers(owner, processor, state, new HashSet<>(), 0);
+        return processMembers(owner, processor, state, new HashSet<>(), 0, null);
     }
 
+    /**
+     * The same, with the template parameters of {@code templateOwner} between the class's own members and those of its
+     * bases.
+     */
     private static boolean processMembers(PsiElement owner,
                                           PsiScopeProcessor processor,
                                           ResolveState state,
                                           Set<PsiElement> visited,
-                                          int depth) {
+                                          int depth,
+                                          @Nullable PsiElement templateOwner) {
         ProgressManager.checkCanceled();
         PsiElement scope = CNameResolver.scopeOf(owner);
+        if (scope != null && !(scope instanceof CPsiNamespaceDeclaration) && !CDeclarations.hasBody(scope)) {
+            scope = definitionOf(scope, state.get(ORIGIN_FILE));
+        }
         if (scope == null || depth > MAX_BASE_DEPTH || !visited.add(scope)) {
-            return true;
+            return templateOwner == null || processTemplateParameters(templateOwner, processor, state);
         }
         if (scope instanceof CPsiNamespaceDeclaration) {
             return offerLevel(namespaceCandidates(scope, processor, state), processor, state);
@@ -332,11 +341,14 @@ public final class CScopes {
         if (!offerByName(ownMemberMap(scope), processor, state)) {
             return false;
         }
+        if (templateOwner != null && !processTemplateParameters(templateOwner, processor, state)) {
+            return false;
+        }
         CPsiSuperClassList superClassList = CDeclarations.childOfType(scope, CPsiSuperClassList.class);
         if (superClassList != null) {
             for (CPsiSuperClass superClass : superClassList.getSuperClasses()) {
                 PsiElement base = CNameResolver.resolveFirst(superClass);
-                if (base != null && !processMembers(base, processor, state, visited, depth + 1)) {
+                if (base != null && !processMembers(base, processor, state, visited, depth + 1, null)) {
                     return false;
                 }
             }
@@ -454,6 +466,36 @@ public final class CScopes {
     }
 
     /**
+     * The definition of a class only declared where it was found - {@code class basic_string;} of a header which does
+     * not include the one defining it - looked up in the file the lookup started in and the headers it includes; the
+     * declaration itself when there is none.
+     */
+    public static PsiElement definitionOf(PsiElement declaration, @Nullable PsiFile origin) {
+        if (CDeclarations.hasBody(declaration) || !CDeclarations.isAggregate(declaration)) {
+            return declaration;
+        }
+        String name = CDeclarations.nameOf(declaration);
+        PsiFile originRoot = origin == null ? null : origin.getViewProvider().getPsi(CLanguage.INSTANCE);
+        PsiElement parent = declaration.getParent();
+        if (name == null || originRoot == null || !(parent instanceof PsiFile || parent instanceof CPsiNamespaceDeclaration)) {
+            return declaration;
+        }
+        List<String> path = parent instanceof PsiFile ? List.of() : namespacePath(parent);
+        Set<PsiFile> files = new LinkedHashSet<>();
+        files.add(originRoot);
+        files.addAll(CIncludedDeclarations.headersMentioning(originRoot, name));
+        for (PsiFile file : files) {
+            Map<String, List<PsiElement>> members = path.isEmpty() ? ownMemberMap(file) : namespaceMapsOf(file).get(path);
+            for (PsiElement member : members == null ? List.<PsiElement>of() : members.getOrDefault(name, List.of())) {
+                if (CDeclarations.isAggregate(member) && CDeclarations.hasBody(member)) {
+                    return member;
+                }
+            }
+        }
+        return declaration;
+    }
+
+    /**
      * The members of each namespace of a file, by the path of its names: a header answers for the namespaces it reopens.
      */
     private static Map<List<String>, Map<String, List<PsiElement>>> namespaceMapsOf(PsiFile file) {
@@ -491,15 +533,19 @@ public final class CScopes {
     }
 
     /**
-     * The names of a namespace and of the named namespaces around it, innermost last; an anonymous one adds nothing,
-     * its members belong to the enclosing namespace.
+     * The names of a namespace and of the named namespaces around it, innermost last; an anonymous or inline one adds
+     * nothing, its members belong to the enclosing namespace.
      */
     private static List<String> namespacePath(PsiElement namespace) {
         List<String> path = new ArrayList<>();
+        PsiFile file = namespace.getContainingFile();
+        Set<String> inlineNames = file == null ? Set.of() : CIncludedDeclarations.inlineNamespaceNames(file);
         for (PsiElement element = namespace; element != null && !(element instanceof PsiFile); element = element.getParent()) {
             if (element instanceof CPsiNamespaceDeclaration) {
                 String name = CDeclarations.nameOf(element);
-                if (name != null) {
+                // an inline namespace adds no name - written so, or reopened plainly after its first declaration said
+                // so: its members are those of the namespace around it
+                if (name != null && !inlineNames.contains(name) && !CDeclarations.isInlineNamespace(element)) {
                     path.add(0, name);
                 }
             }

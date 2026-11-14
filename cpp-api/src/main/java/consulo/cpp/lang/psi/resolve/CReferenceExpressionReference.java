@@ -57,11 +57,31 @@ public final class CReferenceExpressionReference extends CReferenceBase<CPsiRefe
     }
 
     /**
+     * The last child of an expression, or the name before the template arguments it ends with, {@code make_unique} of
+     * {@code std::make_unique<Circle>}.
+     */
+    private static @Nullable PsiElement nameLeafOf(CPsiReferenceExpression element) {
+        PsiElement last = element.getLastChild();
+        if (last == null || last.getNode().getElementType() != CPsiTokens.GT && last.getNode().getElementType() != CPsiTokens.GTGT) {
+            return last;
+        }
+        int level = 0;
+        for (PsiElement child = last; child != null; child = child.getPrevSibling()) {
+            IElementType type = child.getNode().getElementType();
+            level += type == CPsiTokens.GT ? 1 : type == CPsiTokens.GTGT ? 2 : type == CPsiTokens.LT ? -1 : 0;
+            if (level <= 0) {
+                return type == CPsiTokens.LT ? previousSignificant(child) : null;
+            }
+        }
+        return null;
+    }
+
+    /**
      * The reference of an expression ending with a name in the source; none for {@code this}, an operator name, or a
      * name a macro expansion produced.
      */
     public static @Nullable CReferenceExpressionReference of(CPsiReferenceExpression element) {
-        PsiElement last = element.getLastChild();
+        PsiElement last = nameLeafOf(element);
         if (last == null || last.getNode().getElementType() != CPsiTokens.IDENTIFIER || last.getTextLength() == 0) {
             return null;
         }
@@ -73,7 +93,7 @@ public final class CReferenceExpressionReference extends CReferenceBase<CPsiRefe
      * what resolving a qualifier inside an expansion needs.
      */
     public static @Nullable CReferenceExpressionReference ofAnyLength(CPsiReferenceExpression element) {
-        PsiElement last = element.getLastChild();
+        PsiElement last = nameLeafOf(element);
         if (last == null || last.getNode().getElementType() != CPsiTokens.IDENTIFIER) {
             return null;
         }
@@ -107,7 +127,8 @@ public final class CReferenceExpressionReference extends CReferenceBase<CPsiRefe
         }
         if (operatorType == CPsiTokens.DOT || operatorType == CPsiTokens.ARROW) {
             PsiElement qualifier = previousSignificant(operator);
-            PsiElement owner = qualifier == null ? null : CNameResolver.typeScopeOfValue(qualifier);
+            PsiElement owner = qualifier == null ? null
+                : operatorType == CPsiTokens.ARROW ? CTypes.scopeOfArrow(qualifier) : CNameResolver.typeScopeOfValue(qualifier);
             return owner == null ? List.of() : CNameResolver.resolveMember(getElement(), owner, name, VALUE, ResolveState.initial());
         }
         return CNameResolver.resolveUnqualified(getElement(), name, kinds);

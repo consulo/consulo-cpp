@@ -16,6 +16,12 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import consulo.language.psi.PsiReference;
+import java.util.List;
+import java.util.ArrayList;
+import consulo.cpp.lang.psi.resolve.CDeclarationKind;
+import consulo.cpp.lang.psi.resolve.CNameResolver;
+import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import org.jspecify.annotations.Nullable;
 
 import consulo.cpp.lang.psi.resolve.CScopes;
@@ -42,5 +48,19 @@ public class CPsiNamespaceDeclarationImpl extends CPsiNamedElementBaseImpl imple
     @Override
     public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
         return CScopes.processOwnerFromInside(this, processor, state, lastParent);
+    }
+
+    /**
+     * The references of the name a namespace alias stands for, {@code a} and {@code b} of {@code namespace x = a::b;}.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        CNameResolver.NameChain target = CNameResolver.namespaceAliasTarget(this);
+        if (target == null) {
+            return PsiReference.EMPTY_ARRAY;
+        }
+        List<PsiReference> references = new ArrayList<>();
+        CTemplateArgumentReferences.addChain(this, target, CDeclarationKind.NAMESPACES, references);
+        return references.toArray(PsiReference.EMPTY_ARRAY);
     }
 }

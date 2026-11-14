@@ -22,6 +22,7 @@ import consulo.cpp.lang.psi.resolve.CDeclarationKind;
 
 import consulo.cpp.lang.psi.resolve.CNameChainReference;
 
+import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import consulo.language.psi.PsiReference;
 
 import consulo.language.ast.IElementType;
@@ -54,5 +55,13 @@ public class CPsiSuperClassImpl extends CPsiElementBaseImpl implements CPsiSuper
     @Override
     public @Nullable PsiReference getReference() {
         return CNameChainReference.of(this, CDeclarationKind.TYPES);
+    }
+
+    /**
+     * Its own reference and those of the names of its template arguments.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        return CTemplateArgumentReferences.withArguments(this, getReference());
     }
 }

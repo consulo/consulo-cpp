@@ -458,6 +458,20 @@ public class PreprocessorExpander {
         return macros;
     }
 
+    /**
+     * The parameters of the function-like macros defined, for conditions calling them - {@code __GLIBC_USE(LIB_EXT2)}.
+     */
+    private Map<String, List<String>> parametersView() {
+        Map<String, List<String>> view = new LinkedHashMap<>();
+        for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
+            List<String> parameters = entry.getValue().getParameters();
+            if (parameters != null) {
+                view.put(entry.getKey(), parameters);
+            }
+        }
+        return view;
+    }
+
     private Map<String, String> definesView() {
         Map<String, String> view = new LinkedHashMap<>();
         for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
@@ -473,6 +487,7 @@ public class PreprocessorExpander {
      */
     private CPsiSharpIfBody selectActiveBody(CPreprocessorIfBlock element) {
         Map<String, String> defines = definesView();
+        Map<String, List<String>> parameters = parametersView();
         BranchKind kind = null;
         StringBuilder condition = new StringBuilder();
 
@@ -500,7 +515,7 @@ public class PreprocessorExpander {
                 condition.setLength(0);
             }
             else if (child instanceof CPsiSharpIfBody) {
-                if (kind != null && isBranchActive(kind, condition.toString(), defines)) {
+                if (kind != null && isBranchActive(kind, condition.toString(), defines, parameters)) {
                     return (CPsiSharpIfBody) child;
                 }
                 kind = null;
@@ -512,12 +527,12 @@ public class PreprocessorExpander {
         return null;
     }
 
-    private static boolean isBranchActive(BranchKind kind, String condition, Map<String, String> defines) {
+    private static boolean isBranchActive(BranchKind kind, String condition, Map<String, String> defines, Map<String, List<String>> parameters) {
         return switch (kind) {
             case IFDEF -> defines.containsKey(condition.trim());
             case IFNDEF -> !defines.containsKey(condition.trim());
             case ELSE -> true;
-            case IF, ELIF -> CPreprocessorConditionEvaluator.evaluate(condition, defines);
+            case IF, ELIF -> CPreprocessorConditionEvaluator.evaluate(condition, defines, parameters);
         };
     }
 

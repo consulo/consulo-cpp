@@ -263,6 +263,13 @@ public final class CIncludedDeclarations {
 
     private static final Pattern DIRECTIVE = Pattern.compile("\\busing\\s+namespace\\b");
 
+    private static final Pattern INLINE_NAMESPACE = Pattern.compile("\\binline\\s+namespace\\s+([A-Za-z_][A-Za-z_0-9]*)(?=\\s*(?:\\{|__attribute__|\\[\\[))");
+
+    private record InlineNamespaces(long stamp, Set<String> names) {
+    }
+
+    private static final Key<InlineNamespaces> INLINE_NAMESPACES = Key.create("CIncludedDeclarations.inlineNamespaces");
+
     /**
      * The words of a header the word index does not cover, read once per change of it.
      */
@@ -282,6 +289,51 @@ public final class CIncludedDeclarations {
         }
         Set<String> result = Set.copyOf(words);
         file.putUserData(WORDS, new Words(stamp, result));
+        return result;
+    }
+
+    /**
+     * The names of the namespaces declared {@code inline} in {@code file} or in a header it includes. A namespace is
+     * inline if its first declaration says so - libstdc++ says {@code inline namespace __cxx11} once, in
+     * {@code c++config.h}, and reopens it as plain {@code namespace __cxx11} everywhere else. Known by name: the
+     * declaration is read from the text, not resolved.
+     */
+    public static Set<String> inlineNamespaceNames(PsiFile file) {
+        return LanguageCachedValueUtil.getProjectPsiDependentCache(file, CIncludedDeclarations::computeInlineNamespaceNames);
+    }
+
+    private static Set<String> computeInlineNamespaceNames(PsiFile file) {
+        Set<String> names = new HashSet<>();
+        VirtualFile source = sourceFile(file);
+        if (source != null) {
+            names.addAll(inlineNamespacesOf(source));
+        }
+        for (VirtualFile header : includedFiles(file)) {
+            ProgressManager.checkCanceled();
+            names.addAll(inlineNamespacesOf(header));
+        }
+        return names.isEmpty() ? Set.of() : Set.copyOf(names);
+    }
+
+    /**
+     * The names {@code inline namespace} declares in the text of a file, read once per change of it.
+     */
+    private static Set<String> inlineNamespacesOf(VirtualFile file) {
+        long stamp = file.getModificationStamp();
+        InlineNamespaces cached = file.getUserData(INLINE_NAMESPACES);
+        if (cached != null && cached.stamp() == stamp) {
+            return cached.names();
+        }
+        Set<String> names = new HashSet<>();
+        CharSequence text = textOf(file);
+        if (text != null) {
+            Matcher matcher = INLINE_NAMESPACE.matcher(text);
+            while (matcher.find()) {
+                names.add(matcher.group(1));
+            }
+        }
+        Set<String> result = names.isEmpty() ? Set.of() : Set.copyOf(names);
+        file.putUserData(INLINE_NAMESPACES, new InlineNamespaces(stamp, result));
         return result;
     }
 

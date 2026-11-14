@@ -18,6 +18,7 @@ package consulo.cpp.preprocessor;
 import consulo.cpp.preprocessor.expand.CPreprocessorConditionEvaluator;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -34,6 +35,42 @@ public class CPreprocessorConditionEvaluatorTest {
 
     private static boolean eval(String condition) {
         return CPreprocessorConditionEvaluator.evaluate(condition, DEFINES);
+    }
+
+    @Test
+    public void functionLikeMacros() {
+        // glibc's features.h: __GLIBC_USE (F) is __GLIBC_USE_ ## F
+        Map<String, String> defines = Map.of("__GLIBC_USE", "__GLIBC_USE_ ## F", "__GLIBC_USE_LIB_EXT2", "1", "__GLIBC_USE_ISOC23", "0",
+            "MAX", "((a) > (b) ? (a) : (b))");
+        Map<String, List<String>> parameters = Map.of("__GLIBC_USE", List.of("F"), "MAX", List.of("a", "b"));
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("__GLIBC_USE (LIB_EXT2)", defines, parameters));
+        assertFalse(CPreprocessorConditionEvaluator.evaluate("__GLIBC_USE (ISOC23)", defines, parameters));
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("defined X || __GLIBC_USE (LIB_EXT2) || __GLIBC_USE (ISOC23)", defines, parameters));
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("MAX(2, (3)) == 3", defines, parameters));
+        // an unknown macro called is 0, not a malformed condition
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("UNKNOWN(1) || 1", defines, parameters));
+        assertFalse(CPreprocessorConditionEvaluator.evaluate("UNKNOWN(1)", defines, parameters));
+        // the compiler's __has_* are answered yes
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("__has_feature(cxx_access_control_sfinae) && __has_include(<stdio.h>)", defines, parameters));
+    }
+
+    @Test
+    public void arithmetic() {
+        // glibc's __GNUC_PREREQ (4, 6) with gcc 16
+        Map<String, String> defines = Map.of("__GNUC__", "16", "__GNUC_MINOR__", "1",
+            "__GNUC_PREREQ", "((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))");
+        Map<String, List<String>> parameters = Map.of("__GNUC_PREREQ", List.of("maj", "min"));
+        assertTrue(CPreprocessorConditionEvaluator.evaluate("__GNUC_PREREQ (4, 6)", defines, parameters));
+        assertFalse(CPreprocessorConditionEvaluator.evaluate("__GNUC_PREREQ (17, 0)", defines, parameters));
+        assertTrue(eval("LEVEL * 100 + 2 == 302"));
+        assertTrue(eval("(LEVEL & 1) && ~0 && -1 < 0 && 7 % 4 == 3 && (1 | 2) == 3 && (6 ^ 3) == 5"));
+        assertTrue(eval("DEBUG ? LEVEL == 3 : 0"));
+        assertFalse(eval("1 / ZERO"));
+    }
+
+    @Test
+    public void continuedLines() {
+        assertTrue(eval("defined(DEBUG) \\\n    && LEVEL == 3"));
     }
 
     @Test

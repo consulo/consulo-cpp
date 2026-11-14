@@ -47,7 +47,12 @@ public class CDeclarationParsing extends CParsingBase {
          * A C++ condition declaring its variable - {@code if (T x = f())}, {@code while (T x{...})}: one declarator, no
          * semicolon
          */
-        CONDITION
+        CONDITION,
+        /**
+         * The type of a C++ new-expression, {@code new T(args)}: the parentheses after it are its initializer, not a
+         * function type
+         */
+        NEW_TYPE
     }
 
     /**
@@ -97,6 +102,10 @@ public class CDeclarationParsing extends CParsingBase {
         @Nullable String myName;
         boolean myFunction;
         boolean myConsumed;
+        /**
+         * Whether all that was consumed is {@code &} or {@code &&}, as before the names of {@code auto& [key, value]}.
+         */
+        boolean myReferenceOnly;
     }
 
     public CDeclarationParsing(CParsingContext context) {
@@ -234,7 +243,7 @@ public class CDeclarationParsing extends CParsingBase {
         return switch (scope) {
             case FILE -> CElementTypes.FIELD;
             case MEMBER -> CElementTypes.DECLARATION_FIELD;
-            case PARAMETER -> CElementTypes.PARAMETER;
+            case PARAMETER, NEW_TYPE -> CElementTypes.PARAMETER;
             case BLOCK, FOR_INIT, CONDITION -> CElementTypes.LOCAL_VARIABLE;
         };
     }
@@ -604,6 +613,7 @@ public class CDeclarationParsing extends CParsingBase {
                 // a pointer to member, int Class::* p
                 parseMemberPointerClass();
             }
+            declarator.myReferenceOnly = (at(AND) || at(ANDAND)) && (!declarator.myConsumed || declarator.myReferenceOnly);
             advance();
             declarator.myConsumed = true;
             while (at(POINTER_QUALIFIERS) || isAttributeStart() || isDeclaratorQualifier()) {
@@ -640,11 +650,16 @@ public class CDeclarationParsing extends CParsingBase {
         boolean firstSuffix = true;
         boolean array = false;
         while (true) {
+            if (isAttributeStart()) {
+                // operator== [[nodiscard]] (...): the attributes of the declarator, before its suffixes
+                parseAttributes();
+                continue;
+            }
             if (at(LBRACKET) && lookAhead(1) != LBRACKET) {
                 parseArraySuffix();
                 array = true;
             }
-            else if (at(LPARENTH)) {
+            else if (at(LPARENTH) && scope != Scope.NEW_TYPE) {
                 if (parseConstructorArguments(scope, declarator, firstSuffix, nested, array)) {
                     break;
                 }
@@ -811,6 +826,13 @@ public class CDeclarationParsing extends CParsingBase {
      * consumes nothing when there is no type name here.
      */
     public TypeName parseTypeName() {
+        return parseTypeName(Scope.PARAMETER);
+    }
+
+    /**
+     * The same, with the declarator of {@code scope}: {@link Scope#NEW_TYPE} for the type of a new-expression.
+     */
+    public TypeName parseTypeName(Scope declaratorScope) {
         IElementType start = token();
         boolean definite = at(TYPES) || at(MODIFIERS) || at(AGGREGATE_KEYWORDS) || start == TYPEOF_KEYWORD
             || isLanguageTypeNameStart() || isAttributeStart();
@@ -887,7 +909,7 @@ public class CDeclarationParsing extends CParsingBase {
             }
         }
 
-        Declarator declarator = parseDeclarator(Scope.PARAMETER, true);
+        Declarator declarator = parseDeclarator(declaratorScope, true);
         if (declarator.myName != null) {
             // a type name declares nothing: (a b) is no type
             return TypeName.NONE;

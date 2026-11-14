@@ -17,6 +17,7 @@ package consulo.cpp.moduleAware;
 
 import consulo.util.dataholder.Key;
 import consulo.util.io.FileUtil;
+import consulo.component.ProcessCanceledException;
 import consulo.util.io.URLUtil;
 import consulo.virtualFileSystem.LocalFileSystem;
 import consulo.virtualFileSystem.VirtualFileManager;
@@ -197,6 +198,10 @@ public final class CIncludeWalker {
         String text;
         try {
             text = VirtualFileUtil.loadText(file);
+        }
+        catch (ProcessCanceledException canceled) {
+            // a canceled read is no unreadable file: remembering it would leave the file without includes
+            throw canceled;
         }
         catch (IOException | RuntimeException unreadable) {
             return List.of();

@@ -72,6 +72,18 @@ public final class CNameChainReference extends CReferenceBase<PsiElement> {
     }
 
     /**
+     * The reference of a name chain written somewhere in an element other than its own name - a name of its template
+     * arguments, see {@link CTemplateArgumentReferences}.
+     */
+    public static @Nullable CNameChainReference ofChain(PsiElement element, CNameResolver.NameChain chain, Set<CDeclarationKind> kinds) {
+        PsiElement last = chain.last();
+        if (last == null || last.getTextLength() == 0) {
+            return null;
+        }
+        return new CNameChainReference(element, chain, last, kinds, ResolveState.initial());
+    }
+
+    /**
      * The reference of a name chain made by a macro expansion as well as of one written in the file.
      */
     public static @Nullable CNameChainReference ofAnyLength(PsiElement element, Set<CDeclarationKind> kinds) {
