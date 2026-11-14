@@ -338,17 +338,50 @@ public class CppExpressionParsing extends CExpressionParsing {
      */
     public void parseRequiresExpression() {
         PsiBuilder.Marker marker = mark();
+        myBuilder.remapCurrentToken(REQUIRES_KEYWORD);
         advance();
         if (at(LPARENTH)) {
             declarations().parseParameterList();
         }
         if (at(LBRACE)) {
-            skipBalanced();
+            parseRequirements();
         }
         else {
             error(CLocalize.lbraceExpected());
         }
         marker.done(CElementTypes.CALL_EXPRESSION);
+    }
+
+    /**
+     * The requirements of a requires-expression, {@code { t.length(); { *t } -> convertible_to<int>; }}: a simple one
+     * is an expression, of the others only the extent is kept.
+     */
+    private void parseRequirements() {
+        advance();
+        while (!eof() && !at(RBRACE)) {
+            if (at(IDENTIFIER) || at(DOUBLE_COLON) || at(LPARENTH) || at(ASTERISK) || at(AND) || at(EXCL) || at(THIS_KEYWORD)) {
+                PsiBuilder.Marker statement = mark();
+                if (parseExpression()) {
+                    if (at(SEMICOLON)) {
+                        statement.drop();
+                        advance();
+                        continue;
+                    }
+                }
+                statement.rollbackTo();
+            }
+            // { e } -> C<T>; typename T::type; requires C<T>; - to the semicolon
+            while (!eof() && !at(SEMICOLON) && !at(RBRACE)) {
+                if (at(LPARENTH) || at(LBRACKET) || at(LBRACE)) {
+                    skipBalanced();
+                }
+                else {
+                    advance();
+                }
+            }
+            consume(SEMICOLON);
+        }
+        expect(RBRACE, CLocalize.rbraceExpected());
     }
 
     /**
@@ -459,6 +492,7 @@ public class CppExpressionParsing extends CExpressionParsing {
             // a template lambda, []<typename T>(T t) { ... }
             cpp().parseTemplateArguments();
             if (cpp().isContextualKeyword("requires")) {
+                myBuilder.remapCurrentToken(REQUIRES_KEYWORD);
                 advance();
                 cpp().parseConstraint();
             }

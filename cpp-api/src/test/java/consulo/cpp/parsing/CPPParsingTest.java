@@ -101,6 +101,14 @@ public class CPPParsingTest extends CParsingBaseTest {
     }
 
     /**
+     * {@code template <typename T> concept C = requires(...) { ... };} and a parameter constrained by it
+     */
+    @Test
+    public void testConcepts(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * Names in member initializers, lambda captures, {@code typeid} and a namespace alias
      */
     @Test

@@ -114,6 +114,11 @@ public interface CPsiTokens extends StandardTokenTypes, CPreprocessorTokenTypes 
     IElementType CAST_KEYWORD = new CBaseElementType("CAST_KEYWORD"); // static_cast, dynamic_cast, const_cast, reinterpret_cast
     IElementType TYPEID_KEYWORD = new CBaseElementType("TYPEID_KEYWORD"); // typeid
     IElementType DECLTYPE_KEYWORD = new CBaseElementType("DECLTYPE_KEYWORD"); // decltype
+    /**
+     * The contextual words of C++20 constraints, lexed as identifiers and made keywords by the parser where they are.
+     */
+    IElementType CONCEPT_KEYWORD = new CBaseElementType("CONCEPT_KEYWORD"); // concept
+    IElementType REQUIRES_KEYWORD = new CBaseElementType("REQUIRES_KEYWORD"); // requires
     IElementType NOEXCEPT_KEYWORD = new CBaseElementType("NOEXCEPT_KEYWORD"); // noexcept
 
     // types

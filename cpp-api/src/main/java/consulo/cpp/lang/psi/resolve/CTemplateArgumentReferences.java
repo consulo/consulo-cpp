@@ -117,6 +117,10 @@ public final class CTemplateArgumentReferences {
                 }
             }
             else {
+                if (type == CPsiTokens.LT && !segments.isEmpty() && isQualifierArguments(child)) {
+                    // list of std::list<Vec>::iterator: a scope with its arguments, before the name
+                    add(element, new CNameResolver.NameChain(List.copyOf(segments), global), CDeclarationKind.SCOPES, references);
+                }
                 flush(element, segments, global, segmentsInArgument, references);
                 global = false;
                 skipChain = type == CPsiTokens.DOT || type == CPsiTokens.ARROW;
@@ -158,6 +162,28 @@ public final class CTemplateArgumentReferences {
             add(element, new CNameResolver.NameChain(List.copyOf(segments), global), KINDS, references);
         }
         segments.clear();
+    }
+
+    /**
+     * Whether the template arguments opening at {@code open} are followed by {@code ::}.
+     */
+    private static boolean isQualifierArguments(PsiElement open) {
+        int level = 0;
+        for (PsiElement child = open; child != null; child = child.getNextSibling()) {
+            if (child instanceof PsiWhiteSpace || child instanceof PsiComment || child.getNode() == null) {
+                continue;
+            }
+            IElementType type = child.getNode().getElementType();
+            level += type == CPsiTokens.LT ? 1 : type == CPsiTokens.GT ? -1 : type == CPsiTokens.GTGT ? -2 : 0;
+            if (level <= 0) {
+                PsiElement next = child.getNextSibling();
+                while (next instanceof PsiWhiteSpace || next instanceof PsiComment) {
+                    next = next.getNextSibling();
+                }
+                return level == 0 && next != null && next.getNode().getElementType() == CPsiTokens.DOUBLE_COLON;
+            }
+        }
+        return false;
     }
 
     private static void add(PsiElement element, CNameResolver.NameChain chain, Set<CDeclarationKind> kinds, List<PsiReference> references) {

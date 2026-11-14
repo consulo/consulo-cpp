@@ -156,7 +156,11 @@ public final class CTypes {
         if (expression instanceof CPsiCastExpression || expression instanceof CPsiNewExpression) {
             CPsiTypeRef typeRef = CDeclarations.childOfType(expression, CPsiTypeRef.class);
             if (typeRef == null) {
-                return CType.UNKNOWN;
+                // geom::Vec{k, k}: a construction named by a reference
+                PsiElement first = expression.getFirstChild();
+                PsiElement type = first instanceof CPsiReferenceExpression ? CNameResolver.resolveFirst(first) : null;
+                PsiElement scope = type != null && CDeclarations.kindOf(type) == CDeclarationKind.TYPE ? CNameResolver.scopeOf(type) : null;
+                return scope == null ? CType.UNKNOWN : CType.of(scope, List.of());
             }
             CType type = typeOfTypeRef(typeRef, next);
             int pointers = type.pointers() + countPointers(expression) + (expression instanceof CPsiNewExpression ? 1 : 0);
@@ -364,6 +368,9 @@ public final class CTypes {
             PsiElement scope = CNameResolver.scopeOf(target);
             return scope != null ? CType.of(scope, List.of()) : declaredTypeOfAlias(target, depth);
         }
+        if (kind == CDeclarationKind.VARIABLE) {
+            return callOfValue(target, callee, depth);
+        }
         if (kind != CDeclarationKind.FUNCTION) {
             return CType.UNKNOWN;
         }
@@ -426,6 +433,61 @@ public final class CTypes {
         return CType.UNKNOWN;
     }
 
+    /**
+     * What calling a variable gives: the result of the lambda it holds, or what the {@code operator()} of its class
+     * returns - {@code std::function<Vec(double)>} gives a {@code Vec}.
+     */
+    private static CType callOfValue(PsiElement variable, PsiElement callee, int depth) {
+        PsiElement initializer = initializerOf(variable);
+        if (initializer instanceof CPsiCallExpression lambda && CDeclarations.childOfType(lambda, CPsiParameterList.class) != null) {
+            return lambdaResult(lambda, depth);
+        }
+        CType value = substitute(declaredType(variable, depth), variable, receiverType(callee, depth));
+        if (!value.isClass()) {
+            return CType.UNKNOWN;
+        }
+        return operatorResult(value, CPsiTokens.LPARENTH, depth).withReference(false);
+    }
+
+    /**
+     * What a lambda returns: its trailing return type, or what its first {@code return} returns.
+     */
+    private static CType lambdaResult(PsiElement lambda, int depth) {
+        boolean afterArrow = false;
+        for (PsiElement child = lambda.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child.getNode().getElementType() == CPsiTokens.ARROW) {
+                afterArrow = true;
+            }
+            else if (afterArrow && child instanceof CPsiTypeRef typeRef) {
+                return typeOfTypeRef(typeRef, depth + 1);
+            }
+            else if (child instanceof CPsiCodeBlock body) {
+                CPsiReturnStatement statement = firstReturn(body);
+                return statement == null ? CType.of(Builtin.VOID) : typeOf(firstExpression(statement), depth + 1).withReference(false);
+            }
+        }
+        return CType.UNKNOWN;
+    }
+
+    /**
+     * The first {@code return} of a body, not of a lambda inside it.
+     */
+    private static @Nullable CPsiReturnStatement firstReturn(PsiElement element) {
+        for (PsiElement child = element.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (child instanceof CPsiReturnStatement statement) {
+                return statement;
+            }
+            if (child instanceof CPsiCallExpression && CDeclarations.childOfType(child, CPsiParameterList.class) != null) {
+                continue;
+            }
+            CPsiReturnStatement nested = child.getFirstChild() == null ? null : firstReturn(child);
+            if (nested != null) {
+                return nested;
+            }
+        }
+        return null;
+    }
+
     private static CType returnType(PsiElement function, PsiElement call, @Nullable CType receiver, int depth) {
         CType returned = substitute(declaredType(function, depth), function, receiver);
         List<CType> explicit = explicitTemplateArguments(call.getFirstChild(), depth);
@@ -443,6 +505,13 @@ public final class CTypes {
         PsiElement operator = expression.getFirstChild();
         CType operand = typeOf(firstExpression(expression), depth);
         IElementType type = operator == null ? null : operator.getNode().getElementType();
+        if (type != null && operand.isClass()) {
+            // -v, *it, ++it of a class: its operator
+            CType overloaded = overloadedOperator(operand, null, type, depth);
+            if (!overloaded.isUnknown()) {
+                return overloaded.withReference(false);
+            }
+        }
         if (type == CPsiTokens.ASTERISK) {
             return operand.dereferenced();
         }
@@ -468,8 +537,11 @@ public final class CTypes {
         }
         CType left = typeOf(operands.get(0), depth).withReference(false);
         CType right = typeOf(operands.get(1), depth).withReference(false);
-        if (left.isClass() || right.isClass() || left.isUnknown() || right.isUnknown()) {
-            // an overloaded operator - a stream's <<, a vector's + - is not known
+        if (left.isClass() || right.isClass()) {
+            // a + b of classes: the operator of the left one, or one of their namespace taking either
+            return overloadedOperator(left, right, type, depth).withReference(false);
+        }
+        if (left.isUnknown() || right.isUnknown()) {
             return CType.UNKNOWN;
         }
         if (COMPARISONS.contains(type)) {
@@ -488,6 +560,66 @@ public final class CTypes {
             return promoted(left);
         }
         return left.isArithmeticValue() && right.isArithmeticValue() ? usualArithmetic(left, right) : CType.UNKNOWN;
+    }
+
+    /**
+     * What an operator of classes returns: a member of the left operand's class, {@code Vec::operator+=}, or a function of
+     * the namespace of either class taking it, {@code operator+(const Vec&, const Vec&)}; unknown for one not found - the
+     * {@code <<} of a stream, declared in headers apart.
+     */
+    private static CType overloadedOperator(CType left, @Nullable CType right, IElementType symbol, int depth) {
+        if (depth > MAX_DEPTH) {
+            return CType.UNKNOWN;
+        }
+        if (left.isClass()) {
+            PsiElement scope = CNameResolver.scopeOf(left.declaration());
+            PsiElement member = scope == null ? null : operatorOf(scope, symbol, 0);
+            if (member != null) {
+                return substitute(declaredType(member, depth + 1), member, left);
+            }
+        }
+        for (CType operand : right == null ? List.of(left) : List.of(left, right)) {
+            if (!operand.isClass()) {
+                continue;
+            }
+            PsiElement aggregate = CNameResolver.scopeOf(operand.declaration());
+            PsiElement function = aggregate == null ? null : freeOperatorOf(aggregate, symbol, depth);
+            if (function != null) {
+                return declaredType(function, depth + 1);
+            }
+        }
+        return CType.UNKNOWN;
+    }
+
+    /**
+     * An operator function beside a class - in the namespace or the file it is declared in - taking it as one of its
+     * parameters.
+     */
+    private static @Nullable PsiElement freeOperatorOf(PsiElement aggregate, IElementType symbol, int depth) {
+        PsiElement container = aggregate.getParent();
+        while (container instanceof CPsiAccessorOwner) {
+            container = container.getParent();
+        }
+        if (container == null) {
+            return null;
+        }
+        for (PsiElement child = container.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (!(child instanceof CPsiDeclarationMethod)) {
+                continue;
+            }
+            var keyword = child.getNode().findChildByType(CPsiTokens.OPERATOR_KEYWORD);
+            PsiElement next = keyword == null ? null : nextSignificant(keyword.getPsi());
+            if (next == null || next.getNode().getElementType() != symbol) {
+                continue;
+            }
+            for (PsiElement parameter : parametersOf(child)) {
+                CType type = declaredType(parameter, depth + 1);
+                if (type.declaration() != null && aggregate.getManager().areElementsEquivalent(CNameResolver.scopeOf(type.declaration()), aggregate)) {
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -558,17 +690,36 @@ public final class CTypes {
     private static CType bindingType(PsiElement variable, int index, int depth) {
         PsiElement initializer = initializerOf(variable);
         if (initializer != null) {
-            return argument(typeOf(initializer, depth), index);
+            return bound(typeOf(initializer, depth), index, depth);
         }
         PsiElement range = rangeOf(variable);
         if (range == null) {
             return CType.UNKNOWN;
         }
-        return argument(elementOf(typeOf(range, depth), depth), index);
+        return bound(elementOf(typeOf(range, depth), depth), index, depth);
     }
 
-    private static CType argument(CType type, int index) {
-        return type.isClass() && index < type.arguments().size() ? type.arguments().get(index) : CType.UNKNOWN;
+    /**
+     * The {@code index}th part of a value taken apart: of a struct its field - {@code first} and {@code second} of a
+     * {@code pair} - of a class without fields, {@code tuple}, its template argument.
+     */
+    private static CType bound(CType type, int index, int depth) {
+        if (!type.isClass()) {
+            return CType.UNKNOWN;
+        }
+        PsiElement scope = CNameResolver.scopeOf(type.declaration());
+        if (scope != null) {
+            List<PsiElement> fields = new ArrayList<>();
+            for (PsiElement member : CDeclarations.ownMembersOf(scope)) {
+                if (CDeclarations.kindOf(member) == CDeclarationKind.VARIABLE && !CDeclarations.isStatic(member)) {
+                    fields.add(member);
+                }
+            }
+            if (index < fields.size()) {
+                return substitute(declaredType(fields.get(index), depth + 1), fields.get(index), type);
+            }
+        }
+        return index < type.arguments().size() ? type.arguments().get(index) : CType.UNKNOWN;
     }
 
     private static @Nullable PsiElement initializerOf(PsiElement variable) {
@@ -621,14 +772,9 @@ public final class CTypes {
         if (range.pointers() == 0 && range.isClass()) {
             PsiElement scope = CNameResolver.scopeOf(range.declaration());
             if (scope != null) {
-                for (PsiElement member : CDeclarations.ownMembersOf(scope)) {
-                    if ("value_type".equals(CDeclarations.introducedName(member)) && CDeclarations.isTypeAlias(member)) {
-                        CType element = substitute(declaredTypeOfAlias(member, depth + 1), member, range);
-                        if (!element.isUnknown() && !element.isTemplateParameter()) {
-                            return element;
-                        }
-                        break;
-                    }
+                CType element = substitute(valueTypeOf(scope, depth), CTemplates.parametersOf(scope), range.arguments(), 0);
+                if (!element.isUnknown() && !element.isTemplateParameter()) {
+                    return element;
                 }
             }
             if (!range.arguments().isEmpty()) {
@@ -688,6 +834,8 @@ public final class CTypes {
                 return argument.withPointers(Math.max(0, argument.pointers() + pointers));
             }
             CType aliased = declaredTypeOfAlias(target, depth);
+            // std::list<Vec>::iterator: the alias as a member of list<Vec>
+            aliased = substitute(aliased, target, qualifierType(typeRef, depth));
             List<CTemplates.Parameter> parameters = CTemplates.parametersOf(target);
             if (!parameters.isEmpty() && !aliased.isUnknown()) {
                 // an alias template, template<typename T> using Ptr = T*; - Ptr<int> is int*
@@ -702,6 +850,53 @@ public final class CTypes {
             return CType.of(CScopes.definitionOf(target, typeRef.getContainingFile()), templateArguments(typeRef, depth));
         }
         return CType.UNKNOWN;
+    }
+
+    /**
+     * The class with its arguments a type reference names a member of, {@code list<Vec>} of
+     * {@code std::list<Vec>::iterator}; {@code null} without one.
+     */
+    private static @Nullable CType qualifierType(CPsiTypeRef typeRef, int depth) {
+        List<PsiElement> tokens = new ArrayList<>();
+        for (PsiElement child = typeRef.getFirstChild(); child != null; child = child.getNextSibling()) {
+            if (!(child instanceof PsiWhiteSpace) && !(child instanceof PsiComment)) {
+                tokens.add(child);
+            }
+        }
+        CType found = null;
+        List<PsiElement> names = new ArrayList<>();
+        for (int i = 0; i < tokens.size(); i++) {
+            IElementType type = tokens.get(i).getNode().getElementType();
+            if (type == CPsiTokens.IDENTIFIER) {
+                names.add(tokens.get(i));
+            }
+            else if (type == CPsiTokens.LT && !names.isEmpty()) {
+                int level = 0;
+                int close = -1;
+                for (int j = i; j < tokens.size(); j++) {
+                    IElementType inner = tokens.get(j).getNode().getElementType();
+                    level += inner == CPsiTokens.LT ? 1 : inner == CPsiTokens.GT ? -1 : inner == CPsiTokens.GTGT ? -2 : 0;
+                    if (level <= 0) {
+                        close = j;
+                        break;
+                    }
+                }
+                if (close < 0 || close + 1 >= tokens.size() || tokens.get(close + 1).getNode().getElementType() != CPsiTokens.DOUBLE_COLON) {
+                    return found;
+                }
+                List<PsiElement> targets = CNameResolver.resolveChainTargets(typeRef, new CNameResolver.NameChain(List.copyOf(names), false), CDeclarationKind.TYPES);
+                PsiElement scope = targets.isEmpty() ? null : CNameResolver.scopeOf(targets.get(0));
+                if (scope != null) {
+                    found = CType.of(CScopes.definitionOf(scope, typeRef.getContainingFile()),
+                        templateArguments(typeRef, tokens.subList(i, close + 1), depth + 1));
+                }
+                i = close;
+            }
+            else if (type != CPsiTokens.DOUBLE_COLON) {
+                names.clear();
+            }
+        }
+        return found;
     }
 
     /**
@@ -835,10 +1030,63 @@ public final class CTypes {
         if (owner == null) {
             return CType.UNKNOWN;
         }
-        for (PsiElement member : CDeclarations.ownMembersOf(owner)) {
-            if ("value_type".equals(CDeclarations.introducedName(member)) && CDeclarations.isTypeAlias(member)) {
-                CType valueType = declaredTypeOfAlias(member, depth + 1);
-                return valueType.isUnknown() || reference ? valueType : valueType.withPointers(valueType.pointers() + 1);
+        CType valueType = valueTypeOf(owner, depth);
+        return valueType.isUnknown() || reference ? valueType : valueType.withPointers(valueType.pointers() + 1);
+    }
+
+    private static boolean isParameterOf(CType type, PsiElement template) {
+        for (CTemplates.Parameter parameter : CTemplates.parametersOf(template)) {
+            if (parameter.name() == type.declaration()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * The {@code value_type} of a container, in the terms of its template parameters; for one taking it from its
+     * implementation - {@code unordered_map} from {@code _Hashtable} - the {@code pair} of its {@code key_type} and its
+     * {@code mapped_type}.
+     */
+    private static CType valueTypeOf(PsiElement container, int depth) {
+        PsiElement valueType = null;
+        PsiElement keyType = null;
+        PsiElement mappedType = null;
+        for (PsiElement member : CDeclarations.ownMembersOf(container)) {
+            if (!CDeclarations.isTypeAlias(member)) {
+                continue;
+            }
+            String name = CDeclarations.introducedName(member);
+            if ("value_type".equals(name)) {
+                valueType = member;
+            }
+            else if ("key_type".equals(name)) {
+                keyType = member;
+            }
+            else if ("mapped_type".equals(name)) {
+                mappedType = member;
+            }
+        }
+        CType type = valueType == null ? CType.UNKNOWN : declaredTypeOfAlias(valueType, depth + 1);
+        if (type.isTemplateParameter() && !isParameterOf(type, container)) {
+            // _Value of the _Hashtable it is taken from: not in terms of this container
+            type = CType.UNKNOWN;
+        }
+        if (!type.isUnknown() || keyType == null || mappedType == null) {
+            return type;
+        }
+        CType key = declaredTypeOfAlias(keyType, depth + 1);
+        CType mapped = declaredTypeOfAlias(mappedType, depth + 1);
+        List<CTemplates.Parameter> parameters = CTemplates.parametersOf(container);
+        if (parameters.size() >= 2 && (!isParameterOf(key, container) || !isParameterOf(mapped, container))) {
+            // they too are the implementation's: a map is of its first two parameters, the key and the value
+            key = CType.of(parameters.get(0).name(), List.of());
+            mapped = CType.of(parameters.get(1).name(), List.of());
+        }
+        for (PsiElement pair : CNameResolver.resolveUnqualified(container, "pair", CDeclarationKind.TYPES)) {
+            PsiElement scope = CNameResolver.scopeOf(pair);
+            if (scope != null) {
+                return CType.of(CScopes.definitionOf(scope, container.getContainingFile()), List.of(key, mapped));
             }
         }
         return CType.UNKNOWN;
@@ -966,7 +1214,8 @@ public final class CTypes {
         List<PsiElement> head = new ArrayList<>();
         for (PsiElement token : tokens) {
             IElementType type = token.getNode().getElementType();
-            if (type == CPsiTokens.LT) {
+            if (type == CPsiTokens.LT || type == CPsiTokens.LPARENTH) {
+                // the arguments of a template, the parameters of a function type, Vec(double)
                 break;
             }
             head.add(token);

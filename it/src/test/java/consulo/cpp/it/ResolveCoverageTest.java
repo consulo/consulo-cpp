@@ -79,7 +79,7 @@ public class ResolveCoverageTest {
 
     @Test
     public void modernCpp(Application application, ProjectManager projectManager) throws Exception {
-        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp"));
+        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp"));
     }
 
     @Test
@@ -123,6 +123,7 @@ public class ResolveCoverageTest {
 
         Map<String, List<Integer>> unresolved = new TreeMap<>();
         int[] total = new int[1];
+        int[] dependent = new int[1];
         ReadAction.run(() -> {
             PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
             assertNotNull(psiFile);
@@ -134,7 +135,11 @@ public class ResolveCoverageTest {
                 for (PsiElement element : elements) {
                     for (PsiReference reference : element.getReferences()) {
                         total[0]++;
-                        if (!isResolved(reference)) {
+                        if (!isResolved(reference) && isDependent(reference)) {
+                            // value.length() of a const T& value: known once the template is used, not before
+                            dependent[0]++;
+                        }
+                        else if (!isResolved(reference)) {
                             int offset = element.getTextRange().getStartOffset() + reference.getRangeInElement().getStartOffset();
                             int line = (int) text.substring(0, Math.min(offset, text.length())).chars().filter(c -> c == '\n').count() + 1;
                             unresolved.computeIfAbsent(reference.getCanonicalText(), key -> new ArrayList<>()).add(line);
@@ -160,7 +165,8 @@ public class ResolveCoverageTest {
         });
 
         int missing = unresolved.values().stream().mapToInt(List::size).sum();
-        System.out.println("COVERAGE " + file.getName() + ": " + (total[0] - missing) + " of " + total[0] + " references resolve");
+        System.out.println("COVERAGE " + file.getName() + ": " + (total[0] - missing - dependent[0]) + " of " + total[0] + " references resolve, "
+            + dependent[0] + " are members of a template parameter");
         assertTrue(total[0] > 0, file.getName() + " has references");
         List<String> failures = new ArrayList<>();
         unresolved.forEach((name, lines) -> failures.add(file.getName() + ": " + name + " at lines " + lines));
@@ -200,6 +206,18 @@ public class ResolveCoverageTest {
             }
         }
         return false;
+    }
+
+    /**
+     * Whether a reference is a member of a value whose type is a template parameter, {@code length} of
+     * {@code value.length()} for a {@code const T& value}.
+     */
+    private static boolean isDependent(PsiReference reference) {
+        if (!(reference.getElement() instanceof consulo.cpp.lang.psi.CPsiReferenceExpression expression)) {
+            return false;
+        }
+        consulo.cpp.lang.psi.resolve.CType receiver = consulo.cpp.lang.psi.resolve.CTypes.receiverOf(expression);
+        return receiver != null && receiver.isTemplateParameter();
     }
 
     private static boolean isResolved(PsiReference reference) {

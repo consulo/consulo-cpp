@@ -96,13 +96,20 @@ public final class CDeclarations {
         if (element instanceof CPsiDeclarationMethod) {
             return CDeclarationKind.FUNCTION;
         }
-        if (isAggregate(element) || isTypeAlias(element)) {
+        if (isAggregate(element) || isTypeAlias(element) || isConcept(element)) {
             return CDeclarationKind.TYPE;
         }
         if (element instanceof CPsiNamespaceDeclaration) {
             return CDeclarationKind.NAMESPACE;
         }
         return null;
+    }
+
+    /**
+     * {@code template <typename T> concept HasLength = ...;}: named where a type is, {@code template <HasLength T>}.
+     */
+    public static boolean isConcept(PsiElement element) {
+        return element instanceof CPsiDeclaration && element.getNode().findChildByType(CPsiTokens.CONCEPT_KEYWORD) != null;
     }
 
     /**

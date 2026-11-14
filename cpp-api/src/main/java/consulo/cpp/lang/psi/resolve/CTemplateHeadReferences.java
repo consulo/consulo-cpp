@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The references of the names in the default arguments of template heads - {@code less} and {@code T} of
- * {@code template <typename T, typename Compare = less<T>>}. A head is tokens of the file, the namespace or the class
- * around the declaration it is of, so the references are that element's, looked up from the declaration, where the
- * head's parameters are visible.
+ * The references of the names in template heads - {@code less} and {@code T} of
+ * {@code template <typename T, typename Compare = less<T>>}, the concept of {@code template <HasLength T>}. A head is
+ * tokens of the file, the namespace or the class around the declaration it is of, so the references are that
+ * element's, looked up from the declaration, where the head's parameters are visible.
  *
  * @author VISTALL
  * @since 2026-11-14
@@ -69,18 +69,16 @@ public final class CTemplateHeadReferences {
     }
 
     /**
-     * Adds the references of the defaults of the head at {@code keyword}; the last token of the head, {@code null} when
-     * it does not end.
+     * Adds the references of the names of the head at {@code keyword}; the last token of the head, {@code null} when it
+     * does not end.
      */
     private static @Nullable PsiElement head(PsiElement container, PsiElement keyword, List<PsiReference> references) {
         PsiElement open = next(keyword);
         if (open == null || open.getNode().getElementType() != CPsiTokens.LT) {
             return keyword;
         }
-        List<List<PsiElement>> chains = new ArrayList<>();
-        List<Boolean> globals = new ArrayList<>();
-        List<PsiElement> segments = new ArrayList<>();
-        boolean global = false;
+        List<CNameResolver.NameChain> chains = new ArrayList<>();
+        Chain chain = new Chain();
         boolean inDefault = false;
         boolean skipChain = false;
         int depth = 0;
@@ -93,14 +91,11 @@ public final class CTemplateHeadReferences {
             }
             IElementType type = element.getNode().getElementType();
             if (type == CPsiTokens.IDENTIFIER) {
-                if (inDefault && !skipChain) {
-                    if (previous != CPsiTokens.DOUBLE_COLON && !segments.isEmpty()) {
-                        chains.add(List.copyOf(segments));
-                        globals.add(global);
-                        segments.clear();
-                        global = false;
+                if (!skipChain && depth >= 1) {
+                    if (previous != CPsiTokens.DOUBLE_COLON) {
+                        chain.flush(type, chains);
                     }
-                    segments.add(element);
+                    chain.add(element, inDefault, depth);
                 }
             }
             else if (type == CPsiTokens.DOUBLE_COLON) {
@@ -109,16 +104,11 @@ public final class CTemplateHeadReferences {
                     skipChain = true;
                 }
                 else if (previous != CPsiTokens.IDENTIFIER) {
-                    global = true;
+                    chain.global = true;
                 }
             }
             else {
-                if (!segments.isEmpty()) {
-                    chains.add(List.copyOf(segments));
-                    globals.add(global);
-                    segments.clear();
-                }
-                global = false;
+                chain.flush(type, chains);
                 skipChain = type == CPsiTokens.DOT || type == CPsiTokens.ARROW;
                 if (type == CPsiTokens.LT || type == CPsiTokens.LPARENTH) {
                     depth++;
@@ -147,12 +137,40 @@ public final class CTemplateHeadReferences {
         }
         PsiElement declaration = declarationAfter(end);
         if (declaration != null) {
-            for (int i = 0; i < chains.size(); i++) {
-                CRawNameReferences.addChainAt(container, new CNameResolver.NameChain(chains.get(i), globals.get(i)), KINDS, declaration,
-                    references);
+            for (CNameResolver.NameChain found : chains) {
+                CRawNameReferences.addChainAt(container, found, KINDS, declaration, references);
             }
         }
         return end;
+    }
+
+    /**
+     * The names of a head being read: one is a reference in a default, in the arguments of a constraint, or as the
+     * constraint or the type of a parameter - {@code HasLength} of {@code HasLength T}, {@code size_t} of
+     * {@code std::size_t N} - not as the name of a parameter.
+     */
+    private static final class Chain {
+        final List<PsiElement> segments = new ArrayList<>();
+        boolean global;
+        boolean inDefault;
+        int depth;
+
+        void add(PsiElement identifier, boolean inDefault, int depth) {
+            if (segments.isEmpty()) {
+                this.inDefault = inDefault;
+                this.depth = depth;
+            }
+            segments.add(identifier);
+        }
+
+        void flush(IElementType next, List<CNameResolver.NameChain> chains) {
+            if (!segments.isEmpty()
+                && (inDefault || depth >= 2 || next == CPsiTokens.IDENTIFIER || next == CPsiTokens.ELLIPSIS || next == CPsiTokens.LT)) {
+                chains.add(new CNameResolver.NameChain(List.copyOf(segments), global));
+            }
+            segments.clear();
+            global = false;
+        }
     }
 
     /**

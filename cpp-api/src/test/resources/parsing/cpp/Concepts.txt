@@ -1,0 +1,94 @@
+FILE
+  PsiElement(TEMPLATE_KEYWORD)('template')
+  PsiWhiteSpace(' ')
+  PsiElement(LT)('<')
+  PsiElement(TYPENAME_KEYWORD)('typename')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('T')
+  PsiElement(GT)('>')
+  PsiWhiteSpace('\n')
+  CPsiDeclarationImpl: concept HasLength = requires(const T& t) { t.length(); };
+    PsiElement(CONCEPT_KEYWORD)('concept')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('HasLength')
+    PsiWhiteSpace(' ')
+    PsiElement(EQ)('=')
+    PsiWhiteSpace(' ')
+    CPsiCallExpressionImpl: requires(const T& t) { t.length(); }
+      PsiElement(REQUIRES_KEYWORD)('requires')
+      CPsiParameterListImpl: (const T& t)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: const T& t
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: T
+            PsiElement(IDENTIFIER)('T')
+          PsiElement(AND)('&')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('t')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace(' ')
+      CPsiCallExpressionImpl: t.length()
+        CPsiReferenceExpressionImpl: t.length
+          CPsiReferenceExpressionImpl: t
+            PsiElement(IDENTIFIER)('t')
+          PsiElement(DOT)('.')
+          PsiElement(IDENTIFIER)('length')
+        CPsiArgumentListImpl: ()
+          PsiElement(LPARENTH)('(')
+          PsiElement(RPARENTH)(')')
+      PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n\n')
+  PsiElement(TEMPLATE_KEYWORD)('template')
+  PsiWhiteSpace(' ')
+  PsiElement(LT)('<')
+  PsiElement(IDENTIFIER)('HasLength')
+  PsiWhiteSpace(' ')
+  PsiElement(IDENTIFIER)('T')
+  PsiElement(GT)('>')
+  PsiWhiteSpace('\n')
+  CPsiImplementingMethodImpl: double measure(const T& value) { return value.length(); }
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: double
+      PsiElement(DOUBLE_KEYWORD)('double')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('measure')
+    CPsiParameterListImpl: (const T& value)
+      PsiElement(LPARENTH)('(')
+      CPsiParameterImpl: const T& value
+        CPsiModifierListImpl: const
+          PsiElement(CONST_KEYWORD)('const')
+        PsiWhiteSpace(' ')
+        CPsiTypeRefImpl: T
+          PsiElement(IDENTIFIER)('T')
+        PsiElement(AND)('&')
+        PsiWhiteSpace(' ')
+        PsiElement(IDENTIFIER)('value')
+      PsiElement(RPARENTH)(')')
+    PsiWhiteSpace(' ')
+    CPsiCodeBlockImpl: { return value.length(); }
+      PsiElement(LBRACE)('{')
+      PsiWhiteSpace(' ')
+      CPsiReturnStatementImpl: return value.length();
+        PsiElement(RETURN_KEYWORD)('return')
+        PsiWhiteSpace(' ')
+        CPsiCallExpressionImpl: value.length()
+          CPsiReferenceExpressionImpl: value.length
+            CPsiReferenceExpressionImpl: value
+              PsiElement(IDENTIFIER)('value')
+            PsiElement(DOT)('.')
+            PsiElement(IDENTIFIER)('length')
+          CPsiArgumentListImpl: ()
+            PsiElement(LPARENTH)('(')
+            PsiElement(RPARENTH)(')')
+        PsiElement(SEMICOLON)(';')
+      PsiWhiteSpace(' ')
+      PsiElement(RBRACE)('}')
+  PsiWhiteSpace('\n')

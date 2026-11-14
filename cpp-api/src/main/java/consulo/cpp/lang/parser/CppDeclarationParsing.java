@@ -807,6 +807,7 @@ public class CppDeclarationParsing extends CDeclarationParsing {
             }
             else if (isContextualKeyword("requires")) {
                 // void f(T) requires C<T>;
+                myBuilder.remapCurrentToken(REQUIRES_KEYWORD);
                 advance();
                 parseConstraint();
             }
@@ -1058,6 +1059,7 @@ public class CppDeclarationParsing extends CDeclarationParsing {
         }
         if (isContextualKeyword("requires")) {
             // template<typename T> requires C<T> ...
+            myBuilder.remapCurrentToken(REQUIRES_KEYWORD);
             advance();
             parseConstraint();
         }
@@ -1079,6 +1081,7 @@ public class CppDeclarationParsing extends CDeclarationParsing {
      */
     private void parseConcept() {
         PsiBuilder.Marker marker = mark();
+        myBuilder.remapCurrentToken(CONCEPT_KEYWORD);
         advance();
         expect(IDENTIFIER, CLocalize.identifierExpected());
         if (expect(EQ, CLocalize.eqExpected())) {

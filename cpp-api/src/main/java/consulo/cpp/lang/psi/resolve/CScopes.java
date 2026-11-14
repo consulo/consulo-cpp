@@ -89,10 +89,17 @@ public final class CScopes {
     }
 
     /**
-     * A lambda, {@code [&](int arg) { ... }}: its parameters, to its body.
+     * A lambda, {@code [&](int arg) { ... }}: its parameters, to its body; a requires-expression: its parameters, to its
+     * requirements.
      */
     public static boolean processLambda(PsiElement lambda, PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent) {
-        if (!(lastParent instanceof CPsiCodeBlock) || lastParent.getParent() != lambda) {
+        if (lastParent == null || lastParent.getParent() != lambda || lastParent instanceof CPsiParameterList) {
+            return true;
+        }
+        // requires (const T& t) { t.length(); }: the parameters to the requirements
+        PsiElement first = lambda.getFirstChild();
+        boolean requires = first != null && first.getNode().getElementType() == CPsiTokens.REQUIRES_KEYWORD;
+        if (!requires && !(lastParent instanceof CPsiCodeBlock)) {
             return true;
         }
         CPsiParameterList parameterList = CDeclarations.childOfType(lambda, CPsiParameterList.class);
