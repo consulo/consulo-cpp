@@ -16,6 +16,10 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import consulo.language.psi.PsiReference;
+import java.util.List;
+import java.util.ArrayList;
+import consulo.cpp.lang.psi.resolve.CTemplateHeadReferences;
 import consulo.language.ast.ASTNode;
 import org.jetbrains.annotations.NotNull;
 import consulo.cpp.lang.psi.CPsiAccessorOwner;
@@ -28,4 +32,14 @@ public class CPsiAccessorOwnerImpl extends CPsiElementBaseImpl implements CPsiAc
 	public CPsiAccessorOwnerImpl(@NotNull ASTNode node) {
 		super(node);
 	}
+
+    /**
+     * The references of the defaults of the heads of its member templates.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        List<PsiReference> references = new ArrayList<>();
+        CTemplateHeadReferences.addDefaults(this, references);
+        return references.toArray(PsiReference.EMPTY_ARRAY);
+    }
 }

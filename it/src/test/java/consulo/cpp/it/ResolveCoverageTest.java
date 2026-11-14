@@ -62,7 +62,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 /**
  * How much of everyday C and C++ files resolves - the standard library, classes, templates, lambdas - in a module set up as
  * an import sets one up: the macros and include directories of g++ or gcc, the include directories as a library. Reports the
- * references which resolve to nothing, by name, to show where resolve falls short; there should be none.
+ * references which resolve to nothing, and the names no reference covers, to show where resolve falls short; there
+ * should be none.
  *
  * @author VISTALL
  * @since 2026-11-14
@@ -127,7 +128,10 @@ public class ResolveCoverageTest {
             assertNotNull(psiFile);
             String text = psiFile.getText();
             for (PsiFile root : psiFile.getViewProvider().getAllFiles()) {
-                for (PsiElement element : PsiTreeUtil.findChildrenOfType(root, PsiElement.class)) {
+                List<PsiElement> elements = new ArrayList<>(PsiTreeUtil.findChildrenOfType(root, PsiElement.class));
+                // the file has references too: the defaults of its template heads
+                elements.add(root);
+                for (PsiElement element : elements) {
                     for (PsiReference reference : element.getReferences()) {
                         total[0]++;
                         if (!isResolved(reference)) {
@@ -154,12 +158,13 @@ public class ResolveCoverageTest {
                 unreferenced.computeIfAbsent(leaf.getText(), key -> new ArrayList<>()).add(line);
             }
         });
-        unreferenced.forEach((name, lines) -> System.out.println("COVERAGE no reference " + file.getName() + ": " + name + " at lines " + lines));
+
         int missing = unresolved.values().stream().mapToInt(List::size).sum();
         System.out.println("COVERAGE " + file.getName() + ": " + (total[0] - missing) + " of " + total[0] + " references resolve");
         assertTrue(total[0] > 0, file.getName() + " has references");
         List<String> failures = new ArrayList<>();
         unresolved.forEach((name, lines) -> failures.add(file.getName() + ": " + name + " at lines " + lines));
+        unreferenced.forEach((name, lines) -> failures.add(file.getName() + ": " + name + " at lines " + lines + " has no reference"));
         failures.forEach(failure -> System.out.println("COVERAGE unresolved " + failure));
         return failures;
     }
@@ -186,7 +191,8 @@ public class ResolveCoverageTest {
      */
     private static boolean isReferenced(PsiElement identifier) {
         int offset = identifier.getTextRange().getStartOffset();
-        for (PsiElement parent = identifier.getParent(); parent != null && !(parent instanceof PsiFile); parent = parent.getParent()) {
+        // as a lookup of the reference at an offset does: the elements around it, and the file
+        for (PsiElement parent = identifier.getParent(); parent != null; parent = parent instanceof PsiFile ? null : parent.getParent()) {
             for (PsiReference reference : parent.getReferences()) {
                 if (reference.getRangeInElement().shiftRight(parent.getTextRange().getStartOffset()).containsOffset(offset)) {
                     return true;

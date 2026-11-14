@@ -22,6 +22,7 @@ import consulo.cpp.lang.psi.resolve.CDeclarationKind;
 import consulo.cpp.lang.psi.resolve.CDeclarations;
 import consulo.cpp.lang.psi.resolve.CNameChainReference;
 import consulo.cpp.lang.psi.resolve.CNameResolver;
+import consulo.cpp.lang.psi.resolve.CReferenceBase;
 import consulo.cpp.lang.psi.resolve.CReferenceExpressionReference;
 import consulo.cpp.preprocessor.CPreprocessorLanguage;
 import consulo.cpp.preprocessor.psi.impl.CMacroReferenceResolver;
@@ -33,9 +34,12 @@ import consulo.cpp.preprocessor.psi.CPreprocessorUndefDirective;
 import consulo.cpp.preprocessor.psi.CPsiSharpDefineValue;
 import consulo.document.util.TextRange;
 import consulo.language.psi.PsiElement;
+import consulo.language.psi.PsiReference;
 import org.jspecify.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.regex.Pattern;
 
@@ -56,6 +60,29 @@ public final class CSemanticHighlighting {
      */
     @RequiredReadAction
     public static void highlight(PsiElement element, BiConsumer<TextRange, TextAttributesKey> sink) {
+        Set<TextRange> reported = new HashSet<>();
+        BiConsumer<TextRange, TextAttributesKey> tracking = (range, key) -> {
+            reported.add(range);
+            sink.accept(range, key);
+        };
+        highlightOwn(element, tracking);
+        // the names of its template arguments, its qualifiers, its initializers and captures: references of their own
+        for (PsiReference reference : element.getReferences()) {
+            if (!(reference instanceof CReferenceBase<?>)) {
+                continue;
+            }
+            TextRange range = reference.getRangeInElement().shiftRight(element.getTextRange().getStartOffset());
+            if (range.isEmpty() || reported.contains(range)) {
+                continue;
+            }
+            TextAttributesKey key = keyOf(reference.resolve(), true);
+            if (key != null) {
+                tracking.accept(range, key);
+            }
+        }
+    }
+
+    private static void highlightOwn(PsiElement element, BiConsumer<TextRange, TextAttributesKey> sink) {
         if (element instanceof CPreprocessorDefineDirective define) {
             // #define LIMIT 10: the name it defines
             PsiElement name = define.getNameIdentifier();

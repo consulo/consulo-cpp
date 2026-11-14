@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The references of names the parser leaves as tokens of the element around them: the members and bases of a
@@ -39,7 +40,12 @@ public final class CRawNameReferences {
     private enum Role {
         MEMBER_INITIALIZER,
         CAPTURE,
-        DESIGNATOR
+        DESIGNATOR,
+        /**
+         * A name chain looked up from a place of its own: a default argument of a template head, from the declaration the
+         * head is of
+         */
+        CHAIN
     }
 
     private CRawNameReferences() {
@@ -131,6 +137,22 @@ public final class CRawNameReferences {
         }
     }
 
+    /**
+     * The references of a name chain written as tokens of {@code element}, looked up from {@code place}: of each
+     * qualifier, then of the whole meaning {@code kinds}.
+     */
+    public static void addChainAt(PsiElement element, CNameResolver.NameChain chain, Set<CDeclarationKind> kinds, PsiElement place,
+                                  List<PsiReference> references) {
+        List<PsiElement> segments = chain.segments();
+        for (int i = 1; i <= segments.size(); i++) {
+            PsiElement last = segments.get(i - 1);
+            if (last.getTextLength() > 0) {
+                CNameResolver.NameChain prefix = new CNameResolver.NameChain(List.copyOf(segments.subList(0, i)), chain.global());
+                references.add(new CRawNameReference(element, last, Role.CHAIN, place, prefix, i == segments.size() ? kinds : CDeclarationKind.SCOPES));
+            }
+        }
+    }
+
     private static boolean isFollowedBy(PsiElement element, IElementType type) {
         PsiElement next = element.getNextSibling();
         while (next instanceof PsiWhiteSpace || next instanceof PsiComment) {
@@ -141,7 +163,7 @@ public final class CRawNameReferences {
 
     private static void add(PsiElement element, PsiElement name, Role role, PsiElement place, List<PsiReference> references) {
         if (name.getTextLength() > 0) {
-            references.add(new CRawNameReference(element, name, role, place));
+            references.add(new CRawNameReference(element, name, role, place, null, CDeclarationKind.ALL));
         }
     }
 
@@ -149,12 +171,17 @@ public final class CRawNameReferences {
         private final PsiElement myName;
         private final Role myRole;
         private final PsiElement myPlace;
+        private final CNameResolver.@Nullable NameChain myChain;
+        private final Set<CDeclarationKind> myKinds;
 
-        CRawNameReference(PsiElement element, PsiElement name, Role role, PsiElement place) {
+        CRawNameReference(PsiElement element, PsiElement name, Role role, PsiElement place, CNameResolver.@Nullable NameChain chain,
+                          Set<CDeclarationKind> kinds) {
             super(element, name.getTextRange().shiftLeft(element.getTextRange().getStartOffset()));
             myName = name;
             myRole = role;
             myPlace = place;
+            myChain = chain;
+            myKinds = kinds;
         }
 
         @Override
@@ -164,6 +191,7 @@ public final class CRawNameReferences {
                 case MEMBER_INITIALIZER -> memberInitializer(name);
                 case CAPTURE -> CNameResolver.resolveUnqualified(myPlace, name, CDeclarationKind.VARIABLES);
                 case DESIGNATOR -> designator(name);
+                case CHAIN -> myChain == null ? List.of() : CNameResolver.resolveChainTargets(myPlace, myChain, myKinds);
             };
         }
 

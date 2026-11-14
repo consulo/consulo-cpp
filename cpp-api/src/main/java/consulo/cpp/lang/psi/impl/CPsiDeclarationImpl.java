@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.ArrayList;
 import consulo.cpp.lang.psi.CPsiDeclarationMethod;
 import consulo.cpp.lang.psi.resolve.CRawNameReferences;
+import consulo.cpp.lang.psi.resolve.CTemplateHeadReferences;
 import consulo.cpp.lang.psi.resolve.CTemplateArgumentReferences;
 import consulo.language.ast.ASTNode;
 import consulo.language.psi.PsiElement;
@@ -74,8 +75,8 @@ public class CPsiDeclarationImpl extends CPsiNamedElementBaseImpl implements CPs
 	}
 
 	/**
-	 * Its own reference, those of the qualifiers of a using-declaration and of the names of a constructor's
-	 * initializers.
+	 * Its own reference, those of the qualifiers of a using-declaration, of the names of a constructor's initializers
+	 * and, of a class, of the defaults of its member templates.
 	 */
 	@Override
 	public PsiReference[] getReferences()
@@ -93,6 +94,11 @@ public class CPsiDeclarationImpl extends CPsiNamedElementBaseImpl implements CPs
 		if(this instanceof CPsiDeclarationMethod)
 		{
 			CRawNameReferences.addMemberInitializers(this, references);
+		}
+		if(CDeclarations.isAggregate(this))
+		{
+			// the defaults of the heads of its member templates
+			CTemplateHeadReferences.addDefaults(this, references);
 		}
 		return references.toArray(PsiReference.EMPTY_ARRAY);
 	}

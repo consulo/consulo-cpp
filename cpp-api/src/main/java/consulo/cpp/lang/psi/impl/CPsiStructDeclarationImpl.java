@@ -16,6 +16,10 @@
 
 package consulo.cpp.lang.psi.impl;
 
+import consulo.language.psi.PsiReference;
+import java.util.List;
+import java.util.ArrayList;
+import consulo.cpp.lang.psi.resolve.CTemplateHeadReferences;
 import org.jspecify.annotations.Nullable;
 
 import consulo.cpp.lang.psi.resolve.CScopes;
@@ -42,5 +46,15 @@ public class CPsiStructDeclarationImpl extends CPsiNamedElementBaseImpl implemen
     @Override
     public boolean processDeclarations(PsiScopeProcessor processor, ResolveState state, @Nullable PsiElement lastParent, PsiElement place) {
         return CScopes.processOwnerFromInside(this, processor, state, lastParent);
+    }
+
+    /**
+     * The references of the defaults of the heads of its member templates.
+     */
+    @Override
+    public PsiReference[] getReferences() {
+        List<PsiReference> references = new ArrayList<>();
+        CTemplateHeadReferences.addDefaults(this, references);
+        return references.toArray(PsiReference.EMPTY_ARRAY);
     }
 }
