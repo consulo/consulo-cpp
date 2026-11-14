@@ -1,0 +1,105 @@
+FILE
+  PsiElement(OUTER)('#define QT_VA_ARGS_CHOOSE(_1, _2, _3, _4, _5, _6, _7, _8, _9, N, ...) N')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_VA_ARGS_EXPAND(...) __VA_ARGS__ // Needed for MSVC')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_VA_ARGS_COUNT(...) QT_VA_ARGS_EXPAND(QT_VA_ARGS_CHOOSE(__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0))')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC) MACRO##_##ARGC')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO_IMP(MACRO, ARGC) QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC)')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO(MACRO, ...) QT_VA_ARGS_EXPAND(QT_OVERLOADED_MACRO_IMP(MACRO, QT_VA_ARGS_COUNT(__VA_ARGS__))(__VA_ARGS__))')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_DECLARE_EQUALITY_OPERATORS_HELPER(LeftType, RightType, Constexpr, Noexcept, ...) \\n    __VA_ARGS__ \\n    Constexpr int comparesEqual(LeftType const *lhs, RightType const *rhs) Noexcept;')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_DECLARE_ORDERING_HELPER_STRONG(LeftType, RightType, Constexpr, Noexcept, ...) \\n    __VA_ARGS__ \\n    Constexpr int compareThreeWay(LeftType const *lhs, RightType const *rhs) Noexcept;')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_DECLARE_ORDERING_OPERATORS_HELPER(OrderingType, LeftType, RightType, Constexpr, \\n                                             Noexcept, ...) \\n    QT_DECLARE_EQUALITY_OPERATORS_HELPER(LeftType, RightType, Constexpr, Noexcept, __VA_ARGS__) \\n    QT_DECLARE_ORDERING_HELPER_ ## OrderingType (LeftType, RightType, Constexpr, Noexcept, \\n                                                 __VA_ARGS__)')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE_1(Type) \\n    QT_DECLARE_ORDERING_OPERATORS_HELPER(STRONG, Type, Type, static, /* noexcept */, \\n                                         /* no attributes */)')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(...) \\n    QT_OVERLOADED_MACRO(QT_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE, __VA_ARGS__)')
+  PsiWhiteSpace('\n')
+  CPsiStructDeclarationImpl: struct latin {
+    char ch;
+};
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('latin')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n    ')
+    CPsiDeclarationFieldImpl: char ch;
+      CPsiModifierListImpl: 
+        <empty list>
+      CPsiTypeRefImpl: char
+        PsiElement(CHAR_KEYWORD)('char')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('ch')
+      PsiElement(SEMICOLON)(';')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
+  CPsiDeclarationMethodImpl: Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(struct latin)
+    CPsiModifierListImpl: Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(struct latin)
+      CPreprocessorMacroInvocation(Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE)('Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE(struct latin)')
+      ForeignLeaf(STATIC_KEYWORD: static)('static')
+    CPsiTypeRefImpl: 
+      ForeignLeaf(INT_KEYWORD: int)('int')
+    ForeignLeaf(IDENTIFIER: comparesEqual)('comparesEqual')
+    CPsiParameterListImpl: 
+      ForeignLeaf(LPARENTH: ()('(')
+      CPsiParameterImpl: 
+        CPsiTypeRefImpl: 
+          ForeignLeaf(STRUCT_KEYWORD: struct)('struct')
+          ForeignLeaf(IDENTIFIER: latin)('latin')
+        ForeignLeaf(CONST_KEYWORD: const)('const')
+        ForeignLeaf(ASTERISK: *)('*')
+        ForeignLeaf(IDENTIFIER: lhs)('lhs')
+      ForeignLeaf(COMMA: ,)(',')
+      CPsiParameterImpl: 
+        CPsiTypeRefImpl: 
+          ForeignLeaf(STRUCT_KEYWORD: struct)('struct')
+          ForeignLeaf(IDENTIFIER: latin)('latin')
+        ForeignLeaf(CONST_KEYWORD: const)('const')
+        ForeignLeaf(ASTERISK: *)('*')
+        ForeignLeaf(IDENTIFIER: rhs)('rhs')
+      ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  CPsiDeclarationMethodImpl: 
+    CPsiModifierListImpl: 
+      ForeignLeaf(STATIC_KEYWORD: static)('static')
+    CPsiTypeRefImpl: 
+      ForeignLeaf(INT_KEYWORD: int)('int')
+    ForeignLeaf(IDENTIFIER: compareThreeWay)('compareThreeWay')
+    CPsiParameterListImpl: 
+      ForeignLeaf(LPARENTH: ()('(')
+      CPsiParameterImpl: 
+        CPsiTypeRefImpl: 
+          ForeignLeaf(STRUCT_KEYWORD: struct)('struct')
+          ForeignLeaf(IDENTIFIER: latin)('latin')
+        ForeignLeaf(CONST_KEYWORD: const)('const')
+        ForeignLeaf(ASTERISK: *)('*')
+        ForeignLeaf(IDENTIFIER: lhs)('lhs')
+      ForeignLeaf(COMMA: ,)(',')
+      CPsiParameterImpl: 
+        CPsiTypeRefImpl: 
+          ForeignLeaf(STRUCT_KEYWORD: struct)('struct')
+          ForeignLeaf(IDENTIFIER: latin)('latin')
+        ForeignLeaf(CONST_KEYWORD: const)('const')
+        ForeignLeaf(ASTERISK: *)('*')
+        ForeignLeaf(IDENTIFIER: rhs)('rhs')
+      ForeignLeaf(RPARENTH: ))(')')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: int after;
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('after')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')

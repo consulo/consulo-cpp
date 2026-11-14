@@ -79,7 +79,14 @@ public class ResolveCoverageTest {
 
     @Test
     public void modernCpp(Application application, ProjectManager projectManager) throws Exception {
-        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp", "geometry.h", "geometry.cpp", "app.cpp"));
+        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp", "geometry.h", "geometry.cpp", "app.cpp", "gtest_sample.cpp"));
+    }
+
+    @Test
+    public void qtCore(Application application, ProjectManager projectManager) throws Exception {
+        assumeTrue(Files.isDirectory(Path.of("/usr/include/qt6/QtCore")), "Qt 6 is not installed");
+        check(application, projectManager, "/usr/bin/g++",
+            List.of("-x", "c++", "-std=c++20", "-fPIC", "-I/usr/include/qt6", "-I/usr/include/qt6/QtCore"), List.of("qt_sample.cpp"));
     }
 
     @Test
@@ -106,11 +113,17 @@ public class ResolveCoverageTest {
         Map<String, String> defines = new LinkedHashMap<>();
         List<String> includePaths = new ArrayList<>();
         probe(compiler, options, defines, includePaths);
+        long started = System.nanoTime();
         Project project = openProject(application, projectManager, directory, defines, includePaths);
+        long indexed = System.nanoTime();
         List<String> failures = new ArrayList<>();
         for (String sample : samples) {
+            long sampleStarted = System.nanoTime();
             failures.addAll(unresolvedIn(project, directory.resolve(sample)));
+            System.out.println("TIMING " + sample + ": " + (System.nanoTime() - sampleStarted) / 1_000_000 + " ms to resolve");
         }
+        System.out.println("TIMING " + compiler + ": " + (indexed - started) / 1_000_000 + " ms to open and index, "
+            + (System.nanoTime() - indexed) / 1_000_000 + " ms to resolve");
         assertTrue(failures.isEmpty(), "references resolving to nothing: " + failures);
     }
 

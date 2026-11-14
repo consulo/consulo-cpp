@@ -60,6 +60,23 @@ public class CExpandTest extends CParsingBaseTest {
     }
 
     /**
+     * Qt's Q_DECLARE_STRONGLY_ORDERED_LITERAL_TYPE: an overloaded macro whose helpers take empty, commented arguments,
+     * one with its parameters continued over lines
+     */
+    @Test
+    public void testQtOrderingMacro(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
+     * Qt's QT_OVERLOADED_MACRO: the count of the arguments pasted onto the name of the macro called with them
+     */
+    @Test
+    public void testOverloadedMacro(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * {@code #define MY_INT int} used in a global variable declaration
      */
     @Test

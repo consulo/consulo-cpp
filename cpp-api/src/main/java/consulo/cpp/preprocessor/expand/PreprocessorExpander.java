@@ -25,6 +25,7 @@ import consulo.virtualFileSystem.light.LightVirtualFileBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,7 +42,17 @@ import java.util.Set;
 public class PreprocessorExpander {
     public static final Key<PreprocessorExpander> EXPANDER_KEY = Key.create("PreprocessorExpander");
 
-    private final Map<String, ExpandedMacro> myDefines = new LinkedHashMap<>();
+    /**
+     * The macros in scope - of an included file, its includer's own map, which it changes in place: copying thousands
+     * of macros for each {@code #include} is most of the cost of expanding a header.
+     */
+    private final Map<String, ExpandedMacro> myDefines;
+
+    /**
+     * The names this expansion - and the includes it expands - defined or undefined, each with what it was before the
+     * first change - null for one undefined before: what an includer records of an include.
+     */
+    private final Map<String, ExpandedMacro> myTouched = new HashMap<>();
 
     /**
      * A change of a macro by a directive of the file: from {@code offset} on, the macro is {@code macro} - {@code null}
@@ -82,13 +93,13 @@ public class PreprocessorExpander {
     private final List<VirtualFile> myIncludePaths;
 
     public PreprocessorExpander(PsiFile preprocessorFile, CLanguageVersion languageVersion) {
-        this(preprocessorFile, languageVersion, new HashSet<>(), Collections.emptyList(), Collections.emptyMap(), List.of());
+        this(preprocessorFile, languageVersion, new HashSet<>(), Collections.emptyList(), new LinkedHashMap<>(), List.of());
     }
 
     public PreprocessorExpander(PsiFile preprocessorFile,
                                 CLanguageVersion languageVersion,
                                 @NotNull List<VirtualFile> includePaths) {
-        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, Collections.emptyMap(), List.of());
+        this(preprocessorFile, languageVersion, new HashSet<>(), includePaths, new LinkedHashMap<>(), List.of());
     }
 
     /**
@@ -116,7 +127,8 @@ public class PreprocessorExpander {
 
     /**
      * @param inheritedMacros the macros in scope above the first line - the macros themselves, so a function-like
-     *                        macro an including file defined stays function-like here
+     *                        macro an including file defined stays function-like here; the map is the expansion's own,
+     *                        changed by its directives
      */
     private PreprocessorExpander(PsiFile preprocessorFile,
                                  CLanguageVersion languageVersion,
@@ -128,8 +140,7 @@ public class PreprocessorExpander {
         myLanguageVersion = languageVersion;
         myProcessedFiles = processedFiles;
         myIncludePaths = includePaths;
-
-        myDefines.putAll(inheritedMacros);
+        myDefines = inheritedMacros;
 
         VirtualFile vFile = sourceFile(preprocessorFile);
         if (vFile != null) {
@@ -314,24 +325,19 @@ public class PreprocessorExpander {
         }
 
         // Recursively expand the included file, sharing the processed-files set and include paths
+        // The child changes our defines in place, so they are the state after the include; what it changed it
+        // tells, with what each name was before.
         PreprocessorExpander childExpander =
                 new PreprocessorExpander(preprocessorRoot, myLanguageVersion, myProcessedFiles, myIncludePaths, myDefines, List.of());
-        // The child started from our defines, so its final state is the state after the include: names it
-        // undefined are gone, the rest are added or overridden.
-        if (myDirectiveOffset >= 0) {
-            for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
-                if (!childExpander.myDefines.containsKey(entry.getKey())) {
-                    recordChange(entry.getKey(), null);
-                }
-            }
-            for (Map.Entry<String, ExpandedMacro> entry : childExpander.myDefines.entrySet()) {
-                if (myDefines.get(entry.getKey()) != entry.getValue()) {
-                    recordChange(entry.getKey(), entry.getValue());
-                }
+        for (Map.Entry<String, ExpandedMacro> entry : childExpander.myTouched.entrySet()) {
+            String name = entry.getKey();
+            ExpandedMacro before = entry.getValue();
+            myTouched.putIfAbsent(name, before);
+            ExpandedMacro after = myDefines.get(name);
+            if (before != after) {
+                recordChange(name, before, after);
             }
         }
-        myDefines.keySet().retainAll(childExpander.myDefines.keySet());
-        myDefines.putAll(childExpander.myDefines);
     }
 
     /**
@@ -382,14 +388,22 @@ public class PreprocessorExpander {
         @Override
         public void define(String name, @Nullable List<String> parameters, CharSequence value, @Nullable CPreprocessorDefineDirective element) {
             ExpandedMacro macro = new ExpandedMacro(myLanguageVersion, name, parameters, element, value);
-            recordChange(name, macro);
+            recordChange(name, myDefines.get(name), macro);
+            touch(name);
             myDefines.put(name, macro);
         }
 
         @Override
         public void undefine(String name) {
-            recordChange(name, null);
+            recordChange(name, myDefines.get(name), null);
+            touch(name);
             myDefines.remove(name);
+        }
+
+        private void touch(String name) {
+            if (!myTouched.containsKey(name)) {
+                myTouched.put(name, myDefines.get(name));
+            }
         }
 
         @Override
@@ -459,25 +473,58 @@ public class PreprocessorExpander {
     }
 
     /**
-     * The parameters of the function-like macros defined, for conditions calling them - {@code __GLIBC_USE(LIB_EXT2)}.
+     * The parameters of the function-like macros defined, for conditions calling them - {@code __GLIBC_USE(LIB_EXT2)}: a
+     * view of the macros, read where a condition asks - copying them for each {@code #if} costs as much as the headers
+     * have macros, thousands.
      */
     private Map<String, List<String>> parametersView() {
-        Map<String, List<String>> view = new LinkedHashMap<>();
-        for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
-            List<String> parameters = entry.getValue().getParameters();
-            if (parameters != null) {
-                view.put(entry.getKey(), parameters);
+        return new MacroView<>() {
+            @Override
+            public @Nullable List<String> get(Object name) {
+                ExpandedMacro macro = myDefines.get(name);
+                return macro == null ? null : macro.getParameters();
             }
-        }
-        return view;
+
+            @Override
+            public boolean containsKey(Object name) {
+                return get(name) != null;
+            }
+        };
     }
 
+    /**
+     * The texts of the macros defined, a view as {@link #parametersView()} is.
+     */
     private Map<String, String> definesView() {
-        Map<String, String> view = new LinkedHashMap<>();
-        for (Map.Entry<String, ExpandedMacro> entry : myDefines.entrySet()) {
-            view.put(entry.getKey(), entry.getValue().getText().toString());
+        return new MacroView<>() {
+            @Override
+            public @Nullable String get(Object name) {
+                ExpandedMacro macro = myDefines.get(name);
+                return macro == null ? null : macro.getText().toString();
+            }
+
+            @Override
+            public boolean containsKey(Object name) {
+                return myDefines.containsKey(name);
+            }
+        };
+    }
+
+    /**
+     * A map over {@link #myDefines} answering lookups by name; iterating it copies.
+     */
+    private abstract class MacroView<V> extends AbstractMap<String, V> {
+        @Override
+        public Set<Entry<String, V>> entrySet() {
+            Map<String, V> copy = new LinkedHashMap<>();
+            for (String name : myDefines.keySet()) {
+                V value = get(name);
+                if (value != null) {
+                    copy.put(name, value);
+                }
+            }
+            return copy.entrySet();
         }
-        return view;
     }
 
     /**
@@ -602,16 +649,16 @@ public class PreprocessorExpander {
     }
 
     /**
-     * Records that the directive being expanded makes {@code name} {@code macro}; before {@link #myDefines} changes.
+     * Records that the directive being expanded makes {@code name}, which was {@code before}, {@code macro}.
      */
-    private void recordChange(String name, @Nullable ExpandedMacro macro) {
+    private void recordChange(String name, @Nullable ExpandedMacro before, @Nullable ExpandedMacro macro) {
         if (myDirectiveOffset < 0) {
             return;
         }
         List<MacroChange> changes = myChanges.get(name);
         if (changes == null) {
             changes = new ArrayList<>(2);
-            changes.add(new MacroChange(-1, myDefines.get(name)));
+            changes.add(new MacroChange(-1, before));
             myChanges.put(name, changes);
         }
         changes.add(new MacroChange(templateOffsetOf(myDirectiveOffset), macro));

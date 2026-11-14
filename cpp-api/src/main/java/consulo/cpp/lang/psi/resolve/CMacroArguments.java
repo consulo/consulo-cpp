@@ -24,7 +24,9 @@ import consulo.cpp.preprocessor.expand.CMacroArgumentLeafType;
 import consulo.cpp.preprocessor.psi.CPreprocessorElementTypes;
 import consulo.document.util.TextRange;
 import consulo.language.impl.psi.ForeignLeafPsiElement;
+import consulo.language.psi.PsiComment;
 import consulo.language.psi.PsiElement;
+import consulo.language.psi.PsiWhiteSpace;
 import consulo.language.psi.util.PsiTreeUtil;
 import org.jspecify.annotations.Nullable;
 
@@ -104,17 +106,43 @@ public final class CMacroArguments {
         if (parent instanceof CPsiTypeRef || parent instanceof CPsiDoubleColonTypeRef || parent instanceof CPsiSuperClass) {
             CNameResolver.NameChain chain = CNameResolver.nameChainOf(parent);
             int index = chain.segments().indexOf(leaf);
-            if (index < 0) {
-                return null;
+            if (index >= 0) {
+                Set<CDeclarationKind> lastKinds = parent instanceof CPsiDoubleColonTypeRef ? CDeclarationKind.SCOPES : CDeclarationKind.TYPES;
+                List<@Nullable PsiElement> targets = CNameResolver.resolveChain(parent, chain, lastKinds);
+                return index < targets.size() ? targets.get(index) : null;
             }
-            Set<CDeclarationKind> lastKinds = parent instanceof CPsiDoubleColonTypeRef ? CDeclarationKind.SCOPES : CDeclarationKind.TYPES;
-            List<@Nullable PsiElement> targets = CNameResolver.resolveChain(parent, chain, lastKinds);
-            return index < targets.size() ? targets.get(index) : null;
         }
         if (parent != null && CDeclarations.nameIdentifier(parent) == leaf) {
             // a declaration the macro makes, named by an argument
             return parent;
         }
+        if (parent instanceof CPsiTypeRef || parent instanceof CPsiReferenceExpression || parent instanceof CPsiDoubleColonTypeRef
+            || parent instanceof CPsiSuperClass) {
+            // a name of the template arguments, Holder<test_suite_name>: the a::b:: before it, from where it is
+            List<PsiElement> segments = new ArrayList<>();
+            segments.add(leaf);
+            boolean global = false;
+            PsiElement previous = previousSignificant(leaf);
+            while (previous != null && previous.getNode().getElementType() == CPsiTokens.DOUBLE_COLON) {
+                PsiElement qualifier = previousSignificant(previous);
+                if (qualifier == null || qualifier.getNode().getElementType() != CPsiTokens.IDENTIFIER) {
+                    global = qualifier == null || qualifier.getNode().getElementType() != CPsiTokens.GT;
+                    break;
+                }
+                segments.add(0, qualifier);
+                previous = previousSignificant(qualifier);
+            }
+            List<PsiElement> targets = CNameResolver.resolveChainTargets(parent, new CNameResolver.NameChain(segments, global), CDeclarationKind.ALL);
+            return targets.isEmpty() ? null : targets.get(0);
+        }
         return null;
+    }
+
+    private static @Nullable PsiElement previousSignificant(PsiElement element) {
+        PsiElement previous = element.getPrevSibling();
+        while (previous instanceof PsiWhiteSpace || previous instanceof PsiComment) {
+            previous = previous.getPrevSibling();
+        }
+        return previous;
     }
 }

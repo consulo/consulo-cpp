@@ -20,6 +20,7 @@ import org.jspecify.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Evaluates the controlling expression of {@code #if} and {@code #elif}.
@@ -30,6 +31,8 @@ import java.util.Map;
  * condition simply hides its branch instead of breaking the parse.
  */
 public final class CPreprocessorConditionEvaluator {
+    private static final Pattern COMMENT = Pattern.compile("/\\*.*?\\*/|//.*", Pattern.DOTALL);
+
     private final String myText;
     private final Map<String, String> myDefines;
     /**
@@ -52,8 +55,9 @@ public final class CPreprocessorConditionEvaluator {
         if (condition == null) {
             return false;
         }
-        // a condition continued over lines, #if a \<newline> || b, is one line
-        String trimmed = condition.replace("\\\r\n", " ").replace("\\\n", " ").trim();
+        // a condition continued over lines, #if a \<newline> || b, is one line; a comment in it is none of it,
+        // #if !defined(QT_NAMESPACE) /* user namespace */
+        String trimmed = COMMENT.matcher(condition.replace("\\\r\n", " ").replace("\\\n", " ")).replaceAll(" ").trim();
         if (trimmed.isEmpty()) {
             return false;
         }

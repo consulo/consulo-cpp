@@ -1,0 +1,46 @@
+FILE
+  PsiElement(OUTER)('#define QT_VA_ARGS_CHOOSE(_1, _2, _3, N, ...) N')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_VA_ARGS_EXPAND(...) __VA_ARGS__')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_VA_ARGS_COUNT(...) QT_VA_ARGS_EXPAND(QT_VA_ARGS_CHOOSE(__VA_ARGS__, 3, 2, 1, 0))')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC) MACRO##_##ARGC')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO_IMP(MACRO, ARGC) QT_OVERLOADED_MACRO_EXPAND(MACRO, ARGC)')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define QT_OVERLOADED_MACRO(MACRO, ...) QT_VA_ARGS_EXPAND(QT_OVERLOADED_MACRO_IMP(MACRO, QT_VA_ARGS_COUNT(__VA_ARGS__))(__VA_ARGS__))')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define DECLARE_1(Type) int compare_##Type;')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define DECLARE_2(Left, Right) int compare_##Left##_##Right;')
+  PsiWhiteSpace('\n')
+  PsiElement(OUTER)('#define DECLARE(...) QT_OVERLOADED_MACRO(DECLARE, __VA_ARGS__)')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: DECLARE(point)
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: DECLARE(point)
+      CPreprocessorMacroInvocation(DECLARE)('DECLARE(point)')
+      ForeignLeaf(INT_KEYWORD: int)('int')
+    ForeignLeaf(IDENTIFIER: compare_point)('compare_point')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: DECLARE(left, right)
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: DECLARE(left, right)
+      CPreprocessorMacroInvocation(DECLARE)('DECLARE(left, right)')
+      ForeignLeaf(INT_KEYWORD: int)('int')
+    ForeignLeaf(IDENTIFIER: compare_left_right)('compare_left_right')
+    ForeignLeaf(SEMICOLON: ;)(';')
+  PsiWhiteSpace('\n')
+  CPsiFieldImpl: int after;
+    CPsiModifierListImpl: 
+      <empty list>
+    CPsiTypeRefImpl: int
+      PsiElement(INT_KEYWORD)('int')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('after')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')

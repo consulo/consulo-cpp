@@ -127,10 +127,12 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
 
         // (
         builder.advanceLexer();
+        skipContinuation(builder);
 
         while (!builder.eof() && builder.getTokenType() != RPARENTH && builder.getTokenType() != NEW_LINE) {
             if (builder.getTokenType() == IDENTIFIER || builder.getTokenType() == ELLIPSIS) {
                 builder.advanceLexer();
+                skipContinuation(builder);
             }
             else {
                 error(builder, CLocalize.identifierExpected());
@@ -139,6 +141,7 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
 
             if (builder.getTokenType() == COMMA) {
                 builder.advanceLexer();
+                skipContinuation(builder);
             }
             else {
                 break;
@@ -148,6 +151,18 @@ public class CPreprocessorDirectiveParser extends CPreprocessorParserHelper {
         checkMatchesWithoutLines(builder, RPARENTH, CLocalize.rparenthExpected());
 
         marker.done(CPreprocessorElementTypes.DEFINE_PARAMETER_LIST);
+    }
+
+    /**
+     * Over a backslash ending the line, which continues the parameters on the next: {@code #define F(a, \}.
+     */
+    private static void skipContinuation(PsiBuilder builder) {
+        while (builder.getTokenType() == NEXT_LINE) {
+            builder.advanceLexer();
+            if (builder.getTokenType() == NEW_LINE) {
+                builder.advanceLexer();
+            }
+        }
     }
 
     public static void parseUndef(PsiBuilder builder) {

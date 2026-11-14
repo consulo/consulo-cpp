@@ -101,6 +101,15 @@ public class CPPParsingTest extends CParsingBaseTest {
     }
 
     /**
+     * The comparison operators Qt's Q_DECLARE_STRONGLY_ORDERED declares: {@code noexcept(true)}, a lambda in a
+     * {@code static_assert}, {@code operator<=>}
+     */
+    @Test
+    public void testQtComparisonOperators(Context context) throws Exception {
+        doTest(context, null);
+    }
+
+    /**
      * {@code template <typename T> concept C = requires(...) { ... };} and a parameter constrained by it
      */
     @Test

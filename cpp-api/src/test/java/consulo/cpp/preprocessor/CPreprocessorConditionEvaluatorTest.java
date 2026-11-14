@@ -69,6 +69,14 @@ public class CPreprocessorConditionEvaluatorTest {
     }
 
     @Test
+    public void comments() {
+        // Qt's qtconfigmacros.h
+        assertTrue(eval("!defined(QT_NAMESPACE) || defined(Q_MOC_RUN) /* user namespace */"));
+        assertTrue(eval("DEBUG // a debug build"));
+        assertFalse(eval("ZERO /* still 0 */ && DEBUG"));
+    }
+
+    @Test
     public void continuedLines() {
         assertTrue(eval("defined(DEBUG) \\\n    && LEVEL == 3"));
     }

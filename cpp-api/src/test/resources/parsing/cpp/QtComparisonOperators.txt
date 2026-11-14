@@ -1,0 +1,246 @@
+FILE
+  CPsiStructDeclarationImpl: struct QLatin1Char {
+    friend constexpr bool operator==(QLatin1Char const &lhs, QLatin1Char const &rhs) noexcept(true) { constexpr auto f = []() noexcept(true) {}; static_assert(!noexcept(f()) || noexcept(comparesEqual(lhs, rhs)), "Use *_NON_NOEXCEPT version of the macro, " "or make the helper function noexcept"); return comparesEqual(lhs, rhs); } friend constexpr std::strong_ordering operator<=>(QLatin1Char const &lhs, QLatin1Char const &rhs) noexcept(true) { return compareThreeWay(lhs, rhs); }
+    friend constexpr bool comparesEqual(const QLatin1Char &lhs, char rhs) noexcept { return true; }
+};
+    PsiElement(STRUCT_KEYWORD)('struct')
+    PsiWhiteSpace(' ')
+    PsiElement(IDENTIFIER)('QLatin1Char')
+    PsiWhiteSpace(' ')
+    PsiElement(LBRACE)('{')
+    PsiWhiteSpace('\n    ')
+    CPsiImplementingMethodImpl: friend constexpr bool operator==(QLatin1Char const &lhs, QLatin1Char const &rhs) noexcept(true) { constexpr auto f = []() noexcept(true) {}; static_assert(!noexcept(f()) || noexcept(comparesEqual(lhs, rhs)), "Use *_NON_NOEXCEPT version of the macro, " "or make the helper function noexcept"); return comparesEqual(lhs, rhs); }
+      CPsiModifierListImpl: friend constexpr
+        PsiElement(FRIEND_KEYWORD)('friend')
+        PsiWhiteSpace(' ')
+        PsiElement(CONSTEXPR_KEYWORD)('constexpr')
+      PsiWhiteSpace(' ')
+      CPsiTypeRefImpl: bool
+        PsiElement(BOOL_KEYWORD)('bool')
+      PsiWhiteSpace(' ')
+      PsiElement(OPERATOR_KEYWORD)('operator')
+      PsiElement(EQEQ)('==')
+      CPsiParameterListImpl: (QLatin1Char const &lhs, QLatin1Char const &rhs)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: QLatin1Char const &lhs
+          CPsiModifierListImpl: QLatin1Char const
+            PsiElement(IDENTIFIER)('QLatin1Char')
+            PsiWhiteSpace(' ')
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('lhs')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiParameterImpl: QLatin1Char const &rhs
+          CPsiModifierListImpl: QLatin1Char const
+            PsiElement(IDENTIFIER)('QLatin1Char')
+            PsiWhiteSpace(' ')
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('rhs')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+      PsiElement(LPARENTH)('(')
+      PsiElement(BOOL_LITERAL)('true')
+      PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: { constexpr auto f = []() noexcept(true) {}; static_assert(!noexcept(f()) || noexcept(comparesEqual(lhs, rhs)), "Use *_NON_NOEXCEPT version of the macro, " "or make the helper function noexcept"); return comparesEqual(lhs, rhs); }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiLocalVariableImpl: constexpr auto f = []() noexcept(true) {};
+          CPsiModifierListImpl: constexpr auto
+            PsiElement(CONSTEXPR_KEYWORD)('constexpr')
+            PsiWhiteSpace(' ')
+            PsiElement(AUTO_KEYWORD)('auto')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('f')
+          PsiWhiteSpace(' ')
+          PsiElement(EQ)('=')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: []() noexcept(true) {}
+            PsiElement(LBRACKET)('[')
+            PsiElement(RBRACKET)(']')
+            CPsiParameterListImpl: ()
+              PsiElement(LPARENTH)('(')
+              PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+            PsiElement(LPARENTH)('(')
+            PsiElement(BOOL_LITERAL)('true')
+            PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            CPsiCodeBlockImpl: {}
+              PsiElement(LBRACE)('{')
+              PsiElement(RBRACE)('}')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        CPsiStaticAssertImpl: static_assert(!noexcept(f()) || noexcept(comparesEqual(lhs, rhs)), "Use *_NON_NOEXCEPT version of the macro, " "or make the helper function noexcept");
+          PsiElement(STATIC_ASSERT_KEYWORD)('static_assert')
+          PsiElement(LPARENTH)('(')
+          CPsiBinaryExpressionImpl: !noexcept(f()) || noexcept(comparesEqual(lhs, rhs))
+            CPsiPrefixExpressionImpl: !noexcept(f())
+              PsiElement(EXCL)('!')
+              CPsiCallExpressionImpl: noexcept(f())
+                PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+                PsiElement(LPARENTH)('(')
+                PsiElement(IDENTIFIER)('f')
+                PsiElement(LPARENTH)('(')
+                PsiElement(RPARENTH)(')')
+                PsiElement(RPARENTH)(')')
+            PsiWhiteSpace(' ')
+            PsiElement(OROR)('||')
+            PsiWhiteSpace(' ')
+            CPsiCallExpressionImpl: noexcept(comparesEqual(lhs, rhs))
+              PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+              PsiElement(LPARENTH)('(')
+              PsiElement(IDENTIFIER)('comparesEqual')
+              PsiElement(LPARENTH)('(')
+              PsiElement(IDENTIFIER)('lhs')
+              PsiElement(COMMA)(',')
+              PsiWhiteSpace(' ')
+              PsiElement(IDENTIFIER)('rhs')
+              PsiElement(RPARENTH)(')')
+              PsiElement(RPARENTH)(')')
+          PsiElement(COMMA)(',')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: "Use *_NON_NOEXCEPT version of the macro, " "or make the helper function noexcept"
+            PsiElement(STRING_LITERAL)('"Use *_NON_NOEXCEPT version of the macro, "')
+            PsiWhiteSpace(' ')
+            PsiElement(STRING_LITERAL)('"or make the helper function noexcept"')
+          PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        CPsiReturnStatementImpl: return comparesEqual(lhs, rhs);
+          PsiElement(RETURN_KEYWORD)('return')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: comparesEqual(lhs, rhs)
+            CPsiReferenceExpressionImpl: comparesEqual
+              PsiElement(IDENTIFIER)('comparesEqual')
+            CPsiArgumentListImpl: (lhs, rhs)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: lhs
+                PsiElement(IDENTIFIER)('lhs')
+              PsiElement(COMMA)(',')
+              PsiWhiteSpace(' ')
+              CPsiReferenceExpressionImpl: rhs
+                PsiElement(IDENTIFIER)('rhs')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace(' ')
+    CPsiImplementingMethodImpl: friend constexpr std::strong_ordering operator<=>(QLatin1Char const &lhs, QLatin1Char const &rhs) noexcept(true) { return compareThreeWay(lhs, rhs); }
+      CPsiModifierListImpl: friend constexpr
+        PsiElement(FRIEND_KEYWORD)('friend')
+        PsiWhiteSpace(' ')
+        PsiElement(CONSTEXPR_KEYWORD)('constexpr')
+      PsiWhiteSpace(' ')
+      CPsiTypeRefImpl: std::strong_ordering
+        PsiElement(IDENTIFIER)('std')
+        PsiElement(DOUBLE_COLON)('::')
+        PsiElement(IDENTIFIER)('strong_ordering')
+      PsiWhiteSpace(' ')
+      PsiElement(OPERATOR_KEYWORD)('operator')
+      PsiElement(LE)('<=')
+      PsiElement(GT)('>')
+      CPsiParameterListImpl: (QLatin1Char const &lhs, QLatin1Char const &rhs)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: QLatin1Char const &lhs
+          CPsiModifierListImpl: QLatin1Char const
+            PsiElement(IDENTIFIER)('QLatin1Char')
+            PsiWhiteSpace(' ')
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('lhs')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiParameterImpl: QLatin1Char const &rhs
+          CPsiModifierListImpl: QLatin1Char const
+            PsiElement(IDENTIFIER)('QLatin1Char')
+            PsiWhiteSpace(' ')
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('rhs')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+      PsiElement(LPARENTH)('(')
+      PsiElement(BOOL_LITERAL)('true')
+      PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: { return compareThreeWay(lhs, rhs); }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiReturnStatementImpl: return compareThreeWay(lhs, rhs);
+          PsiElement(RETURN_KEYWORD)('return')
+          PsiWhiteSpace(' ')
+          CPsiCallExpressionImpl: compareThreeWay(lhs, rhs)
+            CPsiReferenceExpressionImpl: compareThreeWay
+              PsiElement(IDENTIFIER)('compareThreeWay')
+            CPsiArgumentListImpl: (lhs, rhs)
+              PsiElement(LPARENTH)('(')
+              CPsiReferenceExpressionImpl: lhs
+                PsiElement(IDENTIFIER)('lhs')
+              PsiElement(COMMA)(',')
+              PsiWhiteSpace(' ')
+              CPsiReferenceExpressionImpl: rhs
+                PsiElement(IDENTIFIER)('rhs')
+              PsiElement(RPARENTH)(')')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n    ')
+    CPsiImplementingMethodImpl: friend constexpr bool comparesEqual(const QLatin1Char &lhs, char rhs) noexcept { return true; }
+      CPsiModifierListImpl: friend constexpr
+        PsiElement(FRIEND_KEYWORD)('friend')
+        PsiWhiteSpace(' ')
+        PsiElement(CONSTEXPR_KEYWORD)('constexpr')
+      PsiWhiteSpace(' ')
+      CPsiTypeRefImpl: bool
+        PsiElement(BOOL_KEYWORD)('bool')
+      PsiWhiteSpace(' ')
+      PsiElement(IDENTIFIER)('comparesEqual')
+      CPsiParameterListImpl: (const QLatin1Char &lhs, char rhs)
+        PsiElement(LPARENTH)('(')
+        CPsiParameterImpl: const QLatin1Char &lhs
+          CPsiModifierListImpl: const
+            PsiElement(CONST_KEYWORD)('const')
+          PsiWhiteSpace(' ')
+          CPsiTypeRefImpl: QLatin1Char
+            PsiElement(IDENTIFIER)('QLatin1Char')
+          PsiWhiteSpace(' ')
+          PsiElement(AND)('&')
+          PsiElement(IDENTIFIER)('lhs')
+        PsiElement(COMMA)(',')
+        PsiWhiteSpace(' ')
+        CPsiParameterImpl: char rhs
+          CPsiModifierListImpl: 
+            <empty list>
+          CPsiTypeRefImpl: char
+            PsiElement(CHAR_KEYWORD)('char')
+          PsiWhiteSpace(' ')
+          PsiElement(IDENTIFIER)('rhs')
+        PsiElement(RPARENTH)(')')
+      PsiWhiteSpace(' ')
+      PsiElement(NOEXCEPT_KEYWORD)('noexcept')
+      PsiWhiteSpace(' ')
+      CPsiCodeBlockImpl: { return true; }
+        PsiElement(LBRACE)('{')
+        PsiWhiteSpace(' ')
+        CPsiReturnStatementImpl: return true;
+          PsiElement(RETURN_KEYWORD)('return')
+          PsiWhiteSpace(' ')
+          CPsiLiteralExpressionImpl: true
+            PsiElement(BOOL_LITERAL)('true')
+          PsiElement(SEMICOLON)(';')
+        PsiWhiteSpace(' ')
+        PsiElement(RBRACE)('}')
+    PsiWhiteSpace('\n')
+    PsiElement(RBRACE)('}')
+    PsiElement(SEMICOLON)(';')
+  PsiWhiteSpace('\n')
