@@ -75,7 +75,7 @@ int main() {
     for (const geo::Node& node : graph) {
         for (const auto& edge : node.edges()) {
             std::ostringstream out;
-            out << node.label() << " -> " << edge.target << " (" << edge.weight << ")";
+            out << node.label() << " -> " << edge.target << " (" << edge.weight << ")";  //> label -> Node
         }
     }
 
@@ -86,13 +86,13 @@ int main() {
     }
     auto it = ages.find("ann");
     if (it != ages.end()) {
-        it->second += 1;
+        it->second += 1;  //> second -> pair
         (void) it->first.length();
     }
 
     std::pair<int, std::string> pair{1, "one"};
     (void) pair.first;
-    (void) pair.second.empty();
+    (void) pair.second.empty();  //> empty -> basic_string
     auto tuple = std::make_tuple(1, 2.0, std::string("three"));
     (void) std::get<0>(tuple);
 
@@ -100,12 +100,12 @@ int main() {
     shared->connect(0, 0.5);
     std::weak_ptr<geo::Node> weak = shared;
     if (auto locked = weak.lock()) {
-        (void) locked->label();
+        (void) locked->label();  //> label -> Node
     }
 
     geo::Stack<geo::Vec> stack;
     stack.push(geo::Vec{1, 2});
-    double length = stack.top().dot(stack.top());
+    double length = stack.top().dot(stack.top());  //> dot -> Vec
     geo::Vec sum = stack.top() + geo::Vec{3, 4};
     (void) sum.x;
 

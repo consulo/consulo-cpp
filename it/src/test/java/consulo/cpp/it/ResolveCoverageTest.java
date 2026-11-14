@@ -63,7 +63,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * How much of everyday C and C++ files resolves - the standard library, classes, templates, lambdas - in a module set up as
  * an import sets one up: the macros and include directories of g++ or gcc, the include directories as a library. Reports the
  * references which resolve to nothing, and the names no reference covers, to show where resolve falls short; there
- * should be none.
+ * should be none. A sample says where some of its names resolve to with {@code //> name -> Owner@file}.
  *
  * @author VISTALL
  * @since 2026-11-14
@@ -79,7 +79,7 @@ public class ResolveCoverageTest {
 
     @Test
     public void modernCpp(Application application, ProjectManager projectManager) throws Exception {
-        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp"));
+        check(application, projectManager, "/usr/bin/g++", List.of("-x", "c++", "-std=c++20"), List.of("modern.cpp", "advanced.cpp", "library.cpp", "idioms.cpp", "operators.cpp", "geometry.h", "geometry.cpp", "app.cpp"));
     }
 
     @Test
@@ -144,8 +144,34 @@ public class ResolveCoverageTest {
                             int line = (int) text.substring(0, Math.min(offset, text.length())).chars().filter(c -> c == '\n').count() + 1;
                             unresolved.computeIfAbsent(reference.getCanonicalText(), key -> new ArrayList<>()).add(line);
                         }
+                        else {
+                            String wrong = wrongTarget(reference);
+                            if (wrong != null) {
+                                int offset = element.getTextRange().getStartOffset() + reference.getRangeInElement().getStartOffset();
+                                int line = (int) text.substring(0, Math.min(offset, text.length())).chars().filter(c -> c == '\n').count() + 1;
+                                unresolved.computeIfAbsent(reference.getCanonicalText() + " (resolves to " + wrong + ")", key -> new ArrayList<>()).add(line);
+                            }
+                        }
                     }
                 }
+            }
+        });
+        List<String> wrongTargets = new ArrayList<>();
+        ReadAction.run(() -> {
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(file);
+            String text = psiFile.getText();
+            String[] lines = text.split("\n", -1);
+            int lineStart = 0;
+            for (int number = 1; number <= lines.length; number++) {
+                String line = lines[number - 1];
+                java.util.regex.Matcher mark = TARGET_MARK.matcher(line);
+                if (mark.find()) {
+                    String problem = checkTarget(psiFile, lineStart, line, mark.group(1), mark.group(2), mark.group(3));
+                    if (problem != null) {
+                        wrongTargets.add(file.getName() + ":" + number + " " + problem);
+                    }
+                }
+                lineStart += line.length() + 1;
             }
         });
         Map<String, List<Integer>> unreferenced = new TreeMap<>();
@@ -171,6 +197,7 @@ public class ResolveCoverageTest {
         List<String> failures = new ArrayList<>();
         unresolved.forEach((name, lines) -> failures.add(file.getName() + ": " + name + " at lines " + lines));
         unreferenced.forEach((name, lines) -> failures.add(file.getName() + ": " + name + " at lines " + lines + " has no reference"));
+        failures.addAll(wrongTargets);
         failures.forEach(failure -> System.out.println("COVERAGE unresolved " + failure));
         return failures;
     }
@@ -218,6 +245,59 @@ public class ResolveCoverageTest {
         }
         consulo.cpp.lang.psi.resolve.CType receiver = consulo.cpp.lang.psi.resolve.CTypes.receiverOf(expression);
         return receiver != null && receiver.isTemplateParameter();
+    }
+
+    /**
+     * {@code //> name -> Owner@file}: the first reference {@code name} of the line resolves to a member of {@code Owner} - a
+     * class or a namespace - declared in {@code file}.
+     */
+    private static final java.util.regex.Pattern TARGET_MARK = java.util.regex.Pattern.compile("//> (\\w+) -> (\\w+)(?:@([\\w.]+))?");
+
+    private static @org.jspecify.annotations.Nullable String checkTarget(PsiFile psiFile, int lineStart, String line, String name, String owner,
+                                                                       @org.jspecify.annotations.Nullable String fileName) {
+        int code = line.indexOf("//>");
+        for (int column = line.indexOf(name); column >= 0 && column < code; column = line.indexOf(name, column + 1)) {
+            PsiReference reference = psiFile.findReferenceAt(lineStart + column);
+            if (reference == null || !name.equals(reference.getCanonicalText())) {
+                continue;
+            }
+            PsiElement target = reference.resolve();
+            if (target == null) {
+                return name + " resolves to nothing";
+            }
+            PsiElement around = consulo.cpp.lang.psi.resolve.CDeclarations.enclosingAggregate(target);
+            if (around == null) {
+                around = PsiTreeUtil.getParentOfType(target, consulo.cpp.lang.psi.CPsiNamespaceDeclaration.class);
+            }
+            String actualOwner = around == null ? null : consulo.cpp.lang.psi.resolve.CDeclarations.nameOf(around);
+            String actualFile = target.getContainingFile().getName();
+            if (!owner.equals(actualOwner) || fileName != null && !fileName.equals(actualFile)) {
+                return name + " resolves to a member of " + actualOwner + " in " + actualFile + ", not of " + owner + (fileName == null ? "" : " in " + fileName);
+            }
+            return null;
+        }
+        return "no reference " + name;
+    }
+
+    /**
+     * The name of a declaration a reference resolves to when it is not the name written - {@code Point} of
+     * {@code Holder<geo::Point>} resolving to {@code Holder} - else {@code null}.
+     */
+    private static @org.jspecify.annotations.Nullable String wrongTarget(PsiReference reference) {
+        PsiElement target = reference.resolve();
+        if (target == null) {
+            return null;
+        }
+        String name = consulo.cpp.lang.psi.resolve.CDeclarations.introducedName(target);
+        if (name == null || name.equals(reference.getCanonicalText())) {
+            return null;
+        }
+        for (PsiElement binding : consulo.cpp.lang.psi.resolve.CDeclarations.bindingNames(target)) {
+            if (binding.getText().equals(reference.getCanonicalText())) {
+                return null;
+            }
+        }
+        return name + " in " + target.getContainingFile().getName();
     }
 
     private static boolean isResolved(PsiReference reference) {

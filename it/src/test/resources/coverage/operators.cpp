@@ -62,38 +62,38 @@ struct Pair {
 int main() {
     geom::Vec a{1, 2};
     geom::Vec b{3, 4};
-    double total = (a + b).length() + (a * 2.0).x + (-a).y;
+    double total = (a + b).length() + (a * 2.0).x + (-a).y;  //> length -> Vec
     a += b;
     (void) (a += b).length();
 
     std::vector<std::vector<geom::Vec>> rows(2, std::vector<geom::Vec>(2));
-    rows[0][1].x = 1;
+    rows[0][1].x = 1;  //> x -> Vec
 
     std::list<geom::Vec> path{a, b};
     std::list<geom::Vec>::iterator first = path.begin();
-    (void) (*first).y;
+    (void) (*first).y;  //> y -> Vec
     (void) first->x;
 
     std::unordered_map<int, geom::Vec> byId{{1, a}};
     if (auto it = byId.find(1); it != byId.end()) {
-        (void) it->second.length();
+        (void) it->second.length();  //> length -> Vec
     }
 
     geom::Grid grid = geom::Grid::make();
-    grid[0][0].value = geom::Grid::kSize;
+    grid[0][0].value = geom::Grid::kSize;  //> value -> Cell
     geom::Grid::Cell cell = grid.at(1, 1);
     (void) cell.visited;
     geom::Grid::Row& row = grid[1];
-    (void) row.front().value;
+    (void) row.front().value;  //> value -> Cell
 
     Pair pair{1, "one"};
     auto [number, name] = pair;
-    (void) name.size();
+    (void) name.size();  //> size -> basic_string
 
     auto make = [](double k) { return geom::Vec{k, k}; };
-    (void) make(2.0).length();
+    (void) make(2.0).length();  //> length -> Vec
     std::function<geom::Vec(double)> wrapped = make;
-    (void) wrapped(3.0).x;
+    (void) wrapped(3.0).x;  //> x -> Vec
 
     auto shared = std::make_shared<geom::Vec>(geom::Vec{5, 6});
     geom::Vec moved = std::move(*shared);
@@ -102,7 +102,7 @@ int main() {
     std::vector<geom::Vec> values{a, b};
     std::span<geom::Vec> view(values);
     (void) view[0].x;
-    (void) view.front().length();
+    (void) view.front().length();  //> length -> Vec
 
     return static_cast<int>(total + geom::measure(a)) + number;
 }

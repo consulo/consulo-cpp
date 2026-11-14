@@ -64,18 +64,18 @@ static pair<int, string> lookup(int key) { return make_pair(key, to_string(key))
 int main() {
     map<string, Point> named{{"origin", {0, 0}}, {"unit", {1, 1}}};
     for (auto& entry : named) {
-        entry.second.x += entry.first.size();
+        entry.second.x += entry.first.size();  //> x -> Point
     }
     named["far"].y = 100;
 
     array<Point, 3> corners{};
-    corners[1].x = 5;
+    corners[1].x = 5;  //> x -> Point
     corners.at(2).y = 6;
 
     vector<Point> points{{3, 4}, {1, 2}};
     auto found = find_if(points.begin(), points.end(), [](const Point& p) { return p.x > 2; });
     if (found != points.end()) {
-        found->y = 0;
+        found->y = 0;  //> y -> Point
     }
     int total = accumulate(points.begin(), points.end(), 0, [](int sum, const Point& p) { return sum + p.x; });
 
@@ -89,7 +89,7 @@ int main() {
     unique_ptr<Shape> shape = make_unique<Square>(2.0);
     if (shape->kind() == Shape::Kind::Square) {
         auto* square = static_cast<Square*>(shape.get());
-        (void) square->side();
+        (void) square->side();  //> side -> Square
     }
     decltype(points) copy = points;
     (void) copy.back().x;
@@ -99,7 +99,7 @@ int main() {
     (void) sorted.front();
 
     optional<Point> maybe;
-    (void) maybe.value_or(Point{}).x;
+    (void) maybe.value_or(Point{}).x;  //> x -> Point
 
     cout << setw(4) << numeric_limits<int>::max() << ' ' << string::npos << ' ' << total << endl;
     return static_cast<int>(sorted.size()) + a;
