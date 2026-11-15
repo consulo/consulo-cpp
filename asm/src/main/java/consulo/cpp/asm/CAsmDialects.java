@@ -73,7 +73,8 @@ final class CAsmDialects {
             int dash = target.indexOf('-');
             return dash < 0 ? target : target.substring(0, dash);
         }
-        return Platform.current().jvm().arch().name();
+        // the code is assembled for the machine - its system's architecture, not the JVM's
+        return Platform.current().os().arch().name();
     }
 
     private static @Nullable String targetOf(CPsiAsmCode code) {
